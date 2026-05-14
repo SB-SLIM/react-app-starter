@@ -1,0 +1,68 @@
+# --------------------
+# Dependencies
+# --------------------
+node_modules/
+.pnp/
+.pnp.js
+
+# --------------------
+# Builds & output
+# --------------------
+dist/
+build/
+out/
+.next/
+.next-cache/
+coverage/
+
+# --------------------
+# Logs
+# --------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --------------------
+# Environment files
+# --------------------
+.env
+.env.*
+!.env.example
+
+# --------------------
+# Cache / temp
+# --------------------
+.cache/
+.tmp/
+.temp/
+*.tsbuildinfo
+
+# --------------------
+# Monorepo tools
+# --------------------
+.nx/
+.nx-cache/
+.turbo/
+
+# --------------------
+# Editors / IDEs
+# --------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# --------------------
+# OS files
+# --------------------
+.DS_Store
+Thumbs.db
+
+# --------------------
+# Misc
+# --------------------
+*.log
