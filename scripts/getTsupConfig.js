@@ -15,7 +15,7 @@ export function baseConfig(opts) {
     target: [...legacyTargets, ...modernTargets],
     outDir: 'dist/',
     dts: true,
-    sourcemap: true,
+    sourcemap: process.argv.includes('--watch'),
     clean: true,
     splitting: false,
     minify: true,

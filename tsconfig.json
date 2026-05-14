@@ -4,6 +4,7 @@
   "references": [
     { "path": "./packages/core" },
     { "path": "./packages/ui-components" },
-    { "path": "./apps/admin" }
+    { "path": "./apps/admin" },
+    { "path": "./apps/web" }
   ]
 }

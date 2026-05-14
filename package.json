@@ -1,6 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-
   "name": "root",
   "private": true,
   "version": "1.0.0",
@@ -11,8 +10,12 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "dev:admin": "turbo run dev --filter=admin...",
+    "dev:web": "turbo run dev --filter=web...",
     "clean": "turbo run clean",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
   "keywords": [],
   "author": "",
@@ -22,12 +25,14 @@
     "overrides": {
       "@sb-codex/core": "workspace:^",
       "@sb-codex/ui-components": "workspace:^",
+      "react": "^19.0.0",
+      "react-dom": "^19.0.0",
       "@types/react": "^19.0.1",
       "@types/react-dom": "^19.0.2"
     }
   },
   "devDependencies": {
-    "turbo": "^2.5.4",
+    "@changesets/cli": "^2.31.0",
     "@types/node": "^24.7.2",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.1",
@@ -38,6 +43,7 @@
     "react-dom": "^19.2.0",
     "rimraf": "^6.0.1",
     "tsup": "^8.5.0",
+    "turbo": "^2.5.4",
     "typescript": "^5.9.3",
     "vite": "^7.1.9",
     "vitest": "^3.2.4"
