@@ -1,13 +1,14 @@
 # react-app-starter
 
-A monorepo starter using **pnpm workspaces** + **Turborepo**, with shared packages and a React 19 admin app.
+A monorepo starter using **pnpm workspaces** + **Turborepo**, with shared packages, a React 19 backoffice, and a Next.js front office.
 
 ## Structure
 
 ```
 .
 ├── apps/
-│   └── admin/          # React 19 + Vite application
+│   ├── admin/          # React 19 + Vite — backoffice
+│   └── web/            # Next.js 15 App Router — front office
 └── packages/
     ├── core/           # @sb-codex/core — utilities (cn classname helper)
     └── ui-components/  # @sb-codex/ui-components — React component library (Button, CardUser)
@@ -27,21 +28,26 @@ pnpm install
 # Start all packages in watch mode + all apps
 pnpm dev
 
-# Or start only the admin app (with its package dependencies)
+# Or start only one app (with its package dependencies)
 pnpm dev:admin
+pnpm dev:web
 ```
 
-The admin app runs at `http://localhost:5173` by default.
+| App     | URL                     |
+| ------- | ----------------------- |
+| `admin` | <http://localhost:5173>   |
+| `web`   | <http://localhost:3000>   |
 
 ## Commands
 
-| Command         | Description                                          |
-| --------------- | ---------------------------------------------------- |
-| `pnpm dev`      | Watch-build all packages and start all apps          |
-| `pnpm dev:admin`| Watch-build packages admin depends on + start admin  |
-| `pnpm build`    | Build all packages and apps (respects dep order)     |
-| `pnpm lint`     | Lint all packages and apps                           |
-| `pnpm clean`    | Remove all `dist/` outputs                           |
+| Command          | Description                                          |
+| ---------------- | ---------------------------------------------------- |
+| `pnpm dev`       | Watch-build all packages and start all apps          |
+| `pnpm dev:admin` | Watch-build packages admin depends on + start admin  |
+| `pnpm dev:web`   | Watch-build packages web depends on + start web      |
+| `pnpm build`     | Build all packages and apps (respects dep order)     |
+| `pnpm lint`      | Lint all packages and apps                           |
+| `pnpm clean`     | Remove all `dist/` outputs                           |
 
 ## Packages
 
@@ -57,11 +63,28 @@ cn('base-class', condition && 'conditional-class')
 
 ### `@sb-codex/ui-components`
 
-React component library built on top of `@sb-codex/core`.
+React component library built on top of `@sb-codex/core`. Compatible with both Vite and Next.js (interactive components are marked `'use client'`).
 
 ```tsx
 import { Button, CardUser } from '@sb-codex/ui-components'
 ```
+
+## Publishing Packages
+
+Versioning is managed with [Changesets](https://github.com/changesets/changesets).
+
+```bash
+# 1. Describe what changed (run after each meaningful change)
+pnpm changeset
+
+# 2. Bump versions + generate changelogs
+pnpm version
+
+# 3. Build and publish to npm
+pnpm release
+```
+
+> Packages are published under the `@sb-codex` scope with public access. Make sure you are logged in (`npm login`) before running `pnpm release`.
 
 ## Adding a New Package
 
@@ -74,9 +97,11 @@ See [CLAUDE.md](CLAUDE.md) for the full setup checklist.
 ## Tech Stack
 
 - [React 19](https://react.dev/)
-- [Vite 7](https://vite.dev/)
+- [Next.js 15](https://nextjs.org/) — front office (App Router)
+- [Vite 7](https://vite.dev/) — backoffice
 - [TypeScript 5](https://www.typescriptlang.org/)
 - [tsup](https://tsup.egoist.dev/) — package bundler (CJS + ESM + `.d.ts`)
 - [Turborepo](https://turbo.build/) — task orchestration and caching
 - [pnpm](https://pnpm.io/) — package manager with workspaces
+- [Changesets](https://github.com/changesets/changesets) — versioning and npm publishing
 - [ESLint 9](https://eslint.org/) + [Prettier 3](https://prettier.io/)
