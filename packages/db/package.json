@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@sb-codex/api-contracts",
+  "name": "@sb-codex/db",
   "version": "0.0.0",
   "type": "module",
   "license": "MIT",
@@ -17,7 +17,10 @@
   "scripts": {
     "clean": "premove ./dist",
     "build": "tsup --tsconfig tsconfig.json",
-    "dev": "tsup --watch --tsconfig tsconfig.json"
+    "dev": "tsup --watch --tsconfig tsconfig.json",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/migrate.ts",
+    "db:studio": "drizzle-kit studio"
   },
   "exports": {
     ".": {
@@ -27,10 +30,12 @@
     }
   },
   "dependencies": {
-    "@sb-codex/db": "workspace:^",
-    "@trpc/server": "^11.0.0",
     "drizzle-orm": "^0.44.0",
-    "superjson": "^2.2.2",
-    "zod": "^4.0.0"
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "drizzle-kit": "^0.31.0",
+    "tsx": "^4.19.0"
   }
 }

@@ -1,0 +1,25 @@
+api:
+  dashboard: true
+  insecure: true # dashboard at http://localhost:8080 — disable in prod
+
+entryPoints:
+  web:
+    address: ':80'
+  websecure:
+    address: ':443'
+
+providers:
+  docker:
+    endpoint: 'unix:///var/run/docker.sock'
+    exposedByDefault: false
+    network: saas_net
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+
+# Local dev TLS via self-signed cert (mkcert recommended)
+# In production, swap for ACME / Let's Encrypt
+certificatesResolvers: {}
+
+log:
+  level: INFO

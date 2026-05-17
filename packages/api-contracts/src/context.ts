@@ -1,8 +1,8 @@
-/**
- * Context shape that the server passes to every tRPC procedure.
- * Phase 3 extends this with db, workspace, session, etc.
- */
+import type { Database } from '@sb-codex/db'
+
 export interface Context {
   requestId: string
-  user: { id: string } | null
+  user: { id: string; email: string; name: string } | null
+  workspace: { id: string; slug: string; name: string } | null
+  db: Database
 }

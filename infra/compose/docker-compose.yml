@@ -1,0 +1,170 @@
+version: '3.9'
+
+networks:
+  saas_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  valkey_data:
+  minio_data:
+  meilisearch_data:
+
+services:
+  # ── Reverse proxy ───────────────────────────────────────────────────────────
+  traefik:
+    image: traefik:v3.1
+    command:
+      - '--configFile=/etc/traefik/traefik.yml'
+    ports:
+      - '80:80'
+      - '443:443'
+      - '8080:8080' # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ../traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── Postgres 16 ─────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: saas
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    ports:
+      - '5432:5432'
+    networks: [saas_net]
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── PgBouncer (transaction-mode pooling) ─────────────────────────────────────
+  pgbouncer:
+    image: bitnami/pgbouncer:1.23.1
+    environment:
+      POSTGRESQL_HOST: postgres
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_DATABASE: saas
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: postgres
+      PGBOUNCER_DATABASE: saas
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: 1000
+      PGBOUNCER_DEFAULT_POOL_SIZE: 20
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '5433:6432'
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── Valkey (Redis-compatible OSS cache / queue / sessions) ──────────────────
+  valkey:
+    image: valkey/valkey:7.2-alpine
+    volumes:
+      - valkey_data:/data
+    ports:
+      - '6379:6379'
+    networks: [saas_net]
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'valkey-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── MinIO (S3-compatible object storage) ─────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── Meilisearch ──────────────────────────────────────────────────────────────
+  meilisearch:
+    image: getmeili/meilisearch:v1.9
+    environment:
+      MEILI_NO_ANALYTICS: 'true'
+      MEILI_MASTER_KEY: 'change-me-in-production'
+    volumes:
+      - meilisearch_data:/meili_data
+    ports:
+      - '7700:7700'
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── MailHog (dev SMTP + web UI) ──────────────────────────────────────────────
+  mailhog:
+    image: mailhog/mailhog:latest
+    ports:
+      - '1025:1025' # SMTP
+      - '8025:8025' # Web UI
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── API server ───────────────────────────────────────────────────────────────
+  server:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.server
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://app:app_password@pgbouncer:6432/saas
+      REDIS_URL: redis://valkey:6379
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-change-me-in-production-must-be-32-chars}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://api.localhost}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.server.rule=Host(`api.localhost`)'
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── Admin SPA ────────────────────────────────────────────────────────────────
+  admin:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.admin
+      args:
+        VITE_TRPC_URL: http://api.localhost/trpc
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.admin.rule=HostRegexp(`{workspace:[a-z0-9-]+}.localhost`)'
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── BullMQ worker ────────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.worker
+    environment:
+      REDIS_URL: redis://valkey:6379
+    depends_on:
+      valkey:
+        condition: service_healthy
+    networks: [saas_net]
+    restart: unless-stopped

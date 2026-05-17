@@ -1,0 +1,36 @@
+http:
+  routers:
+    # Wildcard *.localhost → admin app
+    admin-local:
+      rule: 'HostRegexp(`{workspace:[a-z0-9-]+}.localhost`)'
+      service: admin
+      entryPoints:
+        - web
+
+    # Bare localhost → marketing site
+    marketing-local:
+      rule: 'Host(`localhost`)'
+      service: marketing
+      entryPoints:
+        - web
+
+    # API server
+    api-local:
+      rule: 'Host(`api.localhost`)'
+      service: server
+      entryPoints:
+        - web
+
+  services:
+    admin:
+      loadBalancer:
+        servers:
+          - url: 'http://admin:80'
+    marketing:
+      loadBalancer:
+        servers:
+          - url: 'http://web:3000'
+    server:
+      loadBalancer:
+        servers:
+          - url: 'http://server:3001'

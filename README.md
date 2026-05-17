@@ -1,107 +1,80 @@
-# react-app-starter
+# SaaS Starter
 
-A monorepo starter using **pnpm workspaces** + **Turborepo**, with shared packages, a React 19 backoffice, and a Next.js front office.
+An open-source, multi-tenant SaaS starter built for forking. Ships with auth, workspaces, RLS-enforced tenant isolation, a typed API, and a full local dev stack — ready to fork for travel, e-commerce, or any vertical.
 
-## Structure
-
-```
-.
-├── apps/
-│   ├── admin/          # React 19 + Vite — backoffice
-│   └── web/            # Next.js 15 App Router — front office
-└── packages/
-    ├── core/           # @sb-codex/core — utilities (cn classname helper)
-    └── ui-components/  # @sb-codex/ui-components — React component library (Button, CardUser)
-```
-
-## Prerequisites
-
-- [Node.js](https://nodejs.org/) 18+
-- [pnpm](https://pnpm.io/) 10+
-
-## Getting Started
+## Quick start
 
 ```bash
-# Install dependencies
+# 1. Clone and install
+git clone <repo-url> && cd react-app-starter
 pnpm install
 
-# Start all packages in watch mode + all apps
-pnpm dev
+# 2. Configure environment
+cp .env.example .env
 
-# Or start only one app (with its package dependencies)
-pnpm dev:admin
-pnpm dev:web
+# 3. Start the dev infrastructure (Postgres, Valkey, MailHog, …)
+docker compose -f infra/compose/docker-compose.yml up -d postgres valkey mailhog
+
+# 4. Run migrations
+pnpm db:migrate
+
+# 5. Start all apps in watch mode
+pnpm dev
 ```
 
-| App     | URL                     |
-| ------- | ----------------------- |
-| `admin` | <http://localhost:5173>   |
-| `web`   | <http://localhost:3000>   |
+Admin UI → <http://localhost:5173>  
+API → <http://localhost:3001>  
+MailHog → <http://localhost:8025>
+
+## Monorepo structure
+
+```
+apps/
+  admin/      Vite + React 19 + Tailwind v4 + TanStack Router/Query — workspace dashboard
+  server/     Fastify 5 + tRPC v11 + Pino — stateless API
+  web/        Next.js 15 — marketing / public site
+  e2e/        Playwright test suite
+packages/
+  core/             cn() utility
+  ui-components/    Tailwind + Radix primitives
+  config/           Zod env loader (createEnv)
+  db/               Drizzle schema, migrations, RLS
+  auth/             better-auth + organization plugin
+  api-contracts/    tRPC router + Zod schemas (shared client/server)
+  jobs/             BullMQ queues + worker entrypoint
+infra/
+  docker/     Multi-stage Dockerfiles
+  compose/    docker-compose.yml + Postgres init
+  traefik/    Reverse proxy config for wildcard *.localhost
+```
 
 ## Commands
 
-| Command          | Description                                          |
-| ---------------- | ---------------------------------------------------- |
-| `pnpm dev`       | Watch-build all packages and start all apps          |
-| `pnpm dev:admin` | Watch-build packages admin depends on + start admin  |
-| `pnpm dev:web`   | Watch-build packages web depends on + start web      |
-| `pnpm build`     | Build all packages and apps (respects dep order)     |
-| `pnpm lint`      | Lint all packages and apps                           |
-| `pnpm clean`     | Remove all `dist/` outputs                           |
-
-## Packages
-
-### `@sb-codex/core`
-
-General utilities.
-
-```ts
-import { cn } from '@sb-codex/core'
-
-cn('base-class', condition && 'conditional-class')
-```
-
-### `@sb-codex/ui-components`
-
-React component library built on top of `@sb-codex/core`. Compatible with both Vite and Next.js (interactive components are marked `'use client'`).
-
-```tsx
-import { Button, CardUser } from '@sb-codex/ui-components'
-```
-
-## Publishing Packages
-
-Versioning is managed with [Changesets](https://github.com/changesets/changesets).
-
 ```bash
-# 1. Describe what changed (run after each meaningful change)
-pnpm changeset
-
-# 2. Bump versions + generate changelogs
-pnpm version
-
-# 3. Build and publish to npm
-pnpm release
+pnpm install          # install everything
+pnpm dev              # start all apps + package watchers
+pnpm dev:app          # admin + server only
+pnpm build            # build all packages + apps
+pnpm test             # run Vitest across all packages
+pnpm lint             # ESLint across the workspace
+pnpm typecheck        # tsc --noEmit across all packages
+pnpm db:migrate       # apply Drizzle migrations
+pnpm db:generate      # generate migration SQL from schema changes
+pnpm db:studio        # open Drizzle Studio
 ```
 
-> Packages are published under the `@sb-codex` scope with public access. Make sure you are logged in (`npm login`) before running `pnpm release`.
+## Stack
 
-## Adding a New Package
+| Layer         | Choice                                             |
+| ------------- | -------------------------------------------------- |
+| Auth          | better-auth + organization plugin                  |
+| API           | Fastify 5 + tRPC v11                               |
+| ORM           | Drizzle + Postgres 16 RLS                          |
+| Cache / Queue | Valkey (Redis OSS fork) + BullMQ                   |
+| Frontend      | React 19 + TanStack Router/Query + Tailwind v4     |
+| Infra         | Docker + Traefik + PgBouncer + MinIO + Meilisearch |
+| Tests         | Vitest + Playwright                                |
+| CI/CD         | GitHub Actions + GHCR                              |
 
-1. Create `packages/<name>/` with a `package.json` (name `@sb-codex/<name>`), `tsconfig.json`, and `tsup.config.ts`.
-2. Add `"@sb-codex/<name>": "workspace:^"` to `pnpm.overrides` in the root `package.json`.
-3. Import `@sb-codex/<name>` from any app after declaring it as a `workspace:^` dependency.
-
-See [CLAUDE.md](CLAUDE.md) for the full setup checklist.
-
-## Tech Stack
-
-- [React 19](https://react.dev/)
-- [Next.js 15](https://nextjs.org/) — front office (App Router)
-- [Vite 7](https://vite.dev/) — backoffice
-- [TypeScript 5](https://www.typescriptlang.org/)
-- [tsup](https://tsup.egoist.dev/) — package bundler (CJS + ESM + `.d.ts`)
-- [Turborepo](https://turbo.build/) — task orchestration and caching
-- [pnpm](https://pnpm.io/) — package manager with workspaces
-- [Changesets](https://github.com/changesets/changesets) — versioning and npm publishing
-- [ESLint 9](https://eslint.org/) + [Prettier 3](https://prettier.io/)
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for tenant isolation details and the scaling path to 1–2 M users.  
+See [ROADMAP.md](./ROADMAP.md) for the phase-by-phase implementation plan.

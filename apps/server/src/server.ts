@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import Fastify from 'fastify'
+import cookie from '@fastify/cookie'
 import cors from '@fastify/cors'
 import helmet from '@fastify/helmet'
 import rateLimit from '@fastify/rate-limit'
@@ -10,8 +11,11 @@ import {
 } from '@trpc/server/adapters/fastify'
 import { appRouter, type AppRouter } from '@sb-codex/api-contracts'
 import { env } from './env'
+import { db } from './db'
 import { createContext } from './trpc/create-context'
 import { registerErrorHandler } from './plugins/error-handler'
+import { registerAuthPlugin } from './plugins/auth.plugin'
+import { registerTenantPlugin } from './plugins/tenant.plugin'
 
 export async function buildServer() {
   const app = Fastify({
@@ -28,22 +32,23 @@ export async function buildServer() {
 
   await app.register(sensible)
   await app.register(helmet, { contentSecurityPolicy: false })
+  await app.register(cookie)
   await app.register(cors, {
     origin: env.CORS_ORIGIN.split(',').map((s) => s.trim()),
     credentials: true,
   })
-  // Phase 4 swaps the default in-memory store for the Valkey-backed redis store
-  await app.register(rateLimit, {
-    max: 200,
-    timeWindow: '1 minute',
-  })
+  await app.register(rateLimit, { max: 200, timeWindow: '1 minute' })
 
   registerErrorHandler(app)
+  await app.register(registerAuthPlugin)
+  await app.register(registerTenantPlugin)
 
   app.get('/health', () => ({ status: 'ok' }))
-  app.get('/ready', () => {
-    // Phase 3+: also check DB and Valkey here
-    return { status: 'ready', checks: { app: 'ok' } }
+
+  app.get('/ready', async () => {
+    // Verify DB connectivity
+    await db.execute('SELECT 1' as unknown as Parameters<typeof db.execute>[0])
+    return { status: 'ready', checks: { app: 'ok', db: 'ok' } }
   })
 
   await app.register(fastifyTRPCPlugin, {

@@ -7,79 +7,77 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pnpm workspace + Turborepo with two layers:
 
 - `packages/` — shared libraries built with `tsup`, consumed by apps
-  - `@sb-codex/core` — utilities (exports `cn` classname helper via `clsx`)
-  - `@sb-codex/ui-components` — React component library (exports `Button`, `CardUser`)
-- `apps/` — end-user applications built with Vite
-  - `admin` — React 19 + Vite app
+  - `@sb-codex/core` — utilities (`cn` classname helper)
+  - `@sb-codex/ui-components` — React component library (`Button`, `CardUser`)
+  - `@sb-codex/config` — Zod-validated `createEnv()` loader
+  - `@sb-codex/db` — Drizzle ORM schema, migrations, RLS, `createDb()`
+  - `@sb-codex/auth` — better-auth + organization plugin (`createAuth()`)
+  - `@sb-codex/api-contracts` — tRPC router, procedures, shared Zod schemas
+  - `@sb-codex/jobs` — BullMQ queue definitions + worker entrypoint
+- `apps/` — end-user applications
+  - `admin` — React 19 + Vite + Tailwind v4 + TanStack Router/Query
+  - `server` — Fastify 5 + tRPC v11 + Pino
+  - `web` — Next.js 15 marketing site
+  - `e2e` — Playwright test suite
 
-Workspace packages resolve via the pnpm overrides in the root `package.json` and `.npmrc` settings (`linkWorkspacePackages`, `preferWorkspacePackages`). Apps import from `@sb-codex/*` as normal npm imports — pnpm links them to the local `packages/` source.
+Workspace packages resolve via pnpm `overrides` in the root `package.json`.
 
 ## Commands
 
 All commands run from the repo root unless noted.
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Development (watch-builds all packages + starts all apps in parallel)
-pnpm dev
-
-# Development (watch-builds packages admin depends on + starts admin)
-pnpm dev:admin
-
-# Build all packages and apps (respects dependency order)
-pnpm build
-
-# Clean all package dist outputs
-pnpm clean
-
-# Lint all packages and apps
-pnpm lint
+pnpm install          # install everything
+pnpm dev              # watch-builds all packages + starts all apps
+pnpm dev:admin        # admin + its package deps only
+pnpm dev:server       # server + its package deps only
+pnpm dev:app          # admin + server together
+pnpm build            # build all packages + apps (respects dep order)
+pnpm clean            # remove all dist/ outputs
+pnpm lint             # ESLint across the workspace
+pnpm test             # Vitest across all packages
+pnpm typecheck        # tsc --noEmit across all packages
+pnpm db:migrate       # apply Drizzle migrations (requires DATABASE_URL)
+pnpm db:generate      # generate migration SQL from schema changes
+pnpm db:studio        # open Drizzle Studio
 ```
-
-From within `apps/admin`:
-
-```bash
-pnpm lint       # ESLint (TypeScript + react-hooks + react-refresh)
-pnpm build      # tsc type-check + vite production build
-pnpm preview    # Preview the production build locally
-```
-
-> **Important:** Apps depend on the compiled `dist/` output of packages. When iterating on packages and apps together, use `pnpm dev` so tsup watch rebuilds packages automatically alongside the Vite dev server.
 
 ## Build Pipeline (Turborepo)
 
 `turbo.json` defines the task graph:
 
-- **`build`** — `dependsOn: ["^build"]`: packages always build before apps. Outputs cached under `dist/**`.
-- **`dev`** — persistent, no cache. All `dev` tasks run in parallel (packages run `tsup --watch`, apps run `vite`).
+- **`build`** — `dependsOn: ["^build"]`: packages build before apps. Outputs cached under `dist/**`.
+- **`dev`** — persistent, no cache. All `dev` tasks run in parallel.
+- **`test`** — `dependsOn: ["^build"]`: packages must be built before tests run.
+- **`lint`** / **`typecheck`** — `dependsOn: ["^build"]`.
 - **`clean`** — no cache, removes `dist/`.
-- **`lint`** — `dependsOn: ["^build"]`: packages must be built before linting apps.
 
-Turbo caches build outputs by input hash. A clean rebuild: `pnpm clean && pnpm build`.
+A clean rebuild: `pnpm clean && pnpm build`.
 
 ## Package Tooling
 
-- **Packages** use a shared tsup config from `scripts/getTsupConfig.js`. Outputs CJS + ESM, generates `.d.ts`, enables sourcemaps, minifies. Entry: `src/index.ts`.
-- **Apps** use Vite with `@vitejs/plugin-react`.
-- `tsconfig.base.json` is the shared compiler options base (strict settings). Each package extends it and adds `declaration`, `declarationMap`, `noEmit: false`, `outDir`, `rootDir: ./src`. The `ui-components` package also adds `jsx: react-jsx`. The root `tsconfig.json` is a solution config (project references only) for the TypeScript language server.
+- **Packages** use a shared tsup config from `scripts/getTsupConfig.js`. Outputs CJS + ESM, generates `.d.ts`, minifies.
+- **Apps** use Vite (`admin`) or Next.js (`web`) or plain `tsc` + `tsx` (`server`).
+- `tsconfig.base.json` is the shared strict TypeScript base. Each package extends it.
 
-## Code Style
+## Key architectural rules
 
-Prettier config (`prettier.config.js` at root):
+- **Multi-tenant**: every business table has `workspace_id TEXT NOT NULL`. Never omit it.
+- **RLS enforces isolation**: the `enforceWorkspace` tRPC middleware calls `SET LOCAL app.workspace_id = '<id>'` inside a transaction. RLS policies do the rest — no manual `WHERE workspace_id = ?` needed in procedure bodies.
+- **Context shape** (`packages/api-contracts/src/context.ts`): `{ requestId, user, workspace, db }`. `db` is a Drizzle instance; inside `enforceWorkspace` it becomes a transaction.
+- **Auth routes** skip the tenant plugin (`/api/auth/*` prefix check in `tenant.plugin.ts`).
+- **Admin app** only imports `AppRouter` as `import type` — never bundles server code.
 
-- No semicolons
-- Single quotes
-- Trailing commas everywhere (`all`)
+## Adding a new tenant-scoped table
 
-TypeScript is strict with `noUnusedLocals`, `noUnusedParameters`, and `noUncheckedIndexedAccess` enabled.
+1. Add schema to `packages/db/src/schema/`.
+2. Run `pnpm db:generate` then append RLS to the new migration.
+3. Add CRUD procedures to `packages/api-contracts/src/routers/` using `workspaceProcedure`.
+4. Export the new router from `packages/api-contracts/src/routers/_app.ts`.
+5. Run `pnpm db:migrate`.
 
 ## Adding a New Package
 
-1. Create `packages/<name>/` with:
-   - `package.json` — name `@sb-codex/<name>`, scripts: `build`, `dev`, `clean`
-   - `tsconfig.json` — extends `../../tsconfig.base.json`, adds `declaration: true`, `noEmit: false`, `outDir: ./dist`, `rootDir: ./src`
-   - `tsup.config.ts` — uses `baseConfig` from `../../scripts/getTsupConfig.js`
-2. Add the package name to pnpm `overrides` in root `package.json` with `"workspace:^"`.
-3. Apps can then import `@sb-codex/<name>` directly after declaring it as a `workspace:^` dependency.
+1. Create `packages/<name>/` with `package.json` (name `@sb-codex/<name>`, scripts `build`/`dev`/`clean`), `tsconfig.json` (extends `../../tsconfig.base.json`), `tsup.config.ts`.
+2. Add the name to pnpm `overrides` in root `package.json` with `"workspace:^"`.
+3. Consumers declare it as a `workspace:^` dependency and import normally.
