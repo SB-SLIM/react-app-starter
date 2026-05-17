@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@sb-codex/ui-components",
+  "name": "@sb-codex/config",
   "version": "0.0.0",
   "type": "module",
   "license": "MIT",
@@ -11,9 +11,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "clean": "premove ./dist",
     "build": "tsup --tsconfig tsconfig.json",
@@ -27,12 +25,6 @@
     }
   },
   "dependencies": {
-    "@sb-codex/core": "workspace:^"
-  },
-  "peerDependencies": {
-    "react": ">=18"
-  },
-  "devDependencies": {
-    "tailwindcss": "^4.3.0"
+    "zod": "^4.0.0"
   }
 }

@@ -1,49 +1,39 @@
-
-import React from 'react';
+import React from 'react'
+import { cn } from '@sb-codex/core'
 
 export type CardUserProps = {
-  firstName: string;
-  lastName: string;
-  avatarUrl: string;
-  description: string;
-};
+  firstName: string
+  lastName: string
+  avatarUrl: string
+  description: string
+  className?: string
+}
 
 export const CardUser: React.FC<CardUserProps> = ({
   firstName,
   lastName,
   avatarUrl,
   description,
+  className,
 }) => {
   return (
     <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '16px',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-      }}
+      className={cn(
+        'flex flex-col items-center rounded-lg border border-gray-200 bg-white p-4 shadow-sm',
+        className,
+      )}
     >
       <img
         src={avatarUrl}
         alt={`${firstName} ${lastName}`}
-        style={{
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          objectFit: 'cover',
-          marginBottom: '12px',
-        }}
+        className="mb-3 h-20 w-20 rounded-full object-cover"
       />
-      <h3 style={{ margin: '0 0 8px 0' }}>
+      <h3 className="mb-2 text-lg font-semibold text-gray-900">
         {firstName} {lastName}
       </h3>
-      <p style={{ margin: 0, textAlign: 'center', color: '#555' }}>
-        {description}
-      </p>
+      <p className="m-0 text-center text-sm text-gray-600">{description}</p>
     </div>
-  );
-};
+  )
+}
 
-export default CardUser;
+export default CardUser
