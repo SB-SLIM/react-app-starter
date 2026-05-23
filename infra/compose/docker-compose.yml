@@ -1,5 +1,3 @@
-version: '3.9'
-
 networks:
   saas_net:
     driver: bridge
@@ -46,27 +44,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-
-  # ── PgBouncer (transaction-mode pooling) ─────────────────────────────────────
-  pgbouncer:
-    image: bitnami/pgbouncer:1.23.1
-    environment:
-      POSTGRESQL_HOST: postgres
-      POSTGRESQL_PORT: 5432
-      POSTGRESQL_DATABASE: saas
-      POSTGRESQL_USERNAME: postgres
-      POSTGRESQL_PASSWORD: postgres
-      PGBOUNCER_DATABASE: saas
-      PGBOUNCER_POOL_MODE: transaction
-      PGBOUNCER_MAX_CLIENT_CONN: 1000
-      PGBOUNCER_DEFAULT_POOL_SIZE: 20
-    depends_on:
-      postgres:
-        condition: service_healthy
-    ports:
-      - '5433:6432'
-    networks: [saas_net]
-    restart: unless-stopped
 
   # ── Valkey (Redis-compatible OSS cache / queue / sessions) ──────────────────
   valkey:
@@ -127,7 +104,7 @@ services:
       dockerfile: infra/docker/Dockerfile.server
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://app:app_password@pgbouncer:6432/saas
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/saas
       REDIS_URL: redis://valkey:6379
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-change-me-in-production-must-be-32-chars}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://api.localhost}

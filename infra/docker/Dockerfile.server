@@ -7,7 +7,7 @@ RUN corepack enable
 # ── prune stage: extract only what server needs ──────────────────────────────
 FROM base AS pruner
 WORKDIR /app
-RUN pnpm add -g turbo@latest
+RUN npm install -g turbo@latest
 COPY . .
 RUN turbo prune server --docker
 
