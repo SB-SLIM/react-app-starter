@@ -44,7 +44,6 @@ export async function buildServer() {
   await app.register(registerTenantPlugin)
 
   app.get('/health', () => ({ status: 'ok' }))
-  app.get('/clients', () => [{ name: 'John Doe' }])
 
   app.get('/ready', async () => {
     // Verify DB connectivity
