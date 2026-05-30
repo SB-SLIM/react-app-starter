@@ -10,6 +10,7 @@ import {
   type FastifyTRPCPluginOptions,
 } from '@trpc/server/adapters/fastify'
 import { appRouter, type AppRouter } from '@sb-codex/api-contracts'
+import { client } from '@sb-codex/db'
 import { env } from './env'
 import { db } from './db'
 import { createContext } from './trpc/create-context'
@@ -44,6 +45,10 @@ export async function buildServer() {
   await app.register(registerTenantPlugin)
 
   app.get('/health', () => ({ status: 'ok' }))
+
+  if (env.NODE_ENV === 'development') {
+    app.get('/dev/clients', () => db.select().from(client))
+  }
 
   app.get('/ready', async () => {
     // Verify DB connectivity
