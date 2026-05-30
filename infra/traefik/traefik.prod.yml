@@ -1,0 +1,54 @@
+# Traefik production config
+# Mounted at /etc/traefik/traefik.yml inside the container.
+#
+# Let's Encrypt strategy
+# ──────────────────────
+# This file uses HTTP-01 challenge: Traefik automatically requests a cert for
+# each hostname the first time it receives traffic. Works as long as DNS
+# (including *.yourdomain.com wildcard A record) points to this server.
+#
+# Rate limit: Let's Encrypt allows ~50 cert requests per registered domain per
+# week. For large numbers of workspace subdomains, switch to DNS-01 wildcard
+# challenge instead (requires a DNS provider plugin — see Traefik docs).
+#
+# Before starting:
+#   touch infra/traefik/acme.json && chmod 600 infra/traefik/acme.json
+# Replace your-email@example.com below with a real address (LE expiry alerts).
+
+api:
+  dashboard: false
+
+entryPoints:
+  web:
+    address: ':80'
+  websecure:
+    address: ':443'
+    http:
+      tls:
+        certResolver: letsencrypt
+
+providers:
+  docker:
+    endpoint: 'unix:///var/run/docker.sock'
+    exposedByDefault: false
+    network: saas_net
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: your-email@example.com # ← replace before deploying
+      storage: /certs/acme.json
+      httpChallenge:
+        entryPoint: web
+
+http:
+  middlewares:
+    https-redirect:
+      redirectScheme:
+        scheme: https
+        permanent: true
+
+log:
+  level: WARN
+
+accessLog: {}

@@ -1,0 +1,196 @@
+# Production Docker Compose
+# Deploy: docker compose -f infra/compose/docker-compose.prod.yml --env-file .env.production up -d
+#
+# Prerequisites on the VPS:
+#   1. Wildcard DNS A record: *.yourdomain.com → VPS_IP
+#                             yourdomain.com   → VPS_IP
+#   2. Copy .env.production.example → .env.production and fill all values
+#   3. touch infra/traefik/acme.json && chmod 600 infra/traefik/acme.json
+#
+# Workspace subdomains use per-route Let's Encrypt certs via HTTP challenge.
+# For a wildcard cert (*.domain.com) instead, switch to DNS challenge — see traefik.prod.yml.
+
+networks:
+  saas_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  valkey_data:
+  minio_data:
+  meilisearch_data:
+
+services:
+  # ── Reverse proxy + TLS ───────────────────────────────────────────────────────
+  traefik:
+    image: traefik:v3.1
+    command:
+      - '--configFile=/etc/traefik/traefik.yml'
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ../traefik/traefik.prod.yml:/etc/traefik/traefik.yml:ro
+      - ../traefik/acme.json:/certs/acme.json
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── Postgres 16 ───────────────────────────────────────────────────────────────
+  # Port NOT exposed to host — internal traffic only.
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-saas}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    networks: [saas_net]
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ── Valkey (Redis-compatible) ─────────────────────────────────────────────────
+  # Port NOT exposed to host — internal traffic only.
+  valkey:
+    image: valkey/valkey:7.2-alpine
+    command: valkey-server --requirepass ${VALKEY_PASSWORD}
+    volumes:
+      - valkey_data:/data
+    networks: [saas_net]
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'valkey-cli', '-a', '${VALKEY_PASSWORD}', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  # ── MinIO (S3-compatible object storage) ──────────────────────────────────────
+  # API:     https://storage.${DOMAIN}
+  # Console: https://storage-console.${DOMAIN}  (restrict access in production)
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ':9001'
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.minio.rule=Host(`storage.${DOMAIN}`)'
+      - 'traefik.http.routers.minio.entrypoints=websecure'
+      - 'traefik.http.routers.minio.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.minio.service=minio-svc'
+      - 'traefik.http.services.minio-svc.loadbalancer.server.port=9000'
+      - 'traefik.http.routers.minio-console.rule=Host(`storage-console.${DOMAIN}`)'
+      - 'traefik.http.routers.minio-console.entrypoints=websecure'
+      - 'traefik.http.routers.minio-console.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.minio-console.service=minio-console-svc'
+      - 'traefik.http.services.minio-console-svc.loadbalancer.server.port=9001'
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── Meilisearch ───────────────────────────────────────────────────────────────
+  # Internal only — accessed by server/worker via http://meilisearch:7700
+  meilisearch:
+    image: getmeili/meilisearch:v1.9
+    environment:
+      MEILI_NO_ANALYTICS: 'true'
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+    volumes:
+      - meilisearch_data:/meili_data
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── API server (Fastify + tRPC) ───────────────────────────────────────────────
+  # https://api.${DOMAIN}
+  server:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.server
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-saas}
+      REDIS_URL: redis://:${VALKEY_PASSWORD}@valkey:6379
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_URL: https://api.${DOMAIN}
+      CORS_ORIGIN: https://${DOMAIN}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      MEILISEARCH_URL: http://meilisearch:7700
+      MEILISEARCH_KEY: ${MEILI_MASTER_KEY}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.server.rule=Host(`api.${DOMAIN}`)'
+      - 'traefik.http.routers.server.entrypoints=websecure'
+      - 'traefik.http.routers.server.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.server.loadbalancer.server.port=3001'
+      - 'traefik.http.routers.server-http.rule=Host(`api.${DOMAIN}`)'
+      - 'traefik.http.routers.server-http.entrypoints=web'
+      - 'traefik.http.routers.server-http.middlewares=https-redirect@file'
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── Admin SPA (Vite, served via nginx) ───────────────────────────────────────
+  # https://{workspace}.${DOMAIN}  — workspace subdomains
+  # VITE_TRPC_URL is baked into the bundle at build time.
+  admin:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.admin
+      args:
+        VITE_TRPC_URL: https://api.${DOMAIN}/trpc
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.admin.rule=HostRegexp(`{sub:[a-z0-9-]+}.${DOMAIN}`)'
+      - 'traefik.http.routers.admin.entrypoints=websecure'
+      - 'traefik.http.routers.admin.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.admin.loadbalancer.server.port=80'
+      - 'traefik.http.routers.admin-http.rule=HostRegexp(`{sub:[a-z0-9-]+}.${DOMAIN}`)'
+      - 'traefik.http.routers.admin-http.entrypoints=web'
+      - 'traefik.http.routers.admin-http.middlewares=https-redirect@file'
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── BullMQ worker ─────────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.worker
+    environment:
+      NODE_ENV: production
+      REDIS_URL: redis://:${VALKEY_PASSWORD}@valkey:6379
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      MEILISEARCH_URL: http://meilisearch:7700
+      MEILISEARCH_KEY: ${MEILI_MASTER_KEY}
+    depends_on:
+      valkey:
+        condition: service_healthy
+    networks: [saas_net]
+    restart: unless-stopped
