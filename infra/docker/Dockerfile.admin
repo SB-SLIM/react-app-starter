@@ -20,6 +20,8 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/ .
 COPY --from=pruner /app/out/full/ .
+COPY scripts/ ./scripts/
+COPY tsconfig.base.json ./
 ARG VITE_TRPC_URL
 ENV VITE_TRPC_URL=$VITE_TRPC_URL
 RUN pnpm turbo build --filter=admin...
