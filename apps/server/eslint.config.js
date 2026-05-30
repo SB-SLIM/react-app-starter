@@ -10,6 +10,9 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2023,
       sourceType: 'module',
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
   },
 ])
