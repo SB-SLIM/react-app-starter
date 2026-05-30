@@ -34,6 +34,7 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 fastify
 COPY --from=builder /app /build
 RUN cd /build && pnpm --filter=server deploy --prod --legacy /app
+RUN sed -i '/"type": "module"/d' /app/package.json
 RUN chown -R fastify:nodejs /app
 USER fastify
 EXPOSE 3001
