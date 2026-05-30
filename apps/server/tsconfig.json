@@ -5,8 +5,8 @@
     "rootDir": "./src",
     "lib": ["ES2023"],
     "types": ["node"],
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "noEmit": false,
     "declaration": false,
     "sourceMap": true
