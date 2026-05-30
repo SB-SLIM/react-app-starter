@@ -1,0 +1,82 @@
+# Test deployment — no domain, no TLS, access via VPS IP.
+#
+# Usage:
+#   VPS_IP=1.2.3.4 docker compose -f infra/compose/docker-compose.test.yml up -d --build
+#
+# After start:
+#   Frontend → http://VPS_IP
+#   API      → http://VPS_IP:3001
+#
+# VPS_IP must be the public IP of your VPS so the browser can reach the API.
+
+networks:
+  saas_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  valkey_data:
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: saas
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    networks: [saas_net]
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  valkey:
+    image: valkey/valkey:7.2-alpine
+    volumes:
+      - valkey_data:/data
+    networks: [saas_net]
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'valkey-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  server:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.server
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3001
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/saas
+      REDIS_URL: redis://valkey:6379
+      BETTER_AUTH_SECRET: change-me-32-chars-minimum-secret
+      BETTER_AUTH_URL: http://${VPS_IP}:3001
+      CORS_ORIGIN: http://${VPS_IP}
+    ports:
+      - '3001:3001'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    networks: [saas_net]
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.admin
+      args:
+        VITE_TRPC_URL: http://${VPS_IP}:3001/trpc
+    ports:
+      - '80:80'
+    networks: [saas_net]
+    restart: unless-stopped
