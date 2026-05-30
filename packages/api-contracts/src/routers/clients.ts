@@ -5,7 +5,7 @@ import { router, workspaceProcedure } from '../init'
 
 const clientInput = z.object({
   name: z.string().min(1),
-  email: z.string().email().nullish(),
+  email: z.email().nullish(),
   phone: z.string().nullish(),
   notes: z.string().nullish(),
 })
@@ -53,6 +53,8 @@ export const clientsRouter = router({
     .input(clientInput)
     .output(clientSchema)
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.workspace) throw new Error('Workspace not found')
+
       const rows = await ctx.db
         .insert(client)
         .values({ ...input, workspaceId: ctx.workspace.id })
@@ -63,7 +65,7 @@ export const clientsRouter = router({
     }),
 
   update: workspaceProcedure
-    .input(z.object({ id: z.string().uuid() }).merge(clientInput.partial()))
+    .input(z.object({ id: z.uuid() }).extend(clientInput.partial().shape))
     .output(clientSchema)
     .mutation(async ({ ctx, input }) => {
       const { id, ...patch } = input
@@ -78,7 +80,7 @@ export const clientsRouter = router({
     }),
 
   delete: workspaceProcedure
-    .input(z.object({ id: z.string().uuid() }))
+    .input(z.object({ id: z.uuid() }))
     .output(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db.delete(client).where(eq(client.id, input.id))

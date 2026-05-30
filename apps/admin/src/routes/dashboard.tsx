@@ -6,17 +6,18 @@ export const Route = createFileRoute('/dashboard')({
 })
 
 function DashboardPage() {
+  const client = trpc.clients.list.useQuery(undefined, {})
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
       <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
       <p className="mt-2 text-gray-600">
-        Workspace overview will live here. Phase 3 wires tenant context,
+        Workspace overview will live here. Phase 4 wires tenant context,
         auth-guarded loaders, and real tRPC queries.
       </p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         <StatCard label="Members" value="—" />
-        <StatCard label="Clients" value="—" />
+        <StatCard label="Clients" value={String(client.data?.length || 0)} />
         <StatCard label="Active sessions" value="—" />
       </div>
 
