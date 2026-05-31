@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto'
+import path from 'node:path'
+import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import Fastify from 'fastify'
 import cookie from '@fastify/cookie'
 import cors from '@fastify/cors'
@@ -71,6 +73,10 @@ export async function buildServer() {
 }
 
 async function start() {
+  await migrate(db, {
+    migrationsFolder: path.join(process.cwd(), 'migrations'),
+  })
+
   const app = await buildServer()
   try {
     await app.listen({ host: env.HOST, port: env.PORT })

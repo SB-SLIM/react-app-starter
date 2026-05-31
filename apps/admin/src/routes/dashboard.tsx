@@ -6,7 +6,7 @@ export const Route = createFileRoute('/dashboard')({
 })
 
 function DashboardPage() {
-  const client = trpc.clients.list.useQuery(undefined, {})
+  const client = trpc.clients.list.useQuery()
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
       <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
