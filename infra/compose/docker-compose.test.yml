@@ -81,6 +81,22 @@ services:
     networks: [saas_net]
     restart: unless-stopped
 
+  # ── One-shot migration runner ─────────────────────────────────────────────────
+  # Usage: docker compose -f docker-compose.test.yml --profile migrate run --rm migrate
+  migrate:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.server
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/saas
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [saas_net]
+    restart: 'no'
+    profiles: ['migrate']
+
   adminer:
     image: adminer:latest
     ports:

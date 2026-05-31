@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["postgres", "postgresql", "premove", "saas", "TRPC"]
+  "cSpell.words": ["postgres", "postgresql", "premove", "saas", "TRPC"],
+  "postman.settings.dotenv-detection-notification-visibility": false
 }
