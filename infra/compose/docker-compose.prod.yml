@@ -121,8 +121,8 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-saas}
       REDIS_URL: redis://:${VALKEY_PASSWORD}@valkey:6379
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
-      BETTER_AUTH_URL: https://api.${DOMAIN}
-      CORS_ORIGIN: https://${DOMAIN}
+      BETTER_AUTH_URL: https://hub.${DOMAIN}
+      CORS_ORIGIN: https://hub.${DOMAIN}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       SMTP_HOST: ${SMTP_HOST}
@@ -143,11 +143,11 @@ services:
         condition: service_healthy
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.server.rule=Host(`api.${DOMAIN}`)'
+      - 'traefik.http.routers.server.rule=Host(`hub.${DOMAIN}`) && PathPrefix(`/api`)'
       - 'traefik.http.routers.server.entrypoints=websecure'
       - 'traefik.http.routers.server.tls.certresolver=letsencrypt'
       - 'traefik.http.services.server.loadbalancer.server.port=3001'
-      - 'traefik.http.routers.server-http.rule=Host(`api.${DOMAIN}`)'
+      - 'traefik.http.routers.server-http.rule=Host(`hub.${DOMAIN}`) && PathPrefix(`/api`)'
       - 'traefik.http.routers.server-http.entrypoints=web'
       - 'traefik.http.routers.server-http.middlewares=https-redirect@file'
     networks: [saas_net]
@@ -171,21 +171,21 @@ services:
     profiles: ['migrate']
 
   # ── Admin SPA (Vite, served via nginx) ───────────────────────────────────────
-  # https://{workspace}.${DOMAIN}  — workspace subdomains
+  # https://hub.${DOMAIN}
   # VITE_TRPC_URL is baked into the bundle at build time.
   admin:
     build:
       context: ../..
       dockerfile: infra/docker/Dockerfile.admin
       args:
-        VITE_TRPC_URL: https://api.${DOMAIN}/trpc
+        VITE_TRPC_URL: https://hub.${DOMAIN}/api/trpc
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.admin.rule=HostRegexp(`{sub:[a-z0-9-]+}.${DOMAIN}`)'
+      - 'traefik.http.routers.admin.rule=Host(`hub.${DOMAIN}`)'
       - 'traefik.http.routers.admin.entrypoints=websecure'
       - 'traefik.http.routers.admin.tls.certresolver=letsencrypt'
       - 'traefik.http.services.admin.loadbalancer.server.port=80'
-      - 'traefik.http.routers.admin-http.rule=HostRegexp(`{sub:[a-z0-9-]+}.${DOMAIN}`)'
+      - 'traefik.http.routers.admin-http.rule=Host(`hub.${DOMAIN}`)'
       - 'traefik.http.routers.admin-http.entrypoints=web'
       - 'traefik.http.routers.admin-http.middlewares=https-redirect@file'
     networks: [saas_net]
