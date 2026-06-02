@@ -19,4 +19,3 @@ jobs:
             cd ~/react-app-starter
             git pull origin main
             docker compose -f infra/compose/docker-compose.prod.yml down 2>/dev/null || true
-            docker compose -f infra/compose/docker-compose.test.yml up -d --build
