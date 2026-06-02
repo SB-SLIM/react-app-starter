@@ -1,0 +1,28 @@
+http:
+  routers:
+    server:
+      rule: 'Host(`hub.slimbouchoucha.tn`) && PathPrefix(`/api`)'
+      service: server
+      priority: 10
+      entryPoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+
+    admin:
+      rule: 'Host(`hub.slimbouchoucha.tn`)'
+      service: admin
+      priority: 1
+      entryPoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    server:
+      loadBalancer:
+        servers:
+          - url: 'http://server:3001'
+
+    admin:
+      loadBalancer:
+        servers:
+          - url: 'http://admin:80'
