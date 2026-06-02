@@ -44,20 +44,20 @@ export async function buildServer() {
   await app.register(registerAuthPlugin)
   await app.register(registerTenantPlugin)
 
-  app.get('/health', () => ({ status: 'ok' }))
+  app.get('/api/health', () => ({ status: 'ok' }))
 
   if (env.NODE_ENV === 'development') {
-    app.get('/dev/clients', () => db.select().from(client))
+    app.get('/api/dev/clients', () => db.select().from(client))
   }
 
-  app.get('/ready', async () => {
+  app.get('/api/ready', async () => {
     // Verify DB connectivity
     await db.execute('SELECT 1' as unknown as Parameters<typeof db.execute>[0])
     return { status: 'ready', checks: { app: 'ok', db: 'ok' } }
   })
 
   await app.register(fastifyTRPCPlugin, {
-    prefix: '/trpc',
+    prefix: '/api/trpc',
     trpcOptions: {
       router: appRouter,
       createContext,

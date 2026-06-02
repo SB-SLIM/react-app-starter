@@ -75,7 +75,7 @@ services:
       context: ../..
       dockerfile: infra/docker/Dockerfile.admin
       args:
-        VITE_TRPC_URL: http://${VPS_IP}:3001/trpc
+        VITE_TRPC_URL: http://${VPS_IP}:3001/api/trpc
     ports:
       - '80:80'
     networks: [saas_net]
