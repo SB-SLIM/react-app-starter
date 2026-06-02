@@ -43,8 +43,7 @@ certificatesResolvers:
     acme:
       email: bouchouchaslim@gmail.com
       storage: /certs/acme.json
-      httpChallenge:
-        entryPoint: web
+      tlsChallenge: {}
 
 http:
   middlewares:
