@@ -81,3 +81,88 @@ A clean rebuild: `pnpm clean && pnpm build`.
 1. Create `packages/<name>/` with `package.json` (name `@sb-codex/<name>`, scripts `build`/`dev`/`clean`), `tsconfig.json` (extends `../../tsconfig.base.json`), `tsup.config.ts`.
 2. Add the name to pnpm `overrides` in root `package.json` with `"workspace:^"`.
 3. Consumers declare it as a `workspace:^` dependency and import normally.
+
+---
+
+## Production Deployment
+
+### Domain & Subdomains
+
+| Env  | Admin                               | API                                     |
+| ---- | ----------------------------------- | --------------------------------------- |
+| Prod | `https://hub.slimbouchoucha.tn`     | `https://hub.slimbouchoucha.tn/api`     |
+| Dev  | `https://hub-dev.slimbouchoucha.tn` | `https://hub-dev.slimbouchoucha.tn/api` |
+| QA   | `https://hub-qa.slimbouchoucha.tn`  | `https://hub-qa.slimbouchoucha.tn/api`  |
+
+**VPS IP:** 152.53.187.54
+
+### Routing Architecture (Traefik v3.1)
+
+Traefik uses a **static file provider** (`infra/traefik/dynamic.prod.yml`) — NOT the Docker label provider. This is because the VPS runs Docker Engine 27+ which dropped support for Docker API < 1.40, and Traefik's Docker client requests API 1.24.
+
+- `PathPrefix(/api)` → Fastify server (priority 10)
+- `Host(hub.*)` catch-all → nginx/admin SPA (priority 1)
+- HTTPS redirect at entrypoint level (port 80 → 443)
+- TLS certificates via Let's Encrypt `tlsChallenge` (port 443, stored in `infra/traefik/acme.json`)
+
+### Fastify Routes
+
+All routes are prefixed with `/api`:
+
+- `GET /api/health` — health check (public)
+- `GET /api/ready` — readiness check with DB ping (public)
+- `GET /api/auth/*` — better-auth endpoints
+- `/api/trpc/*` — tRPC endpoint
+
+### Key Files
+
+| File                                    | Purpose                                              |
+| --------------------------------------- | ---------------------------------------------------- |
+| `infra/compose/docker-compose.prod.yml` | Production stack                                     |
+| `infra/compose/docker-compose.test.yml` | Test stack (VPS, no TLS)                             |
+| `infra/traefik/traefik.prod.yml`        | Traefik static config (tlsChallenge, entrypoints)    |
+| `infra/traefik/dynamic.prod.yml`        | Traefik routes (hardcoded domain, file provider)     |
+| `infra/traefik/acme.json`               | Let's Encrypt certs (600 permissions, never commit)  |
+| `apps/server/src/migrate.ts`            | Standalone migration script → `node dist/migrate.js` |
+| `.env.production`                       | Prod secrets on VPS (never committed)                |
+
+### Deploy Commands (on VPS)
+
+```bash
+# Full deploy after git pull
+git pull
+docker compose -f infra/compose/docker-compose.prod.yml --env-file .env.production up -d --build
+
+# Run migrations only (before deploying server)
+docker compose -f infra/compose/docker-compose.prod.yml --env-file .env.production --profile migrate run --rm migrate
+
+# Rebuild single service
+docker compose -f infra/compose/docker-compose.prod.yml --env-file .env.production up -d --build server
+docker compose -f infra/compose/docker-compose.prod.yml --env-file .env.production up -d --build admin
+```
+
+### .env.production required variables
+
+```
+DOMAIN=slimbouchoucha.tn
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=<secret>
+POSTGRES_DB=saas
+VALKEY_PASSWORD=<secret>
+BETTER_AUTH_SECRET=<32+ chars>
+BETTER_AUTH_URL=https://hub.slimbouchoucha.tn
+CORS_ORIGIN=https://hub.slimbouchoucha.tn
+DATABASE_URL=postgresql://postgres:<password>@postgres:5432/saas
+SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
+MINIO_ROOT_USER, MINIO_ROOT_PASSWORD
+MEILI_MASTER_KEY
+```
+
+### tRPC Client (admin app)
+
+`VITE_TRPC_URL` is baked at build time via Docker build arg:
+
+- Prod: `https://hub.slimbouchoucha.tn/api/trpc`
+- Test: `http://<VPS_IP>:3001/api/trpc`
+
+The workspace slug is sent via `x-workspace-slug` header (to be implemented — currently uses subdomain extraction from `window.location.hostname`).
