@@ -13,3 +13,4 @@
 **/.dockerignore
 infra/k8s
 .github
+infra/traefik/acme.json
