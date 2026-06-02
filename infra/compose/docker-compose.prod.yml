@@ -26,6 +26,8 @@ services:
     image: traefik:v3.1
     command:
       - '--configFile=/etc/traefik/traefik.yml'
+    environment:
+      - DOCKER_API_VERSION=1.41
     ports:
       - '80:80'
       - '443:443'
