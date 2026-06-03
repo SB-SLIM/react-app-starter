@@ -1,21 +1,57 @@
 name: Deploy to VPS
 
 on:
-  push:
+  # Runs only after Build & Push Images completes successfully on main.
+  # This ensures containers are never brought up with a missing or broken image.
+  workflow_run:
+    workflows: ['Build & Push Images']
+    types: [completed]
     branches: [main]
 
 jobs:
   deploy:
+    name: Deploy
     runs-on: ubuntu-latest
+    # Only deploy when the build workflow succeeded.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
+        env:
+          # GITHUB_TOKEN is automatic — no extra PAT needed.
+          # Passed via envs so it never appears in the script string.
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_USER: ${{ github.actor }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
+          envs: GHCR_TOKEN,GHCR_USER
           script: |
+            set -e
             cd ~/react-app-starter
+
+            # Pull latest code (for infra files: compose, traefik config…)
             git pull origin main
-            docker compose -f infra/compose/docker-compose.prod.yml down 2>/dev/null || true
+
+            # Authenticate to GHCR using the workflow's automatic token
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+
+            # Pull new images BEFORE touching running containers.
+            # If pull fails, the running stack is untouched.
+            docker compose -f infra/compose/docker-compose.prod.yml \
+              --env-file .env.production pull server admin worker
+
+            # Bring up the new containers (replaces only changed services).
+            # No --build (images come from GHCR), no explicit `down`
+            # (up -d replaces each service in-place with minimal downtime).
+            docker compose -f infra/compose/docker-compose.prod.yml \
+              --env-file .env.production up -d --no-build
+
+            # Run migrations after server container is up
+            docker compose -f infra/compose/docker-compose.prod.yml \
+              --env-file .env.production --profile migrate run --rm migrate
+
+            docker logout ghcr.io

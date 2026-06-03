@@ -112,6 +112,7 @@ services:
   # ── API server (Fastify + tRPC) ───────────────────────────────────────────────
   # https://api.${DOMAIN}
   server:
+    image: ${GHCR_IMAGE_PREFIX}/server:${IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: infra/docker/Dockerfile.server
@@ -148,6 +149,7 @@ services:
   # ── One-shot migration runner ─────────────────────────────────────────────────
   # Usage: docker compose -f docker-compose.prod.yml --profile migrate run --rm migrate
   migrate:
+    image: ${GHCR_IMAGE_PREFIX}/server:${IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: infra/docker/Dockerfile.server
@@ -164,8 +166,9 @@ services:
 
   # ── Admin SPA (Vite, served via nginx) ───────────────────────────────────────
   # https://hub.${DOMAIN}
-  # VITE_TRPC_URL is baked into the bundle at build time.
+  # VITE_TRPC_URL is baked into the bundle at CI build time (build-images.yml).
   admin:
+    image: ${GHCR_IMAGE_PREFIX}/admin:${IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: infra/docker/Dockerfile.admin
@@ -176,6 +179,7 @@ services:
 
   # ── BullMQ worker ─────────────────────────────────────────────────────────────
   worker:
+    image: ${GHCR_IMAGE_PREFIX}/worker:${IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: infra/docker/Dockerfile.worker

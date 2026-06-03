@@ -1,7 +1,11 @@
 name: Build & Push Images
 
 on:
-  push:
+  # Only build images after CI (lint/typecheck/test) passes.
+  # Prevents pushing broken images and triggering a deploy from a failing commit.
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
     branches: [main]
 
 env:
@@ -11,6 +15,7 @@ env:
 jobs:
   build:
     name: Build ${{ matrix.app }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -48,6 +53,16 @@ jobs:
             type=sha,prefix=sha-
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
+      # Build args are only needed for the admin SPA (Vite bakes them in).
+      # Set in GitHub repo settings: Settings → Variables → Actions.
+      - name: Resolve build args
+        id: args
+        run: |
+          if [ "${{ matrix.app }}" = "admin" ]; then
+            echo "value=VITE_TRPC_URL=${{ vars.VITE_TRPC_URL }}" >> "$GITHUB_OUTPUT"
+            echo "VITE_BETTER_AUTH_URL=${{ vars.VITE_BETTER_AUTH_URL }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -56,6 +71,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: ${{ steps.args.outputs.value }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
