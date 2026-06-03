@@ -1,6 +1,6 @@
 'use client'
 
-import { createAuthClient } from 'better-auth/client'
+import { createAuthClient } from 'better-auth/react'
 import { organizationClient } from 'better-auth/client/plugins'
 
 // ── Clean types exposed to consumers ──────────────────────────────────────────
@@ -109,18 +109,7 @@ export function createSbAuthClient(baseURL: string) {
      * Must be called inside a React component or hook.
      */
     useSession(): { session: AuthSession | null; isPending: boolean } {
-      // better-auth types useSession as Atom<T> (nanostores) but it is
-      // callable as a React hook at runtime. Cast to avoid the TS2349 error.
-      type RawSession = {
-        data: {
-          user: { id: string; email: string; name: string } | null
-          session: { activeOrganizationId?: string | null } | null
-        } | null
-        isPending: boolean
-      }
-      const { data, isPending } = (
-        internal.useSession as unknown as () => RawSession
-      )()
+      const { data, isPending } = internal.useSession()
       const user = data?.user
       return {
         session: user
