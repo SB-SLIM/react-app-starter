@@ -16,7 +16,8 @@
 # Replace your-email@example.com below with a real address (LE expiry alerts).
 
 api:
-  dashboard: false
+  dashboard: true
+  insecure: true # accès sans auth sur port 8080
 
 entryPoints:
   web:
