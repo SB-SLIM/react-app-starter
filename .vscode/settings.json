@@ -1,4 +1,28 @@
 {
-  "cSpell.words": ["postgres", "postgresql", "premove", "saas", "TRPC"],
+  "cSpell.words": [
+    "certresolver",
+    "Fastify",
+    "getmeili",
+    "healthcheck",
+    "initdb",
+    "isready",
+    "letsencrypt",
+    "loadbalancer",
+    "meili",
+    "MEILI",
+    "meilisearch",
+    "MEILISEARCH",
+    "nginx",
+    "postgres",
+    "postgresql",
+    "premove",
+    "requirepass",
+    "saas",
+    "traefik",
+    "TRPC",
+    "valkey",
+    "websecure",
+    "yourdomain"
+  ],
   "postman.settings.dotenv-detection-notification-visibility": false
 }
