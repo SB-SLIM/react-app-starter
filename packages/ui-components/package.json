@@ -12,7 +12,8 @@
     "access": "public"
   },
   "files": [
-    "dist"
+    "dist",
+    "src/theme.css"
   ],
   "scripts": {
     "clean": "premove ./dist",
@@ -24,7 +25,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./theme.css": "./src/theme.css"
   },
   "dependencies": {
     "@sb-codex/core": "workspace:^"

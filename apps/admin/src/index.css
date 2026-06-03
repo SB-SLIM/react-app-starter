@@ -1,29 +1,9 @@
-@import 'tailwindcss';
+/* Single Tailwind entry — tokens, base styles and dark-mode variant live in
+ * the shared UI package so every app stays visually consistent. */
+@import '@sb-codex/ui-components/theme.css';
 
-@source '../../../packages/ui-components/src/**/*.{ts,tsx}';
-
-@theme {
-  --color-brand-50: #eef2ff;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-}
-
-html,
-body,
-#root {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* Override the shared palette for this app by re-declaring tokens here, e.g.:
+ * @theme {
+ *   --color-primary-600: #db2777;
+ * }
+ */

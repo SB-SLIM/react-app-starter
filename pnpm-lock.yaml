@@ -92,6 +92,9 @@ importers:
       '@sb-codex/api-contracts':
         specifier: workspace:^
         version: link:../../packages/api-contracts
+      '@sb-codex/auth':
+        specifier: workspace:^
+        version: link:../../packages/auth
       '@sb-codex/ui-components':
         specifier: workspace:^
         version: link:../../packages/ui-components

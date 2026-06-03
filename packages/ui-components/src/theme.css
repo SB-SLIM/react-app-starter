@@ -1,0 +1,55 @@
+/**
+ * Shared theme + base styles for all apps.
+ *
+ * Apps consume this as the single Tailwind entry:
+ *   @import '@sb-codex/ui-components/theme.css';
+ *
+ * It pulls in Tailwind, scans this package's own components for class names,
+ * defines the design tokens, and enables class-based dark mode (toggled by
+ * <UIProvider> via a `dark` class on <html>).
+ */
+@import 'tailwindcss';
+
+/* Scan this package's components (paths are relative to this file). */
+@source './**/*.{ts,tsx}';
+
+/* Class-based dark mode: `dark:` utilities respond to a `.dark` ancestor. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Default design tokens. These are semantic (`primary`, not a brand name) so an
+ * app can override its palette without touching any component. Override by
+ * re-declaring the token AFTER the import, e.g. in an app's index.css:
+ *
+ *   @import '@sb-codex/ui-components/theme.css';
+ *   @theme {
+ *     --color-primary-600: #db2777;  // this app's brand color
+ *   }
+ *
+ * Components reference `primary-*`, so they pick up each app's palette.
+ */
+@theme {
+  --color-primary-50: #eef2ff;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

@@ -14,6 +14,10 @@ export const trpcClient = trpc.createClient({
     httpBatchLink({
       url: TRPC_URL,
       transformer: superjson,
+      headers() {
+        const slug = localStorage.getItem('workspace-slug')
+        return slug ? { 'x-workspace-slug': slug } : {}
+      },
       fetch(url, options) {
         return fetch(url, { ...options, credentials: 'include' })
       },

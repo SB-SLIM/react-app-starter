@@ -68,6 +68,28 @@ A clean rebuild: `pnpm clean && pnpm build`.
 - **Auth routes** skip the tenant plugin (`/api/auth/*` prefix check in `tenant.plugin.ts`).
 - **Admin app** only imports `AppRouter` as `import type` — never bundles server code.
 
+## Frontend structure (feature-based)
+
+The `admin` app is organized by feature, not by technical type.
+
+```text
+apps/admin/src/
+  app/          composition root — router, queryClient, trpc client setup
+  shared/       cross-feature code — ui, hooks, lib (e.g. useZodForm)
+  features/     one folder per domain feature
+    <feature>/
+      components/   feature-specific React components
+      hooks/        feature hooks (often wrapping a tRPC query/mutation)
+      api/          calls to the typed client (tRPC or better-auth)
+  routes/       TanStack file-based routes — THIN, only wiring
+```
+
+Rules:
+
+- **Routes stay thin**: a route file imports a feature component and wires it to the router. Business logic lives in `features/<name>/`, never in `routes/`.
+- **Features don't import each other.** Shared needs go through `shared/`.
+- **Backend mirrors this**: each tRPC router in `packages/api-contracts/src/routers/` is one feature (`clients.ts`, `health.ts`), aggregated in `_app.ts`. A new frontend feature maps to a router of the same name.
+
 ## Adding a new tenant-scoped table
 
 1. Add schema to `packages/db/src/schema/`.

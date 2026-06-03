@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { eq } from 'drizzle-orm'
 import { client } from '@sb-codex/db'
-import { publicProcedure, router, workspaceProcedure } from '../init'
+import { router, workspaceProcedure } from '../init'
 
 const clientInput = z.object({
   name: z.string().min(1),
@@ -23,7 +23,7 @@ const clientSchema = z.object({
 
 export const clientsRouter = router({
   // FIXME: should be workspaceProcedure
-  list: publicProcedure
+  list: workspaceProcedure
     .input(
       z
         .object({

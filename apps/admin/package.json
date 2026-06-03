@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@sb-codex/auth": "workspace:^",
     "@hookform/resolvers": "^5.2.2",
     "@sb-codex/api-contracts": "workspace:^",
     "@sb-codex/ui-components": "workspace:^",
