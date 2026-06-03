@@ -13,9 +13,22 @@ env:
   IMAGE_PREFIX: ${{ github.repository_owner }}/${{ github.event.repository.name }}
 
 jobs:
+  # Gate job: runs unconditionally and fails if CI didn't pass.
+  # Without this, a workflow where all jobs are skipped still has
+  # conclusion 'success', which would incorrectly trigger Deploy.
+  gate:
+    name: Check CI passed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if CI did not succeed
+        if: ${{ github.event.workflow_run.conclusion != 'success' }}
+        run: |
+          echo "CI workflow concluded with '${{ github.event.workflow_run.conclusion }}' — aborting build."
+          exit 1
+
   build:
     name: Build ${{ matrix.app }}
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: gate
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -59,8 +72,12 @@ jobs:
         id: args
         run: |
           if [ "${{ matrix.app }}" = "admin" ]; then
-            echo "value=VITE_TRPC_URL=${{ vars.VITE_TRPC_URL }}" >> "$GITHUB_OUTPUT"
-            echo "VITE_BETTER_AUTH_URL=${{ vars.VITE_BETTER_AUTH_URL }}" >> "$GITHUB_OUTPUT"
+            {
+              echo "value<<ARGS_EOF"
+              echo "VITE_TRPC_URL=${{ vars.VITE_TRPC_URL }}"
+              echo "VITE_BETTER_AUTH_URL=${{ vars.VITE_BETTER_AUTH_URL }}"
+              echo "ARGS_EOF"
+            } >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build and push
