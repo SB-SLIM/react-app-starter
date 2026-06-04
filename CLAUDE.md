@@ -4,6 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 See [docs/architecture.md](docs/architecture.md) for full architecture details.
 See [docs/roadmap.md](docs/roadmap.md) for phase status and what's next.
+See [.claude/workflow.md](.claude/workflow.md) for session workflow rules.
+
+## Documentation update rule
+
+Update docs **at the end of a session**, once a feature is working, validated, and deployed. Never mid-feature.
+
+**5 places to keep in sync (one pass):**
+
+1. `CLAUDE.md` — architectural rules, conventions, infra
+2. `docs/architecture.md` — tenant model, routing, auth, theme, scaling
+3. `docs/roadmap.md` — phase status, decisions
+4. `README.md` — quick start, stack, env vars
+5. **Notion** page `3741c921-e61d-815f-8b78-e896fe1b65f3` — mirror of architecture + roadmap
 
 ## Monorepo Structure
 
