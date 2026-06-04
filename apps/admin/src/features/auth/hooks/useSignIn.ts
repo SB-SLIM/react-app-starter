@@ -15,6 +15,12 @@ export function useSignIn() {
         setError(res.error)
         return
       }
+
+      const orgsRes = await authClient.listWorkspaces()
+      if (!orgsRes.error && orgsRes.data && orgsRes.data.length > 0) {
+        localStorage.setItem('workspace-slug', orgsRes.data[0].slug)
+      }
+
       await navigate({ to: '/dashboard' })
     })
   }

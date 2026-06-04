@@ -141,6 +141,21 @@ export function createSbAuthClient(baseURL: string) {
         error: null,
       }
     },
+
+    /** List the current user's workspaces. */
+    async listWorkspaces(): Promise<AuthResult<Workspace[]>> {
+      const res = await internal.organization.list()
+      if (res.error)
+        return {
+          data: null,
+          error: res.error.message ?? 'Failed to list workspaces',
+        }
+      const orgs = res.data ?? []
+      return {
+        data: orgs.map((o) => ({ id: o.id, slug: o.slug, name: o.name })),
+        error: null,
+      }
+    },
   }
 }
 
