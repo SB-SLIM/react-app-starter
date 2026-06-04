@@ -2,8 +2,24 @@
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@sb-codex/config",
   "version": "0.0.0",
+  "description": "Zod-validated environment loader (createEnv) for the sb-codex SaaS starter.",
   "type": "module",
   "license": "MIT",
+  "author": "Slim Bouchoucha",
+  "keywords": [
+    "sb-codex",
+    "saas-starter",
+    "env",
+    "zod",
+    "config"
+  ],
+  "homepage": "https://github.com/SB-SLIM/react-app-starter/tree/main/packages/config#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SB-SLIM/react-app-starter.git",
+    "directory": "packages/config"
+  },
+  "bugs": "https://github.com/SB-SLIM/react-app-starter/issues",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,7 +27,9 @@
   "publishConfig": {
     "access": "public"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "clean": "premove ./dist",
     "build": "tsup --tsconfig tsconfig.json",
@@ -24,7 +42,10 @@
       "require": "./dist/index.cjs"
     }
   },
-  "dependencies": {
+  "peerDependencies": {
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
     "zod": "^4.0.0"
   }
 }

@@ -164,6 +164,8 @@ No application-level rewrites required — `workspace_id` is the natural shard k
 | `@sb-codex/api-contracts` | tRPC router, procedures, shared Zod schemas                 |
 | `@sb-codex/jobs`          | BullMQ queue definitions + worker entrypoint                |
 
+Each package is an independent, publishable npm plugin (`@sb-codex` scope). Shared-instance libs are `peerDependencies`. See [plugins/README.md](plugins/README.md) for the index and [starting-a-new-project.md](starting-a-new-project.md) for bootstrapping a new app.
+
 ---
 
 ## Adding a new tenant-scoped table

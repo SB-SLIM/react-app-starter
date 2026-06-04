@@ -2,8 +2,25 @@
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@sb-codex/auth",
   "version": "0.0.0",
+  "description": "better-auth server config (createAuth) + library-agnostic client facade for the sb-codex SaaS starter.",
   "type": "module",
   "license": "MIT",
+  "author": "Slim Bouchoucha",
+  "keywords": [
+    "sb-codex",
+    "saas-starter",
+    "better-auth",
+    "auth",
+    "organizations",
+    "multi-tenant"
+  ],
+  "homepage": "https://github.com/SB-SLIM/react-app-starter/tree/main/packages/auth#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SB-SLIM/react-app-starter.git",
+    "directory": "packages/auth"
+  },
+  "bugs": "https://github.com/SB-SLIM/react-app-starter/issues",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -32,7 +49,12 @@
     }
   },
   "dependencies": {
-    "@sb-codex/db": "workspace:^",
+    "@sb-codex/db": "workspace:^"
+  },
+  "peerDependencies": {
+    "better-auth": "^1.0.0"
+  },
+  "devDependencies": {
     "better-auth": "^1.0.0"
   }
 }

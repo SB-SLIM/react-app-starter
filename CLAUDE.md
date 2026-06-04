@@ -120,6 +120,16 @@ Rules:
 1. Create `packages/<name>/` with `package.json` (name `@sb-codex/<name>`, scripts `build`/`dev`/`clean`), `tsconfig.json` (extends `../../tsconfig.base.json`), `tsup.config.ts`.
 2. Add the name to pnpm `overrides` in root `package.json` with `"workspace:^"`.
 3. Consumers declare it as a `workspace:^` dependency and import normally.
+4. Add `README.md`, publish metadata (`description`, `repository.directory`, `keywords`), and a row in `docs/plugins/README.md`.
+
+## Packages are publishable plugins
+
+Every `packages/*` is an independent npm plugin under `@sb-codex`. Conventions:
+
+- Each has a `README.md` (canonical docs), publish metadata, and `publishConfig.access: public`.
+- Shared-instance libs (`react`, `zod`, `drizzle-orm`, `@trpc/server`, `better-auth`) are **`peerDependencies`** (mirrored in `devDependencies`), not `dependencies`.
+- Publishing is via changesets — see [docs/plugins/README.md](docs/plugins/README.md).
+- New projects are bootstrapped with the `create-sb-app` CLI — see [docs/starting-a-new-project.md](docs/starting-a-new-project.md).
 
 ---
 

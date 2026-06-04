@@ -2,8 +2,25 @@
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@sb-codex/db",
   "version": "0.0.0",
+  "description": "Drizzle ORM schema, migrations, RLS helpers and createDb() for the sb-codex SaaS starter.",
   "type": "module",
   "license": "MIT",
+  "author": "Slim Bouchoucha",
+  "keywords": [
+    "sb-codex",
+    "saas-starter",
+    "drizzle",
+    "postgres",
+    "rls",
+    "multi-tenant"
+  ],
+  "homepage": "https://github.com/SB-SLIM/react-app-starter/tree/main/packages/db#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SB-SLIM/react-app-starter.git",
+    "directory": "packages/db"
+  },
+  "bugs": "https://github.com/SB-SLIM/react-app-starter/issues",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -30,12 +47,15 @@
     }
   },
   "dependencies": {
-    "drizzle-orm": "^0.44.0",
     "postgres": "^3.4.5"
+  },
+  "peerDependencies": {
+    "drizzle-orm": "^0.44.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "drizzle-kit": "^0.31.0",
+    "drizzle-orm": "^0.44.0",
     "tsx": "^4.19.0"
   }
 }

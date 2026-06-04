@@ -2,8 +2,24 @@
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@sb-codex/api-contracts",
   "version": "0.0.0",
+  "description": "tRPC router, procedures and shared Zod schemas for the sb-codex SaaS starter.",
   "type": "module",
   "license": "MIT",
+  "author": "Slim Bouchoucha",
+  "keywords": [
+    "sb-codex",
+    "saas-starter",
+    "trpc",
+    "zod",
+    "api"
+  ],
+  "homepage": "https://github.com/SB-SLIM/react-app-starter/tree/main/packages/api-contracts#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SB-SLIM/react-app-starter.git",
+    "directory": "packages/api-contracts"
+  },
+  "bugs": "https://github.com/SB-SLIM/react-app-starter/issues",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -28,9 +44,16 @@
   },
   "dependencies": {
     "@sb-codex/db": "workspace:^",
+    "superjson": "^2.2.2"
+  },
+  "peerDependencies": {
     "@trpc/server": "^11.0.0",
     "drizzle-orm": "^0.44.0",
-    "superjson": "^2.2.2",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@trpc/server": "^11.0.0",
+    "drizzle-orm": "^0.44.0",
     "zod": "^4.0.0"
   }
 }

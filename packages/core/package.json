@@ -2,8 +2,23 @@
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@sb-codex/core",
   "version": "0.0.0",
+  "description": "Core utilities for the sb-codex SaaS starter (cn classname helper).",
   "type": "module",
   "license": "MIT",
+  "author": "Slim Bouchoucha",
+  "keywords": [
+    "sb-codex",
+    "saas-starter",
+    "utils",
+    "classnames"
+  ],
+  "homepage": "https://github.com/SB-SLIM/react-app-starter/tree/main/packages/core#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SB-SLIM/react-app-starter.git",
+    "directory": "packages/core"
+  },
+  "bugs": "https://github.com/SB-SLIM/react-app-starter/issues",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",

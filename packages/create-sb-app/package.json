@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "create-sb-app",
+  "version": "0.0.0",
+  "description": "Scaffold a new multi-tenant SaaS project from the sb-codex starter.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Slim Bouchoucha",
+  "keywords": [
+    "sb-codex",
+    "saas-starter",
+    "create",
+    "scaffold",
+    "cli",
+    "template"
+  ],
+  "homepage": "https://github.com/SB-SLIM/react-app-starter/tree/main/packages/create-sb-app#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SB-SLIM/react-app-starter.git",
+    "directory": "packages/create-sb-app"
+  },
+  "bugs": "https://github.com/SB-SLIM/react-app-starter/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "create-sb-app": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "premove ./dist",
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "giget": "^1.2.1",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsup": "^8.5.0"
+  }
+}

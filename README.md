@@ -104,3 +104,5 @@ Required as **GitHub Actions Variables** (for CI builds of the admin SPA):
 
 See [docs/architecture.md](docs/architecture.md) for tenant isolation details and the scaling path to 1–2 M users.
 See [docs/roadmap.md](docs/roadmap.md) for the phase-by-phase implementation plan.
+See [docs/plugins/README.md](docs/plugins/README.md) for the publishable `@sb-codex/*` plugins.
+See [docs/starting-a-new-project.md](docs/starting-a-new-project.md) to bootstrap a new project (`create-sb-app`).
