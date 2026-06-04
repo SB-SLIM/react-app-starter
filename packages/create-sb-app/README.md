@@ -1,13 +1,12 @@
-# create-sb-app
+# @sb-codex/create-sb-app
 
 Scaffold a new multi-tenant SaaS project from the [sb-codex starter](https://github.com/SB-SLIM/react-app-starter). Downloads the full monorepo (apps + packages in `workspace:^`, self-contained) and replaces project-specific values for you.
 
 ## Usage
 
 ```bash
-pnpm create sb-app my-saas
-# or: npm create sb-app my-saas
-# or: yarn create sb-app my-saas
+pnpm create @sb-codex/sb-app my-saas
+# or: npm create @sb-codex/sb-app my-saas
 ```
 
 Prompts:
@@ -37,10 +36,10 @@ pnpm dev
 
 It also drops its own `packages/create-sb-app` from the generated project and copies `.env.example` → `.env`.
 
-## Local usage (before publish)
+## Local usage (from the monorepo)
 
 ```bash
-pnpm --filter create-sb-app build
+pnpm --filter @sb-codex/create-sb-app build
 node packages/create-sb-app/dist/index.js ../my-saas
 ```
 

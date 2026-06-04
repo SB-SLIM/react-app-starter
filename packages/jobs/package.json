@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@sb-codex/jobs",
-  "version": "0.0.0",
+  "version": "0.0.1-beta.0",
   "description": "BullMQ queue definitions + worker entrypoint for the sb-codex SaaS starter.",
   "type": "module",
   "license": "MIT",

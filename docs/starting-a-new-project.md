@@ -2,12 +2,12 @@
 
 Two ways to start a new product from this starter.
 
-## Option A — `create-sb-app` CLI (recommended)
+## Option A — `@sb-codex/create-sb-app` CLI (recommended)
 
 Scaffolds a full, self-contained copy of the monorepo (apps + packages in `workspace:^`) and replaces project-specific values for you.
 
 ```bash
-pnpm create sb-app my-project
+pnpm create @sb-codex/sb-app my-project
 ```
 
 It prompts for:

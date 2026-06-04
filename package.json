@@ -22,7 +22,8 @@
     "db:studio": "pnpm --filter @sb-codex/db db:studio",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "pnpm build && changeset publish",
+    "build:packages": "turbo run build --filter=./packages/*",
+    "release": "pnpm build:packages && changeset publish",
     "prepare": "husky"
   },
   "keywords": [],

@@ -1,0 +1,19 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "admin": "0.0.0",
+    "e2e": "0.0.0",
+    "server": "0.0.0",
+    "web": "0.0.0",
+    "@sb-codex/api-contracts": "0.0.0",
+    "@sb-codex/auth": "0.0.0",
+    "@sb-codex/config": "0.0.0",
+    "@sb-codex/core": "0.0.0",
+    "create-sb-app": "0.0.0",
+    "@sb-codex/db": "0.0.0",
+    "@sb-codex/jobs": "0.0.0",
+    "@sb-codex/ui-components": "0.0.0"
+  },
+  "changesets": ["initial-beta"]
+}

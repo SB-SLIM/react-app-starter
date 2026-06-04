@@ -13,7 +13,7 @@ The canonical documentation for each plugin lives in its own `README.md` (single
 | `@sb-codex/api-contracts` | tRPC router + shared Zod schemas                | [README](../../packages/api-contracts/README.md) |
 | `@sb-codex/jobs`          | BullMQ queues + worker                          | [README](../../packages/jobs/README.md)          |
 | `@sb-codex/ui-components` | React primitives + UIProvider + theme.css       | [README](../../packages/ui-components/README.md) |
-| `create-sb-app`           | CLI to scaffold a new project from this starter | [README](../../packages/create-sb-app/README.md) |
+| `@sb-codex/create-sb-app` | CLI to scaffold a new project from this starter | [README](../../packages/create-sb-app/README.md) |
 
 ## Publishing
 
@@ -33,4 +33,4 @@ Libraries whose instance must be shared with the consumer (`react`, `zod`, `driz
 
 ## Starting a new project
 
-To bootstrap a new app from this starter, see [starting-a-new-project.md](../starting-a-new-project.md) or use the `create-sb-app` CLI.
+To bootstrap a new app from this starter, see [starting-a-new-project.md](../starting-a-new-project.md) or use the `@sb-codex/create-sb-app` CLI.
