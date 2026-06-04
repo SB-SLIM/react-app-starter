@@ -2,16 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+See [docs/architecture.md](docs/architecture.md) for full architecture details.
+See [docs/roadmap.md](docs/roadmap.md) for phase status and what's next.
+
 ## Monorepo Structure
 
 pnpm workspace + Turborepo with two layers:
 
 - `packages/` — shared libraries built with `tsup`, consumed by apps
   - `@sb-codex/core` — utilities (`cn` classname helper)
-  - `@sb-codex/ui-components` — React component library (`Button`, `CardUser`)
+  - `@sb-codex/ui-components` — React component library + `UIProvider` + `theme.css`
   - `@sb-codex/config` — Zod-validated `createEnv()` loader
   - `@sb-codex/db` — Drizzle ORM schema, migrations, RLS, `createDb()`
-  - `@sb-codex/auth` — better-auth + organization plugin (`createAuth()`)
+  - `@sb-codex/auth` — better-auth server config (`createAuth()`) + client facade (`./client`)
   - `@sb-codex/api-contracts` — tRPC router, procedures, shared Zod schemas
   - `@sb-codex/jobs` — BullMQ queue definitions + worker entrypoint
 - `apps/` — end-user applications
@@ -67,6 +70,7 @@ A clean rebuild: `pnpm clean && pnpm build`.
 - **Context shape** (`packages/api-contracts/src/context.ts`): `{ requestId, user, workspace, db }`. `db` is a Drizzle instance; inside `enforceWorkspace` it becomes a transaction.
 - **Auth routes** skip the tenant plugin (`/api/auth/*` prefix check in `tenant.plugin.ts`).
 - **Admin app** only imports `AppRouter` as `import type` — never bundles server code.
+- **Auth client**: apps import from `@sb-codex/auth/client` — never from `better-auth` directly. `createSbAuthClient(baseURL)` is the library-agnostic facade.
 
 ## Frontend structure (feature-based)
 
@@ -120,12 +124,12 @@ Rules:
 
 ### Routing Architecture (Traefik v3.1)
 
-Traefik uses a **static file provider** (`infra/traefik/dynamic.prod.yml`) — NOT the Docker label provider. This is because the VPS runs Docker Engine 27+ which dropped support for Docker API < 1.40, and Traefik's Docker client requests API 1.24.
+Traefik uses a **static file provider** (`infra/traefik/dynamic.prod.yml`) — NOT the Docker label provider. Docker Engine 27+ dropped support for Docker API < 1.40 which Traefik's Docker client requires.
 
 - `PathPrefix(/api)` → Fastify server (priority 10)
 - `Host(hub.*)` catch-all → nginx/admin SPA (priority 1)
 - HTTPS redirect at entrypoint level (port 80 → 443)
-- TLS certificates via Let's Encrypt `tlsChallenge` (port 443, stored in `infra/traefik/acme.json`)
+- TLS via Let's Encrypt `tlsChallenge` (port 443, stored in `infra/traefik/acme.json`)
 
 ### Fastify Routes
 
@@ -136,36 +140,36 @@ All routes are prefixed with `/api`:
 - `GET /api/auth/*` — better-auth endpoints
 - `/api/trpc/*` — tRPC endpoint
 
+### CI/CD Pipeline
+
+```text
+push → main
+  └── CI (lint/typecheck/test)
+        └── if success → Build & Push Images (native arm64 runner → GHCR)
+                  └── if success → Deploy to VPS
+                        ├── git pull
+                        ├── docker compose pull   (images from GHCR, no downtime)
+                        ├── docker compose up -d  (2-5s downtime per service)
+                        └── migrate
+```
+
+GitHub Actions Variables required: `VITE_TRPC_URL`, `VITE_BETTER_AUTH_URL`
+GitHub Actions Secrets required: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_PORT`
+
 ### Key Files
 
 | File                                    | Purpose                                              |
 | --------------------------------------- | ---------------------------------------------------- |
 | `infra/compose/docker-compose.prod.yml` | Production stack                                     |
-| `infra/compose/docker-compose.test.yml` | Test stack (VPS, no TLS)                             |
 | `infra/traefik/traefik.prod.yml`        | Traefik static config (tlsChallenge, entrypoints)    |
 | `infra/traefik/dynamic.prod.yml`        | Traefik routes (hardcoded domain, file provider)     |
 | `infra/traefik/acme.json`               | Let's Encrypt certs (600 permissions, never commit)  |
 | `apps/server/src/migrate.ts`            | Standalone migration script → `node dist/migrate.js` |
 | `.env.production`                       | Prod secrets on VPS (never committed)                |
 
-### Deploy Commands (on VPS)
-
-```bash
-# Full deploy after git pull
-git pull
-docker compose -f infra/compose/docker-compose.prod.yml --env-file .env.production up -d --build
-
-# Run migrations only (before deploying server)
-docker compose -f infra/compose/docker-compose.prod.yml --env-file .env.production --profile migrate run --rm migrate
-
-# Rebuild single service
-docker compose -f infra/compose/docker-compose.prod.yml --env-file .env.production up -d --build server
-docker compose -f infra/compose/docker-compose.prod.yml --env-file .env.production up -d --build admin
-```
-
 ### .env.production required variables
 
-```
+```bash
 DOMAIN=slimbouchoucha.tn
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=<secret>
@@ -175,16 +179,17 @@ BETTER_AUTH_SECRET=<32+ chars>
 BETTER_AUTH_URL=https://hub.slimbouchoucha.tn
 CORS_ORIGIN=https://hub.slimbouchoucha.tn
 DATABASE_URL=postgresql://postgres:<password>@postgres:5432/saas
-SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
-MINIO_ROOT_USER, MINIO_ROOT_PASSWORD
-MEILI_MASTER_KEY
+GHCR_IMAGE_PREFIX=ghcr.io/sb-slim/react-app-starter
+SMTP_HOST=...
+SMTP_PORT=587
+SMTP_USER=...
+SMTP_PASS=...
+SMTP_FROM=...
+MINIO_ROOT_USER=...
+MINIO_ROOT_PASSWORD=...
+MEILI_MASTER_KEY=...
 ```
 
 ### tRPC Client (admin app)
 
-`VITE_TRPC_URL` is baked at build time via Docker build arg:
-
-- Prod: `https://hub.slimbouchoucha.tn/api/trpc`
-- Test: `http://<VPS_IP>:3001/api/trpc`
-
-The workspace slug is sent via `x-workspace-slug` header (to be implemented — currently uses subdomain extraction from `window.location.hostname`).
+`VITE_TRPC_URL` and `VITE_BETTER_AUTH_URL` are baked at build time via Docker build args in CI. The workspace slug is sent via `x-workspace-slug` header (read from `localStorage`, set after signup/login).
