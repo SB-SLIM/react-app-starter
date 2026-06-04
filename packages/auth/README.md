@@ -6,9 +6,10 @@ Authentication for the sb-codex SaaS starter, built on [better-auth](https://bet
 
 ```bash
 pnpm add @sb-codex/auth
-# peer dependency
-pnpm add better-auth
 ```
+
+`better-auth` is a regular dependency of this package — it's the internal engine
+behind the facade, so consumers never install or import it directly.
 
 ## Usage
 
@@ -56,10 +57,6 @@ const { session } = authClient.useSession() // React hook
 ## Swapping the auth library
 
 All better-auth usage is contained in `src/index.ts` (server) and `src/client.ts` (client). To move to another provider, rewrite those two files — no consuming app code changes.
-
-## Peer dependencies
-
-- `better-auth` `^1`
 
 ---
 

@@ -327,7 +327,6 @@ importers:
       '@sb-codex/db':
         specifier: workspace:^
         version: link:../db
-    devDependencies:
       better-auth:
         specifier: ^1.0.0
         version: 1.6.11(drizzle-kit@0.31.10)(next@15.5.18(@playwright/test@1.60.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(vitest@3.2.4(@types/node@24.7.2)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.22.1)(yaml@2.8.1))

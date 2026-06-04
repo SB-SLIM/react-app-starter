@@ -26,6 +26,7 @@ import {
   SKIP_DIRS,
   type Answers,
 } from './replacements'
+import { applyAppsOnly } from './transform'
 
 const TEMPLATE = 'github:SB-SLIM/react-app-starter'
 
@@ -160,14 +161,13 @@ async function main() {
   }
   s.stop('Template downloaded')
 
-  // 2. Remove the scaffolder itself + a stale lockfile from the generated project
-  const selfDir = join(targetDir, 'packages', 'create-sb-app')
-  if (existsSync(selfDir)) rmSync(selfDir, { recursive: true, force: true })
+  // 2. Apps-only transform: apps depend on the published @sb-codex/* versions
+  //    (+ their peer deps); the packages/ source is removed.
+  applyAppsOnly(targetDir)
   // giget ships a tarball (no .git), but be safe
   const gitDir = join(targetDir, '.git')
   if (existsSync(gitDir)) rmSync(gitDir, { recursive: true, force: true })
-  // The starter's lockfile references create-sb-app (now removed) — drop it so
-  // the new project resolves a fresh lockfile on first install.
+  // Drop the starter's lockfile so the new project resolves a fresh one.
   const lockfile = join(targetDir, 'pnpm-lock.yaml')
   if (existsSync(lockfile)) rmSync(lockfile, { force: true })
 
@@ -220,13 +220,13 @@ async function main() {
       '  server   Fastify 5 + tRPC v11 + Pino (stateless API)',
       '  web      Next.js 15 marketing site',
       '  e2e      Playwright',
-      pc.bold('packages/  (@sb-codex/* plugins, workspace:^)'),
+      pc.bold('@sb-codex/* plugins (from npm)'),
       '  core · config · db · auth · api-contracts · jobs · ui-components',
       pc.bold('infra/'),
       '  docker · compose · traefik',
       '',
       pc.dim('Multi-tenant: Postgres + RLS, x-workspace-slug header.'),
-      pc.dim('Docs: docs/architecture.md · docs/roadmap.md · docs/plugins/'),
+      pc.dim('Plugins resolved from npm — no packages/ folder.'),
     ].join('\n'),
     'Architecture',
   )

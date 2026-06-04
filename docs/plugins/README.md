@@ -29,7 +29,9 @@ pnpm release            # build + publish to npm (needs NPM_TOKEN)
 
 ## Dependency conventions
 
-Libraries whose instance must be shared with the consumer (`react`, `zod`, `drizzle-orm`, `@trpc/server`, `better-auth`) are declared as **`peerDependencies`** (and mirrored in `devDependencies` for local build/dev). This avoids duplicate copies and version-mismatch bugs in consuming apps.
+Libraries whose instance must be shared with the consumer (`react`, `zod`, `drizzle-orm`, `@trpc/server`) are declared as **`peerDependencies`** (and mirrored in `devDependencies` for local build/dev). This avoids duplicate copies and version-mismatch bugs in consuming apps.
+
+`@sb-codex/auth` is the exception: `better-auth` is a regular **dependency** because it's the internal engine behind the facade — consumers use `@sb-codex/auth`, never `better-auth` directly.
 
 ## Starting a new project
 
