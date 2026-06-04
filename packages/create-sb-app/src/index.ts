@@ -4,7 +4,6 @@ import {
   readFileSync,
   writeFileSync,
   rmSync,
-  statSync,
   copyFileSync,
 } from 'node:fs'
 import { join, extname, basename } from 'node:path'
@@ -48,7 +47,7 @@ function parseFlags(argv: string[]): Record<string, string | boolean> {
   const flags: Record<string, string | boolean> = {}
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]
-    if (!arg.startsWith('--')) continue
+    if (!arg || !arg.startsWith('--')) continue
     const eq = arg.indexOf('=')
     if (eq !== -1) {
       flags[arg.slice(2, eq)] = arg.slice(eq + 1)
