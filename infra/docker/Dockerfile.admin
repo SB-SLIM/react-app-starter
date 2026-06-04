@@ -24,6 +24,8 @@ COPY scripts/ ./scripts/
 COPY tsconfig.base.json ./
 ARG VITE_TRPC_URL
 ENV VITE_TRPC_URL=$VITE_TRPC_URL
+ARG VITE_BETTER_AUTH_URL
+ENV VITE_BETTER_AUTH_URL=$VITE_BETTER_AUTH_URL
 RUN pnpm turbo build --filter=admin...
 
 # Serve with a lightweight static server
