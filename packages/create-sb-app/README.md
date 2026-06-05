@@ -48,13 +48,6 @@ pnpm dev
 npx @sb-codex/create-sb-app my-saas --name my-saas --domain localhost --no-git
 ```
 
-## Local usage (from the monorepo)
-
-```bash
-pnpm --filter @sb-codex/create-sb-app build
-node packages/create-sb-app/dist/index.js ../my-saas
-```
-
 ---
 
 Part of the [sb-codex SaaS starter](https://github.com/SB-SLIM/react-app-starter). See [docs/plugins](../../docs/plugins/README.md).

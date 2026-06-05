@@ -6,7 +6,7 @@ import {
   rmSync,
   copyFileSync,
 } from 'node:fs'
-import { join, extname, basename } from 'node:path'
+import { join, extname } from 'node:path'
 import { execSync } from 'node:child_process'
 import {
   intro,
@@ -89,36 +89,25 @@ async function main() {
   const flags = parseFlags(process.argv.slice(2))
   const positional = process.argv.slice(2).find((a) => !a.startsWith('--'))
 
-  // Target directory (positional arg or prompt)
+  // Project name = directory name (single source of truth, like create-vite).
+  // Positional arg or --name skips the prompt; otherwise ask once.
   let target =
-    positional ?? (typeof flags.dir === 'string' ? flags.dir : undefined)
+    positional ?? (typeof flags.name === 'string' ? flags.name : undefined)
   if (!target) {
     const answer = await text({
-      message: 'Project directory?',
+      message: 'Project name?',
       placeholder: 'my-saas',
-      validate: (v) => (v.length === 0 ? 'Required' : undefined),
+      validate: (v) => (slugify(v).length === 0 ? 'Invalid name' : undefined),
     })
     if (isCancel(answer)) bail('Cancelled.')
     target = answer
   }
 
+  // The folder and the package name are always the same value.
+  const name = slugify(target)
   const targetDir = join(process.cwd(), target)
   if (existsSync(targetDir) && readdirSync(targetDir).length > 0) {
     bail(`Directory "${target}" already exists and is not empty.`)
-  }
-
-  // Project name (--name or prompt)
-  let name: string
-  if (typeof flags.name === 'string') {
-    name = flags.name
-  } else {
-    const nameAnswer = await text({
-      message: 'Project name (package name)?',
-      initialValue: slugify(basename(target)),
-      validate: (v) => (slugify(v).length === 0 ? 'Invalid name' : undefined),
-    })
-    if (isCancel(nameAnswer)) bail('Cancelled.')
-    name = nameAnswer
   }
 
   // Production domain (--domain or prompt)
