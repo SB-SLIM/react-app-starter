@@ -164,7 +164,7 @@ No application-level rewrites required — `workspace_id` is the natural shard k
 | `@sb-codex/api-contracts` | tRPC router, procedures, shared Zod schemas                 |
 | `@sb-codex/jobs`          | BullMQ queue definitions + worker entrypoint                |
 
-Each package is an independent, publishable npm plugin (`@sb-codex` scope). Shared-instance libs are `peerDependencies`. See [plugins/README.md](plugins/README.md) for the index and [starting-a-new-project.md](starting-a-new-project.md) for bootstrapping a new app.
+Each package is an independent npm plugin (`@sb-codex` scope), **published to npm** (currently `beta`). Shared-instance libs are `peerDependencies`; `@sb-codex/auth` keeps `better-auth` as a regular dependency (facade engine). New projects are scaffolded **apps-only** with `pnpm create @sb-codex/sb-app@latest` — plugins resolved from npm, no `packages/`. See [plugins/README.md](plugins/README.md) and [starting-a-new-project.md](starting-a-new-project.md).
 
 ---
 

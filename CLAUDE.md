@@ -124,12 +124,12 @@ Rules:
 
 ## Packages are publishable plugins
 
-Every `packages/*` is an independent npm plugin under `@sb-codex`. Conventions:
+Every `packages/*` is an independent npm plugin under `@sb-codex`, published to npm (currently `beta`, `0.0.1-beta.x`). Conventions:
 
 - Each has a `README.md` (canonical docs), publish metadata, and `publishConfig.access: public`.
-- Shared-instance libs (`react`, `zod`, `drizzle-orm`, `@trpc/server`, `better-auth`) are **`peerDependencies`** (mirrored in `devDependencies`), not `dependencies`.
-- Publishing is via changesets — see [docs/plugins/README.md](docs/plugins/README.md).
-- New projects are bootstrapped with the `create-sb-app` CLI — see [docs/starting-a-new-project.md](docs/starting-a-new-project.md).
+- Shared-instance libs (`react`, `zod`, `drizzle-orm`, `@trpc/server`) are **`peerDependencies`** (mirrored in `devDependencies`), not `dependencies`. **Exception**: `@sb-codex/auth` keeps `better-auth` as a regular dependency — it's the internal engine of the facade, hidden from consumers.
+- Publishing is via changesets (prerelease `beta` mode) — see [docs/plugins/README.md](docs/plugins/README.md). `pnpm release` builds packages only (`build:packages`) then `changeset publish`.
+- New projects are bootstrapped with `pnpm create @sb-codex/sb-app@latest` — generates an **apps-only** project (plugins from npm, no `packages/`). See [docs/starting-a-new-project.md](docs/starting-a-new-project.md).
 
 ---
 

@@ -4,7 +4,18 @@ An open-source, multi-tenant SaaS starter built for forking. Ships with auth, wo
 
 **Live demo:** <https://hub.slimbouchoucha.tn>
 
-## Quick start
+## Create a new project
+
+The fastest way to start: scaffold an apps-only project that pulls the `@sb-codex/*` plugins from npm.
+
+```bash
+pnpm create @sb-codex/sb-app@latest my-saas
+cd my-saas && pnpm install && pnpm dev
+```
+
+The published plugins live under the [`@sb-codex`](https://www.npmjs.com/org/sb-codex) npm scope (currently `beta`). See [docs/plugins/README.md](docs/plugins/README.md) and [docs/starting-a-new-project.md](docs/starting-a-new-project.md).
+
+## Quick start (develop the starter itself)
 
 ```bash
 # 1. Clone and install

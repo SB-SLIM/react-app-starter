@@ -58,10 +58,11 @@ Build an **open-source, multi-tenant SaaS starter** that can be forked to ship v
 | 6   | Theme system (UIProvider, `theme.css`, semantic `primary-*` tokens, dark mode, runtime override)      | ✅ Done |
 | 7   | CI/CD (GitHub Actions: `ci.yml`, `build-images.yml`, `deploy.yml`, GHCR, native arm64 runner)         | ✅ Done |
 | 8   | Production deploy (hub.slimbouchoucha.tn, Let's Encrypt TLS, Traefik file provider)                   | ✅ Done |
-| 9   | Testing (Vitest workspace + Playwright `apps/e2e` with tenant-isolation suite)                        | ⏳      |
-| 10  | Client management UI (list/create/edit/delete — API exists, frontend missing)                         | ⏳      |
-| 11  | Member management (invite flow, role management)                                                      | ⏳      |
-| 12  | Billing (Stripe via better-auth plugin)                                                               | ⏳      |
+| 9   | Publishable plugins: `@sb-codex/*` on npm (beta) + `@sb-codex/create-sb-app` scaffolder (apps-only)   | ✅ Done |
+| 10  | Testing (Vitest workspace + Playwright `apps/e2e` with tenant-isolation suite)                        | ⏳      |
+| 11  | Client management UI (list/create/edit/delete — API exists, frontend missing)                         | ⏳      |
+| 12  | Member management (invite flow, role management)                                                      | ⏳      |
+| 13  | Billing (Stripe via better-auth plugin)                                                               | ⏳      |
 
 ---
 
@@ -80,9 +81,16 @@ Build an **open-source, multi-tenant SaaS starter** that can be forked to ship v
 - RLS policies enforce isolation at the DB level — no manual `WHERE workspace_id = ?` needed
 - `x-workspace-slug` header resolved by tenant plugin → workspace looked up + membership verified
 
+### Publishable plugins
+
+- The 7 `@sb-codex/*` packages are published to npm under the `beta` dist-tag (`0.0.1-beta.x`).
+- `@sb-codex/create-sb-app` (tag `latest`) scaffolds a new project: `pnpm create @sb-codex/sb-app@latest <name>`.
+- The scaffold is **apps-only** — `apps/` only, `@sb-codex/*` pulled from npm at the published version with peer deps injected; `packages/`, `.claude/`, `CLAUDE.md`, `docs/` and changeset config are stripped.
+- `@sb-codex/auth` bundles `better-auth` as a regular dependency (facade engine), not a peer.
+
 ### CI/CD pipeline
 
-```
+```text
 push → main
   └── CI (lint/typecheck/test — Node 20+22)
         └── if success → Build & Push Images (native arm64 runner → GHCR)

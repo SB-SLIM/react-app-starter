@@ -108,4 +108,10 @@ export function applyAppsOnly(targetDir: string): void {
   const changesetDir = join(targetDir, '.changeset')
   if (existsSync(changesetDir))
     rmSync(changesetDir, { recursive: true, force: true })
+
+  // 7. Drop starter-specific meta files (not relevant to a forked project).
+  for (const rel of ['.claude', 'CLAUDE.md', 'docs']) {
+    const p = join(targetDir, rel)
+    if (existsSync(p)) rmSync(p, { recursive: true, force: true })
+  }
 }
