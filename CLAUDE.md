@@ -143,7 +143,7 @@ Every `packages/*` is an independent npm plugin under `@sb-codex`. Conventions:
 | Dev  | `https://hub-dev.slimbouchoucha.tn` | `https://hub-dev.slimbouchoucha.tn/api` |
 | QA   | `https://hub-qa.slimbouchoucha.tn`  | `https://hub-qa.slimbouchoucha.tn/api`  |
 
-**VPS IP:** 152.53.187.54
+**VPS IP:** _kept private — set it in your local deployment notes / `.env.production`, not in the repo._
 
 ### Routing Architecture (Traefik v3.1)
 

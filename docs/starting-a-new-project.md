@@ -7,7 +7,7 @@ Two ways to start a new product from this starter.
 Scaffolds a full, self-contained copy of the monorepo (apps + packages in `workspace:^`) and replaces project-specific values for you.
 
 ```bash
-pnpm create @sb-codex/sb-app my-project
+pnpm create @sb-codex/sb-app@latest my-project
 ```
 
 It prompts for:

@@ -33,8 +33,6 @@ export function buildReplacements(answers: Answers): Replacement[] {
     },
     // Remaining bare repo name (URLs, image names)
     { find: /react-app-starter/g, replace: name },
-    // VPS IP
-    { find: /152\.53\.187\.54/g, replace: 'YOUR_VPS_IP' },
     // Notion page id (mirror of architecture docs — project specific)
     { find: NOTION_PAGE_ID_DASHED, replace: 'YOUR_NOTION_PAGE_ID' },
     { find: NOTION_PAGE_ID_COMPACT, replace: 'YOUR_NOTION_PAGE_ID' },

@@ -127,12 +127,12 @@ async function main() {
     domain = flags.domain
   } else {
     const domainAnswer = await text({
-      message: 'Production domain?',
-      placeholder: 'myapp.com',
-      defaultValue: 'example.com',
+      message: 'Production domain? (defaults to localhost for local dev)',
+      placeholder: 'localhost',
+      defaultValue: 'localhost',
     })
     if (isCancel(domainAnswer)) bail('Cancelled.')
-    domain = domainAnswer || 'example.com'
+    domain = domainAnswer || 'localhost'
   }
 
   // git init (--git / --no-git, or prompt)
