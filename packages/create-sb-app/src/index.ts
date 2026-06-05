@@ -183,6 +183,34 @@ async function main() {
     writeFileSync(rootPkgPath, JSON.stringify(pkg, null, 2) + '\n')
   }
 
+  // Fresh project-specific README (replaces the starter's).
+  writeFileSync(
+    join(targetDir, 'README.md'),
+    `# ${answers.name}
+
+Built from the [sb-codex SaaS starter](https://github.com/SB-SLIM/react-app-starter).
+
+## Development
+
+\`\`\`bash
+pnpm install
+# .env was created from .env.example — fill in the secrets
+pnpm dev
+\`\`\`
+
+- Admin → http://localhost:5173
+- API → http://localhost:3001
+
+## Stack
+
+React 19 · Vite · Tailwind v4 · TanStack Router/Query · Fastify 5 · tRPC v11 ·
+Drizzle + Postgres (RLS) · better-auth · \`@sb-codex/*\` plugins.
+
+Multi-tenant: every business table is scoped by \`workspace_id\` and isolated via
+Postgres Row-Level Security.
+`,
+  )
+
   // .env from .env.example
   const envExample = join(targetDir, '.env.example')
   const envFile = join(targetDir, '.env')

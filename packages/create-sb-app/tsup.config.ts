@@ -9,6 +9,6 @@ export default defineConfig({
   outDir: 'dist',
   clean: true,
   dts: false,
-  minify: false,
+  minify: true,
   banner: { js: '#!/usr/bin/env node' },
 })
