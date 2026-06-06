@@ -18,31 +18,31 @@ Build an **open-source, multi-tenant SaaS starter** that can be forked to ship v
 
 ## Locked architecture decisions
 
-| Layer                    | Choice                                                                  |
-| ------------------------ | ----------------------------------------------------------------------- |
-| Tenant isolation         | Shared Postgres + **Row-Level Security** (`SET LOCAL app.workspace_id`) |
-| Tenant URL               | `x-workspace-slug` header (stored in `localStorage` after signup/login) |
-| Auth + organizations     | **better-auth** (MIT) + organization plugin                             |
-| Auth client              | Library-agnostic facade in `@sb-codex/auth/client`                      |
-| Server                   | **Fastify 5** + **tRPC v11** + Pino                                     |
-| SQL                      | **Postgres 16** + **Drizzle ORM**                                       |
-| Connection pool          | PgBouncer (transaction mode)                                            |
-| Cache / queue / sessions | **Valkey** (BSD-3, OSS Redis 7.2 fork)                                  |
-| Queue runner             | BullMQ on Valkey                                                        |
-| Search                   | Meilisearch                                                             |
-| Object storage           | MinIO (S3-compatible)                                                   |
-| Email                    | Nodemailer + SMTP (MailHog in dev)                                      |
-| Reverse proxy / TLS      | Traefik v3.1 — **file provider** (Docker API incompatibility)           |
-| Containers               | Docker multi-stage + docker-compose                                     |
-| CI/CD                    | GitHub Actions + GHCR — native arm64 runner                             |
-| Frontend routing         | TanStack Router (file-based)                                            |
-| Frontend server-state    | TanStack Query                                                          |
-| Styling                  | Tailwind CSS v4 — semantic tokens, overridable per app/tenant           |
-| Component primitives     | Radix UI + shadcn-style copy-in                                         |
-| Forms                    | React Hook Form + Zod (via `useZodForm` wrapper)                        |
-| Unit tests               | Vitest + Testing Library                                                |
-| E2E tests                | Playwright                                                              |
-| Pre-commit               | Husky + lint-staged + commitlint                                        |
+| Layer                    | Choice                                                                                                                              |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Tenant isolation         | Shared Postgres + **Row-Level Security** (`SET LOCAL app.workspace_id`); server connects as non-privileged `app` role (see ADR-001) |
+| Tenant URL               | `x-workspace-slug` header (stored in `localStorage` after signup/login)                                                             |
+| Auth + organizations     | **better-auth** (MIT) + organization plugin                                                                                         |
+| Auth client              | Library-agnostic facade in `@sb-codex/auth/client`                                                                                  |
+| Server                   | **Fastify 5** + **tRPC v11** + Pino                                                                                                 |
+| SQL                      | **Postgres 16** + **Drizzle ORM**                                                                                                   |
+| Connection pool          | PgBouncer (transaction mode)                                                                                                        |
+| Cache / queue / sessions | **Valkey** (BSD-3, OSS Redis 7.2 fork)                                                                                              |
+| Queue runner             | BullMQ on Valkey                                                                                                                    |
+| Search                   | Meilisearch                                                                                                                         |
+| Object storage           | MinIO (S3-compatible)                                                                                                               |
+| Email                    | Nodemailer + SMTP (MailHog in dev)                                                                                                  |
+| Reverse proxy / TLS      | Traefik v3.1 — **file provider** (Docker API incompatibility)                                                                       |
+| Containers               | Docker multi-stage + docker-compose                                                                                                 |
+| CI/CD                    | GitHub Actions + GHCR — native arm64 runner                                                                                         |
+| Frontend routing         | TanStack Router (file-based)                                                                                                        |
+| Frontend server-state    | TanStack Query                                                                                                                      |
+| Styling                  | Tailwind CSS v4 — semantic tokens, overridable per app/tenant                                                                       |
+| Component primitives     | Radix UI + shadcn-style copy-in                                                                                                     |
+| Forms                    | React Hook Form + Zod (via `useZodForm` wrapper)                                                                                    |
+| Unit tests               | Vitest + Testing Library                                                                                                            |
+| E2E tests                | Playwright                                                                                                                          |
+| Pre-commit               | Husky + lint-staged + commitlint                                                                                                    |
 
 ---
 
@@ -78,8 +78,12 @@ Build an **open-source, multi-tenant SaaS starter** that can be forked to ship v
 ### Multi-tenant isolation
 
 - Every `workspaceProcedure` call opens a transaction with `SET LOCAL app.workspace_id`
-- RLS policies enforce isolation at the DB level — no manual `WHERE workspace_id = ?` needed
+- RLS policies (`USING` + `WITH CHECK`, `FORCE ROW LEVEL SECURITY`) enforce isolation at the DB level — no manual `WHERE workspace_id = ?` needed
+- The **server** connects as the non-privileged `app` role (RLS applies); **migrations** connect as the superuser (bypass, intended). Pointing the server at the superuser silently disables isolation.
 - `x-workspace-slug` header resolved by tenant plugin → workspace looked up + membership verified
+- Regression test `packages/db/src/__tests__/rls.test.ts` (CI job `rls-isolation`) proves a tenant cannot read/write another's rows
+
+> **ADR-001 (2026-06-06):** isolation stays **shared Postgres + RLS** (not schema-per-tenant — that caps tenant count and complicates migrations). Per-tenant backup/export/delete is a separate lifecycle concern, to be solved on top of RLS. Mirrored on Notion.
 
 ### Publishable plugins
 

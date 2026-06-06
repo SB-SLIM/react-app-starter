@@ -20,9 +20,18 @@ The tenant plugin (`apps/server/src/plugins/tenant.plugin.ts`) resolves the work
 SELECT set_config('app.workspace_id', '<uuid>', true);
 ```
 
-Because the policy is `USING (workspace_id = current_setting('app.workspace_id', true))`, any `SELECT`, `UPDATE`, or `DELETE` that omits a `WHERE workspace_id = ?` clause is automatically scoped — a missing filter cannot leak data across tenants.
+The policy uses both `USING (workspace_id = current_setting('app.workspace_id', true))` (filters reads) and `WITH CHECK (...)` (rejects cross-tenant writes), and the table is set to `FORCE ROW LEVEL SECURITY`. So any `SELECT`, `UPDATE`, `DELETE`, or `INSERT` that omits a `WHERE workspace_id = ?` clause is automatically scoped — a missing filter cannot leak or mis-write data across tenants.
 
-Superusers and the table owner (used during `db:migrate`) bypass RLS by default, so migrations work without setting the config variable.
+### Critical: who connects as which role
+
+Postgres **superusers and table owners bypass RLS** (FORCE only re-enables it for the owner, never for a superuser). This makes the connection role the linchpin of isolation:
+
+| Connection     | Role                              | Why                                                      |
+| -------------- | --------------------------------- | -------------------------------------------------------- |
+| **Server**     | `app` — non-privileged, non-owner | RLS always applies → tenant isolation is enforced        |
+| **Migrations** | superuser (`POSTGRES_USER`)       | must manage every workspace → intentionally bypasses RLS |
+
+The `app` role is created by `infra/compose/init/01_init.sh` (password from `APP_DB_PASSWORD`) and by migration `0002`. **Never point the server at the superuser** — doing so silently disables all tenant isolation. This is covered by the regression test `packages/db/src/__tests__/rls.test.ts` (CI job `rls-isolation`).
 
 ### Tenant URL resolution
 

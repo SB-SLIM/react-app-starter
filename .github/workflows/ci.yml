@@ -43,3 +43,37 @@ jobs:
 
       - name: Test
         run: pnpm turbo test
+
+  rls-isolation:
+    name: RLS tenant-isolation
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: saas
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d saas"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run RLS isolation test
+        run: pnpm --filter @sb-codex/db test
+        env:
+          # Superuser URL — the test runs migrations + seeds, then connects as `app`.
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas

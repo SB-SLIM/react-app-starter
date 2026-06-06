@@ -79,7 +79,8 @@ A clean rebuild: `pnpm clean && pnpm build`.
 ## Key architectural rules
 
 - **Multi-tenant**: every business table has `workspace_id TEXT NOT NULL`. Never omit it.
-- **RLS enforces isolation**: the `enforceWorkspace` tRPC middleware calls `SET LOCAL app.workspace_id = '<id>'` inside a transaction. RLS policies do the rest — no manual `WHERE workspace_id = ?` needed in procedure bodies.
+- **RLS enforces isolation**: the `enforceWorkspace` tRPC middleware calls `SET LOCAL app.workspace_id = '<id>'` inside a transaction. RLS policies do the rest — no manual `WHERE workspace_id = ?` needed in procedure bodies. Policies use `USING` + `WITH CHECK` and tables are `FORCE ROW LEVEL SECURITY`.
+- **Connection role is the linchpin**: the **server** connects as the non-privileged `app` role (RLS applies). **Migrations** connect as the superuser (`POSTGRES_USER`) and intentionally bypass RLS. Superusers/table owners bypass RLS — never point the server at the superuser. Regression test: `packages/db/src/__tests__/rls.test.ts` (CI job `rls-isolation`).
 - **Context shape** (`packages/api-contracts/src/context.ts`): `{ requestId, user, workspace, db }`. `db` is a Drizzle instance; inside `enforceWorkspace` it becomes a transaction.
 - **Auth routes** skip the tenant plugin (`/api/auth/*` prefix check in `tenant.plugin.ts`).
 - **Admin app** only imports `AppRouter` as `import type` — never bundles server code.
@@ -198,9 +199,12 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=<secret>
 POSTGRES_DB=saas
 VALKEY_PASSWORD=<secret>
+# Password for the non-privileged `app` role the SERVER connects as (RLS enforcement).
+APP_DB_PASSWORD=<secret>
 BETTER_AUTH_SECRET=<32+ chars>
 BETTER_AUTH_URL=https://hub.slimbouchoucha.tn
 CORS_ORIGIN=https://hub.slimbouchoucha.tn
+# Used by the MIGRATE service only (superuser). The server uses app:APP_DB_PASSWORD.
 DATABASE_URL=postgresql://postgres:<password>@postgres:5432/saas
 GHCR_IMAGE_PREFIX=ghcr.io/sb-slim/react-app-starter
 SMTP_HOST=...

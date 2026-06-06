@@ -45,6 +45,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-saas}
+      # Non-privileged role the server connects as (init/01_init.sh). RLS depends on it.
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
@@ -120,7 +122,8 @@ services:
       NODE_ENV: production
       HOST: 0.0.0.0
       PORT: 3001
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-saas}
+      # Connect as the non-privileged `app` role so RLS is enforced (NOT the superuser).
+      DATABASE_URL: postgresql://app:${APP_DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-saas}
       REDIS_URL: redis://:${VALKEY_PASSWORD}@valkey:6379
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
       BETTER_AUTH_URL: https://hub.${DOMAIN}

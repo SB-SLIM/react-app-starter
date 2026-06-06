@@ -37,7 +37,8 @@
     "dev": "tsup --watch --tsconfig tsconfig.json",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/migrate.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "test": "vitest run"
   },
   "exports": {
     ".": {
@@ -56,6 +57,7 @@
     "@types/node": "^24.0.0",
     "drizzle-kit": "^0.31.0",
     "drizzle-orm": "^0.44.0",
-    "tsx": "^4.19.0"
+    "tsx": "^4.19.0",
+    "vitest": "^3.2.4"
   }
 }

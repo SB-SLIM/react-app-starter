@@ -98,13 +98,19 @@ pnpm db:studio        # open Drizzle Studio
 
 Required in `.env` (local) or `.env.production` (VPS):
 
-| Variable             | Description                                    |
-| -------------------- | ---------------------------------------------- |
-| `DATABASE_URL`       | Postgres connection string                     |
-| `BETTER_AUTH_SECRET` | 32+ char secret for session signing            |
-| `BETTER_AUTH_URL`    | Server base URL (e.g. `http://localhost:3001`) |
-| `REDIS_URL`          | Valkey/Redis connection string                 |
-| `CORS_ORIGIN`        | Admin app URL (e.g. `http://localhost:5173`)   |
+| Variable             | Description                                                                 |
+| -------------------- | --------------------------------------------------------------------------- |
+| `DATABASE_URL`       | Postgres connection string used by **migrations** (privileged role)         |
+| `APP_DB_PASSWORD`    | Password for the non-privileged `app` role the **server** connects as (RLS) |
+| `BETTER_AUTH_SECRET` | 32+ char secret for session signing                                         |
+| `BETTER_AUTH_URL`    | Server base URL (e.g. `http://localhost:3001`)                              |
+| `REDIS_URL`          | Valkey/Redis connection string                                              |
+| `CORS_ORIGIN`        | Admin app URL (e.g. `http://localhost:5173`)                                |
+
+> **Tenant isolation:** the server connects to Postgres as the non-privileged `app`
+> role so Row-Level Security is always enforced. Migrations connect as the superuser
+> (they must manage every workspace). Never point the server at the superuser — RLS is
+> bypassed for superusers/table owners. See [docs/architecture.md](docs/architecture.md).
 
 Required as **GitHub Actions Variables** (for CI builds of the admin SPA):
 
