@@ -6,6 +6,8 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import type { QueryClient } from '@tanstack/react-query'
+import { Button, useTheme } from '@sb-codex/ui-components'
+import { Moon, Sun } from 'lucide-react'
 import { authClient } from '@/features/auth/api/authClient'
 
 export interface RouterContext {
@@ -18,6 +20,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootLayout() {
   const { session } = authClient.useSession()
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
 
   async function handleSignOut() {
@@ -37,6 +40,23 @@ function RootLayout() {
             SaaS Starter
           </Link>
           <div className="flex flex-wrap items-center gap-3 text-sm sm:gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              aria-label={
+                theme === 'dark'
+                  ? 'Switch to light mode'
+                  : 'Switch to dark mode'
+              }
+              className="h-9 w-9"
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </Button>
             {session ? (
               <>
                 <Link
