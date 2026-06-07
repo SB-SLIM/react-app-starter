@@ -22,9 +22,6 @@ COPY --from=deps /app/ .
 COPY --from=pruner /app/out/full/ .
 COPY scripts/ ./scripts/
 COPY tsconfig.base.json ./
-# Type stub: tsc resolves _app.d.ts instead of _app.ts, avoiding server-only deps
-RUN mkdir -p apps/server/src/trpc && \
-    printf 'export declare type AppRouter = any;\n' > apps/server/src/trpc/_app.d.ts
 ARG VITE_TRPC_URL
 ENV VITE_TRPC_URL=$VITE_TRPC_URL
 ARG VITE_BETTER_AUTH_URL
