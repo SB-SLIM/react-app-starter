@@ -231,7 +231,10 @@ export function ShowcasePage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [page, setPage] = useState(1)
   const stepper = useStepper(checkoutSteps.length)
-  const modal = useModal<'settings' | 'invite', string>(['settings', 'invite'])
+  const modal = useModal<'edit' | 'remove', (typeof teamMembers)[number]>([
+    'edit',
+    'remove',
+  ])
 
   return (
     <div className="mx-auto max-w-6xl space-y-12 px-6 py-10">
@@ -512,55 +515,68 @@ export function ShowcasePage() {
         </div>
       </Section>
 
-      {/* ── useModal (multi-modal control + per-modal data) ── */}
+      {/* ── useModal (one hook, many modals, typed per-modal data) ── */}
       <Section title="useModal">
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={() =>
-              modal.open('settings', 'opened from the Settings button')
-            }
-          >
-            Open Settings
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() =>
-              modal.open('invite', 'opened from the Invite button')
-            }
-          >
-            Open Invite
-          </Button>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          A single <code>useModal</code> drives both dialogs. Each row passes
+          its member object to <code>open(key, data)</code>; the dialog reads it
+          back from <code>modal.state[key]</code>.
+        </p>
+        <div className="divide-y divide-gray-100 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-700">
+          {teamMembers.map((m) => (
+            <div
+              key={m.id}
+              className="flex items-center justify-between px-4 py-3"
+            >
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {m.firstName} {m.lastName}
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => modal.open('edit', m)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => modal.open('remove', m)}
+                >
+                  Remove
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
+
         <Dialog
-          open={modal.isOpen('settings')}
-          onOpenChange={(o) => !o && modal.close('settings')}
+          open={modal.isOpen('edit')}
+          onOpenChange={(o) => !o && modal.close('edit')}
         >
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Settings</DialogTitle>
+              <DialogTitle>
+                Edit {modal.state.edit?.firstName} {modal.state.edit?.lastName}
+              </DialogTitle>
             </DialogHeader>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              One <code>useModal(['settings','invite'])</code> controls both
-              dialogs by key. Attached data:{' '}
-              <span className="font-medium">{modal.state.settings}</span>
+              Role: {modal.state.edit?.description ?? '—'}
             </p>
           </DialogContent>
         </Dialog>
-        <Dialog
-          open={modal.isOpen('invite')}
-          onOpenChange={(o) => !o && modal.close('invite')}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Invite teammate</DialogTitle>
-            </DialogHeader>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Same hook, different key. Attached data:{' '}
-              <span className="font-medium">{modal.state.invite}</span>
-            </p>
-          </DialogContent>
-        </Dialog>
+
+        <ConfirmDialog
+          open={modal.isOpen('remove')}
+          onOpenChange={(o) => !o && modal.close('remove')}
+          title={`Remove ${modal.state.remove?.firstName ?? ''} ${
+            modal.state.remove?.lastName ?? ''
+          }?`}
+          description="They will lose access to this workspace."
+          confirmLabel="Remove"
+          onConfirm={() => modal.close('remove')}
+        />
       </Section>
 
       {/* ── Toasts ── */}
