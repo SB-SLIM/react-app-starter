@@ -231,6 +231,9 @@ importers:
       pino-pretty:
         specifier: ^11.2.2
         version: 11.3.0
+      postgres:
+        specifier: ^3.4.5
+        version: 3.4.9
       superjson:
         specifier: ^2.2.2
         version: 2.2.6

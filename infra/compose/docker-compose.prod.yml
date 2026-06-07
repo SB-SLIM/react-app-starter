@@ -160,6 +160,8 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-saas}
+      # Needed so migrate.ts can sync the app role password on every deploy.
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
     depends_on:
       postgres:
         condition: service_healthy
