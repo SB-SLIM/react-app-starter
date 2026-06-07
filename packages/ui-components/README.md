@@ -55,13 +55,13 @@ function Toggle() {
 
 ### Components
 
-| Group        | Exports                                                                                                                                                                    |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Primitives   | `Button`, `Input`, `Textarea`, `Label`, `Checkbox`, `Switch`, `Select`, `Combobox`, `DatePicker`, `Badge`, `Avatar`, `Card`, `Separator`, `Skeleton`, `Spinner`, `Tooltip` |
-| Overlays     | `Dialog`, `ConfirmDialog`, `Popover`, `DropdownMenu`, `Toaster` + `toast`                                                                                                  |
-| Data display | `Table`, `DataTable` (TanStack: search + sort + pagination), `Pagination`, `StatCard`, `Tabs`, `Stepper`, `Breadcrumb`                                                     |
-| Patterns     | `PageHeader`, `EmptyState`, `CardUser`                                                                                                                                     |
-| Charts       | `SbAreaChart`, `SbBarChart`, `SbLineChart` (recharts wrappers)                                                                                                             |
+| Group        | Exports                                                                                                                                                                                  |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Primitives   | `Button`, `Input`, `Textarea`, `Label`, `Checkbox`, `Switch`, `RadioGroup`, `Select`, `Combobox`, `DatePicker`, `Badge`, `Avatar`, `Card`, `Separator`, `Skeleton`, `Spinner`, `Tooltip` |
+| Overlays     | `Dialog`, `ConfirmDialog`, `Popover`, `DropdownMenu`, `Toaster` + `toast`                                                                                                                |
+| Data display | `Table`, `DataTable` (TanStack: search + sort + pagination), `Pagination`, `StatCard`, `Tabs`, `Stepper`, `Breadcrumb`                                                                   |
+| Patterns     | `PageHeader`, `EmptyState`, `CardUser`                                                                                                                                                   |
+| Charts       | `SbAreaChart`, `SbBarChart`, `SbLineChart` (recharts wrappers)                                                                                                                           |
 
 ### Layout
 

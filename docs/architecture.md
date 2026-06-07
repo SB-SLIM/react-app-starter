@@ -131,12 +131,14 @@ Rules:
 - `@custom-variant dark` for class-based dark mode
 - `@theme` with semantic tokens (`primary-*`, not brand names)
 
-Apps override tokens by re-declaring them after the import:
+The package ships **only** the `primary-*` base. Each app declares its own palette — overriding `primary-*` and/or adding extra scales like `secondary-*` / `surface-*` — by re-declaring tokens after the import (these live in the **app**, e.g. `apps/admin/src/index.css`, not the package):
 
 ```css
 @import '@sb-codex/ui-components/theme.css';
 @theme {
   --color-primary-600: #db2777; /* this app's brand color */
+  --color-secondary-600: #7c3aed; /* app-defined accent scale */
+  --color-surface-100: #f9fafb; /* app-defined surface scale */
 }
 ```
 
@@ -149,7 +151,7 @@ document.documentElement.style.setProperty(
 )
 ```
 
-`<UIProvider>` manages light/dark theme state, persists to `localStorage`, and toggles the `.dark` class on `<html>`. The admin `/showcase` route includes a live demo: a `Select` of palette presets that rewrites the `--color-primary-*` tokens on `:root`, recoloring every component on the fly.
+`<UIProvider>` manages light/dark theme state, persists to `localStorage`, and toggles the `.dark` class on `<html>`. The admin header has a Sun/Moon toggle wired to `useTheme().toggleTheme`. The `/showcase` route includes a live branding demo: a `RadioGroup` of theme presets that rewrites the `--color-primary-*`, `--color-secondary-*` and `--color-surface-*` tokens on `:root`, recoloring every component on the fly.
 
 ---
 
@@ -168,15 +170,15 @@ No application-level rewrites required — `workspace_id` is the natural shard k
 
 ## Package map
 
-| Package                   | Purpose                                                                                                                                                  |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@sb-codex/core`          | Pure utils: format\*, slugify, debounce, throttle, sleep, groupBy, uniqueBy, pick, omit, isDefined, assertNever                                          |
-| `@sb-codex/ui-components` | RSC-aware design system: `components/` (primitives, `DataTable`, `Select`, `DatePicker`, charts), `layout/`, `hooks/` (`useStepper`, `useModal`), `lib/` |
-| `@sb-codex/config`        | Zod-validated `createEnv()` loader                                                                                                                       |
-| `@sb-codex/db`            | Drizzle **platform** schema (auth + tenant) + migrations + RLS + `createDb()`                                                                            |
-| `@sb-codex/auth`          | better-auth server config + auth client facade (`./client`) — includes `signInWithGoogle`, `signInWithProvider`                                          |
-| `@sb-codex/api-contracts` | tRPC factory (`workspaceProcedure`, middlewares, `Context`) + `healthRouter`; no `AppRouter` export                                                      |
-| `@sb-codex/jobs`          | BullMQ queue definitions + typed payloads (email, export, searchIndex, webhook) + worker entrypoint                                                      |
+| Package                   | Purpose                                                                                                                                                                |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@sb-codex/core`          | Pure utils: format\*, slugify, debounce, throttle, sleep, groupBy, uniqueBy, pick, omit, isDefined, assertNever                                                        |
+| `@sb-codex/ui-components` | RSC-aware design system: `components/` (primitives, `DataTable`, `Select`, `DatePicker`, `RadioGroup`, charts), `layout/`, `hooks/` (`useStepper`, `useModal`), `lib/` |
+| `@sb-codex/config`        | Zod-validated `createEnv()` loader                                                                                                                                     |
+| `@sb-codex/db`            | Drizzle **platform** schema (auth + tenant) + migrations + RLS + `createDb()`                                                                                          |
+| `@sb-codex/auth`          | better-auth server config + auth client facade (`./client`) — includes `signInWithGoogle`, `signInWithProvider`                                                        |
+| `@sb-codex/api-contracts` | tRPC factory (`workspaceProcedure`, middlewares, `Context`) + `healthRouter`; no `AppRouter` export                                                                    |
+| `@sb-codex/jobs`          | BullMQ queue definitions + typed payloads (email, export, searchIndex, webhook) + worker entrypoint                                                                    |
 
 Each package is an independent npm plugin (`@sb-codex` scope), **published to npm** (currently `beta`). Shared-instance libs are `peerDependencies`; `@sb-codex/auth` keeps `better-auth` as a regular dependency (facade engine). New projects are scaffolded **apps-only** with `pnpm create @sb-codex/sb-app@latest` — plugins resolved from npm, no `packages/`. See [plugins/README.md](plugins/README.md) and [starting-a-new-project.md](starting-a-new-project.md).
 
