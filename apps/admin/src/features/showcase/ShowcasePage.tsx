@@ -35,6 +35,9 @@ import {
   Label,
   PageHeader,
   Pagination,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SbAreaChart,
   SbBarChart,
   SbLineChart,
@@ -47,6 +50,7 @@ import {
   Skeleton,
   Spinner,
   StatCard,
+  Stepper,
   Switch,
   Table,
   TableBody,
@@ -65,6 +69,8 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  useModal,
+  useStepper,
   useTheme,
 } from '@sb-codex/ui-components'
 import { MoreHorizontal } from 'lucide-react'
@@ -73,30 +79,34 @@ import { monthlyRevenue, pageViews, teamMembers, userGrowth } from './mockData'
 type Invoice = (typeof invoices)[number]
 
 const invoiceColumns: ColumnDef<Invoice>[] = [
-  { key: 'id', header: 'Invoice', cell: (r) => r.id, sortable: true },
-  { key: 'client', header: 'Client', cell: (r) => r.client, sortable: true },
-  { key: 'date', header: 'Date', cell: (r) => r.date, sortable: true },
+  { accessorKey: 'id', header: 'Invoice' },
+  { accessorKey: 'client', header: 'Client' },
+  { accessorKey: 'date', header: 'Date' },
   {
-    key: 'status',
+    accessorKey: 'status',
     header: 'Status',
-    cell: (r) => (
+    cell: ({ row }) => (
       <span
-        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[r.status]}`}
+        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[row.original.status]}`}
       >
-        {r.status}
+        {row.original.status}
       </span>
     ),
   },
   {
-    key: 'amount',
+    accessorKey: 'amount',
     header: 'Amount',
-    cell: (r) => r.amount,
-    className: 'text-right font-medium',
-    headerClassName: 'text-right',
+    meta: {
+      className: 'text-right font-medium',
+      headerClassName: 'text-right',
+    },
   },
   {
-    key: 'actions',
+    id: 'actions',
     header: '',
+    enableSorting: false,
+    enableGlobalFilter: false,
+    meta: { headerClassName: 'w-12' },
     cell: () => (
       <div className="text-right">
         <DropdownMenu>
@@ -115,7 +125,6 @@ const invoiceColumns: ColumnDef<Invoice>[] = [
         </DropdownMenu>
       </div>
     ),
-    headerClassName: 'w-12',
   },
 ]
 
@@ -164,6 +173,13 @@ const statusColors: Record<string, string> = {
   Overdue: 'text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-950',
 }
 
+const checkoutSteps = [
+  { label: 'Cart', description: 'Review items' },
+  { label: 'Shipping', description: 'Address' },
+  { label: 'Payment', description: 'Card details' },
+  { label: 'Confirm', description: 'Place order' },
+]
+
 const comboboxOptions = [
   { value: 'admin', label: 'Admin' },
   { value: 'member', label: 'Member' },
@@ -209,9 +225,16 @@ export function ShowcasePage() {
   const [checked, setChecked] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [comboValue, setComboValue] = useState<string | undefined>('member')
-  const [dateValue, setDateValue] = useState('2026-06-07')
+  const [dateValue, setDateValue] = useState<Date | undefined>(
+    () => new Date('2026-06-07'),
+  )
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [page, setPage] = useState(1)
+  const stepper = useStepper(checkoutSteps.length)
+  const modal = useModal<'edit' | 'remove', (typeof teamMembers)[number]>([
+    'edit',
+    'remove',
+  ])
 
   return (
     <div className="mx-auto max-w-6xl space-y-12 px-6 py-10">
@@ -377,26 +400,19 @@ export function ShowcasePage() {
       <Separator />
 
       {/* ── DataTable ── */}
-      <Section title="DataTable (sortable + row actions)">
-        <Card>
-          <CardContent className="p-0">
-            <DataTable
-              columns={invoiceColumns}
-              data={invoices}
-              getRowKey={(r) => r.id}
-            />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-0">
-            <DataTable
-              columns={invoiceColumns}
-              data={[]}
-              getRowKey={(r) => r.id}
-              emptyMessage="No invoices yet."
-            />
-          </CardContent>
-        </Card>
+      <Section title="DataTable (search + sort + pagination)">
+        <DataTable
+          columns={invoiceColumns}
+          data={invoices}
+          pageSize={3}
+          searchPlaceholder="Search invoices…"
+        />
+        <DataTable
+          columns={invoiceColumns}
+          data={[]}
+          enableGlobalFilter={false}
+          emptyMessage="No invoices yet."
+        />
       </Section>
 
       <Separator />
@@ -464,6 +480,102 @@ export function ShowcasePage() {
           description="This action cannot be undone."
           confirmLabel="Delete"
           onConfirm={() => setConfirmOpen(false)}
+        />
+      </Section>
+
+      {/* ── Popover ── */}
+      <Section title="Popover">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">Open popover</Button>
+          </PopoverTrigger>
+          <PopoverContent align="start">
+            <p className="text-sm font-medium">Dimensions</p>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              A floating panel anchored to its trigger — holds any content.
+            </p>
+          </PopoverContent>
+        </Popover>
+      </Section>
+
+      {/* ── Stepper (+ useStepper) ── */}
+      <Section title="Stepper">
+        <Stepper steps={checkoutSteps} currentStep={stepper.step} />
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={stepper.prev}
+            disabled={stepper.isFirst}
+          >
+            Back
+          </Button>
+          <Button onClick={stepper.next} disabled={stepper.isLast}>
+            {stepper.isLast ? 'Done' : 'Next'}
+          </Button>
+        </div>
+      </Section>
+
+      {/* ── useModal (one hook, many modals, typed per-modal data) ── */}
+      <Section title="useModal">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          A single <code>useModal</code> drives both dialogs. Each row passes
+          its member object to <code>open(key, data)</code>; the dialog reads it
+          back from <code>modal.state[key]</code>.
+        </p>
+        <div className="divide-y divide-gray-100 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-700">
+          {teamMembers.map((m) => (
+            <div
+              key={m.id}
+              className="flex items-center justify-between px-4 py-3"
+            >
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {m.firstName} {m.lastName}
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => modal.open('edit', m)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => modal.open('remove', m)}
+                >
+                  Remove
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <Dialog
+          open={modal.isOpen('edit')}
+          onOpenChange={(o) => !o && modal.close('edit')}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                Edit {modal.state.edit?.firstName} {modal.state.edit?.lastName}
+              </DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Role: {modal.state.edit?.description ?? '—'}
+            </p>
+          </DialogContent>
+        </Dialog>
+
+        <ConfirmDialog
+          open={modal.isOpen('remove')}
+          onOpenChange={(o) => !o && modal.close('remove')}
+          title={`Remove ${modal.state.remove?.firstName ?? ''} ${
+            modal.state.remove?.lastName ?? ''
+          }?`}
+          description="They will lose access to this workspace."
+          confirmLabel="Remove"
+          onConfirm={() => modal.close('remove')}
         />
       </Section>
 
@@ -627,12 +739,8 @@ export function ShowcasePage() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="date-demo">Date Picker</Label>
-              <DatePicker
-                id="date-demo"
-                value={dateValue}
-                onChange={(e) => setDateValue(e.target.value)}
-              />
+              <Label>Date Picker</Label>
+              <DatePicker value={dateValue} onChange={setDateValue} />
             </div>
           </div>
 

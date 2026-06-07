@@ -1,17 +1,12 @@
-import { useState } from 'react'
 import { trpc } from '@/app/trpc'
 
-const PAGE_SIZE = 10
-
 /**
- * Paginated clients list backed by `trpc.clients.list` + `trpc.clients.count`.
- * Exposes 1-based `page` state that drives the `offset` query input.
+ * Clients list backed by `trpc.clients.list` + `trpc.clients.count`.
+ * Fetches a generous page; the DataTable handles search/sort/pagination
+ * client-side. (Server-side filtering is a later step.)
  */
 export function useClients() {
-  const [page, setPage] = useState(1)
-  const offset = (page - 1) * PAGE_SIZE
-
-  const list = trpc.clients.list.useQuery({ limit: PAGE_SIZE, offset })
+  const list = trpc.clients.list.useQuery({ limit: 100, offset: 0 })
   const count = trpc.clients.count.useQuery()
 
   return {
@@ -20,8 +15,5 @@ export function useClients() {
     isLoading: list.isPending,
     isError: list.isError,
     error: list.error,
-    page,
-    pageSize: PAGE_SIZE,
-    setPage,
   }
 }

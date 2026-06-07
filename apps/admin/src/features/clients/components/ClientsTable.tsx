@@ -11,8 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Pagination,
-  Spinner,
+  toast,
 } from '@sb-codex/ui-components'
 import { trpc } from '@/app/trpc'
 import { useClients } from '../hooks/useClients'
@@ -20,8 +19,7 @@ import { useClients } from '../hooks/useClients'
 type Client = ReturnType<typeof useClients>['clients'][number]
 
 export function ClientsTable() {
-  const { clients, total, isLoading, isError, error, page, pageSize, setPage } =
-    useClients()
+  const { clients, total, isLoading, isError, error } = useClients()
   const utils = trpc.useUtils()
   const [toDelete, setToDelete] = useState<Client | null>(null)
 
@@ -31,27 +29,39 @@ export function ClientsTable() {
         utils.clients.list.invalidate(),
         utils.clients.count.invalidate(),
       ])
+      toast.success('Client deleted')
       setToDelete(null)
     },
+    onError: (err) => toast.error(err.message),
   })
 
   const columns: ColumnDef<Client>[] = [
     {
-      key: 'name',
+      accessorKey: 'name',
       header: 'Name',
-      cell: (c) => (
+      cell: ({ row }) => (
         <span className="font-medium text-gray-900 dark:text-gray-100">
-          {c.name}
+          {row.original.name}
         </span>
       ),
     },
-    { key: 'email', header: 'Email', cell: (c) => c.email ?? '—' },
-    { key: 'phone', header: 'Phone', cell: (c) => c.phone ?? '—' },
     {
-      key: 'actions',
+      accessorKey: 'email',
+      header: 'Email',
+      cell: ({ row }) => row.original.email ?? '—',
+    },
+    {
+      accessorKey: 'phone',
+      header: 'Phone',
+      cell: ({ row }) => row.original.phone ?? '—',
+    },
+    {
+      id: 'actions',
       header: '',
-      headerClassName: 'w-12',
-      cell: (c) => (
+      enableSorting: false,
+      enableGlobalFilter: false,
+      meta: { headerClassName: 'w-12' },
+      cell: ({ row }) => (
         <div className="text-right">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -63,7 +73,10 @@ export function ClientsTable() {
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem disabled>Edit</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem destructive onSelect={() => setToDelete(c)}>
+              <DropdownMenuItem
+                destructive
+                onSelect={() => setToDelete(row.original)}
+              >
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -82,27 +95,17 @@ export function ClientsTable() {
   }
 
   return (
-    <div className="space-y-4">
-      {isLoading ? (
-        <div className="flex items-center gap-2 py-12 text-sm text-gray-500">
-          <Spinner size="sm" /> Loading clients…
-        </div>
-      ) : (
-        <DataTable
-          columns={columns}
-          data={clients}
-          getRowKey={(c) => c.id}
-          emptyMessage="No clients yet."
-        />
-      )}
-
-      <Pagination
-        page={page}
-        pageSize={pageSize}
-        total={total}
-        onPageChange={setPage}
+    <div className="space-y-3">
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        {total} total {total === 1 ? 'client' : 'clients'}
+      </p>
+      <DataTable
+        columns={columns}
+        data={clients}
+        isLoading={isLoading}
+        searchPlaceholder="Search clients…"
+        emptyMessage="No clients yet."
       />
-
       <ConfirmDialog
         open={toDelete !== null}
         onOpenChange={(open) => !open && setToDelete(null)}
