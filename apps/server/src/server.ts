@@ -29,6 +29,7 @@ export async function buildServer() {
     },
     genReqId: () => randomUUID(),
     disableRequestLogging: false,
+    trustProxy: true,
   })
 
   await app.register(sensible)
