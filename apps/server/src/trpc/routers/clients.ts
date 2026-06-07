@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { eq } from 'drizzle-orm'
+import { eq, count } from 'drizzle-orm'
 import { client } from '@sb-codex/db'
 import { router, workspaceProcedure } from '@sb-codex/api-contracts'
 
@@ -35,6 +35,13 @@ export const clientsRouter = router({
     .query(async ({ ctx, input }) => {
       const { limit = 20, offset = 0 } = input ?? {}
       return ctx.db.select().from(client).limit(limit).offset(offset)
+    }),
+
+  count: workspaceProcedure
+    .output(z.object({ total: z.number() }))
+    .query(async ({ ctx }) => {
+      const rows = await ctx.db.select({ value: count() }).from(client)
+      return { total: rows[0]?.value ?? 0 }
     }),
 
   get: workspaceProcedure

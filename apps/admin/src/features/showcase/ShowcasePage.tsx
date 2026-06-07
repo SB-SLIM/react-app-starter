@@ -6,6 +6,7 @@ import {
   AvatarFallback,
   AvatarImage,
   Badge,
+  Breadcrumb,
   Button,
   Card,
   CardContent,
@@ -13,15 +14,27 @@ import {
   CardTitle,
   CardUser,
   Checkbox,
+  type ColumnDef,
+  Combobox,
+  ConfirmDialog,
+  DataTable,
+  DatePicker,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   EmptyState,
   Input,
   Label,
   PageHeader,
+  Pagination,
   SbAreaChart,
   SbBarChart,
   SbLineChart,
@@ -32,19 +45,133 @@ import {
   SelectValue,
   Separator,
   Skeleton,
+  Spinner,
   StatCard,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
   Textarea,
+  toast,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  useTheme,
 } from '@sb-codex/ui-components'
+import { MoreHorizontal } from 'lucide-react'
 import { monthlyRevenue, pageViews, teamMembers, userGrowth } from './mockData'
+
+type Invoice = (typeof invoices)[number]
+
+const invoiceColumns: ColumnDef<Invoice>[] = [
+  { key: 'id', header: 'Invoice', cell: (r) => r.id, sortable: true },
+  { key: 'client', header: 'Client', cell: (r) => r.client, sortable: true },
+  { key: 'date', header: 'Date', cell: (r) => r.date, sortable: true },
+  {
+    key: 'status',
+    header: 'Status',
+    cell: (r) => (
+      <span
+        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[r.status]}`}
+      >
+        {r.status}
+      </span>
+    ),
+  },
+  {
+    key: 'amount',
+    header: 'Amount',
+    cell: (r) => r.amount,
+    className: 'text-right font-medium',
+    headerClassName: 'text-right',
+  },
+  {
+    key: 'actions',
+    header: '',
+    cell: () => (
+      <div className="text-right">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" aria-label="Row actions">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem>View</DropdownMenuItem>
+            <DropdownMenuItem>Duplicate</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem destructive>Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    ),
+    headerClassName: 'w-12',
+  },
+]
+
+const invoices = [
+  {
+    id: 'INV-001',
+    client: 'Acme Corp',
+    amount: '$4,200',
+    status: 'Paid',
+    date: '2026-05-12',
+  },
+  {
+    id: 'INV-002',
+    client: 'Globex Inc',
+    amount: '$1,850',
+    status: 'Pending',
+    date: '2026-05-20',
+  },
+  {
+    id: 'INV-003',
+    client: 'Initech',
+    amount: '$3,100',
+    status: 'Paid',
+    date: '2026-05-28',
+  },
+  {
+    id: 'INV-004',
+    client: 'Umbrella Ltd',
+    amount: '$780',
+    status: 'Overdue',
+    date: '2026-04-30',
+  },
+  {
+    id: 'INV-005',
+    client: 'Stark Industries',
+    amount: '$9,600',
+    status: 'Paid',
+    date: '2026-06-02',
+  },
+]
+
+const statusColors: Record<string, string> = {
+  Paid: 'text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-950',
+  Pending:
+    'text-yellow-700 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-950',
+  Overdue: 'text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-950',
+}
+
+const comboboxOptions = [
+  { value: 'admin', label: 'Admin' },
+  { value: 'member', label: 'Member' },
+  { value: 'viewer', label: 'Viewer' },
+  { value: 'billing', label: 'Billing Manager' },
+  { value: 'support', label: 'Support Agent' },
+  { value: 'developer', label: 'Developer' },
+]
 
 function formatMoney(v: unknown) {
   const n = Number(v ?? 0)
@@ -78,9 +205,13 @@ function Section({
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export function ShowcasePage() {
+  const { theme, toggleTheme } = useTheme()
   const [checked, setChecked] = useState(false)
-  const [toggled, setToggled] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [comboValue, setComboValue] = useState<string | undefined>('member')
+  const [dateValue, setDateValue] = useState('2026-06-07')
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [page, setPage] = useState(1)
 
   return (
     <div className="mx-auto max-w-6xl space-y-12 px-6 py-10">
@@ -195,6 +326,185 @@ export function ShowcasePage() {
 
       <Separator />
 
+      {/* ── Table ── */}
+      <Section title="Table">
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Invoice</TableHead>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {invoices.map((inv) => (
+                  <TableRow key={inv.id}>
+                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">
+                      {inv.id}
+                    </TableCell>
+                    <TableCell>{inv.client}</TableCell>
+                    <TableCell>{inv.date}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[inv.status]}`}
+                      >
+                        {inv.status}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right font-medium">
+                      {inv.amount}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TableCell colSpan={4} className="text-gray-500">
+                    5 invoices
+                  </TableCell>
+                  <TableCell className="text-right">$19,530</TableCell>
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </CardContent>
+        </Card>
+      </Section>
+
+      <Separator />
+
+      {/* ── DataTable ── */}
+      <Section title="DataTable (sortable + row actions)">
+        <Card>
+          <CardContent className="p-0">
+            <DataTable
+              columns={invoiceColumns}
+              data={invoices}
+              getRowKey={(r) => r.id}
+            />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-0">
+            <DataTable
+              columns={invoiceColumns}
+              data={[]}
+              getRowKey={(r) => r.id}
+              emptyMessage="No invoices yet."
+            />
+          </CardContent>
+        </Card>
+      </Section>
+
+      <Separator />
+
+      {/* ── Breadcrumb ── */}
+      <Section title="Breadcrumb">
+        <Breadcrumb
+          items={[
+            { label: 'Home', href: '#' },
+            { label: 'Workspace', href: '#' },
+            { label: 'Invoices' },
+          ]}
+        />
+      </Section>
+
+      {/* ── Pagination ── */}
+      <Section title="Pagination">
+        <Pagination
+          page={page}
+          pageSize={10}
+          total={87}
+          onPageChange={setPage}
+        />
+      </Section>
+
+      {/* ── Dropdown Menu ── */}
+      <Section title="Dropdown Menu">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">Open menu</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Billing</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem destructive>Sign out</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </Section>
+
+      {/* ── Spinner ── */}
+      <Section title="Spinner">
+        <div className="flex items-center gap-6">
+          <Spinner size="sm" />
+          <Spinner size="md" />
+          <Spinner size="lg" />
+          <Button disabled>
+            <Spinner size="sm" className="mr-2" />
+            Loading…
+          </Button>
+        </div>
+      </Section>
+
+      {/* ── Confirm Dialog ── */}
+      <Section title="Confirm Dialog">
+        <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
+          Delete item
+        </Button>
+        <ConfirmDialog
+          open={confirmOpen}
+          onOpenChange={setConfirmOpen}
+          title="Delete this item?"
+          description="This action cannot be undone."
+          confirmLabel="Delete"
+          onConfirm={() => setConfirmOpen(false)}
+        />
+      </Section>
+
+      {/* ── Toasts ── */}
+      <Section title="Toasts">
+        <div className="flex flex-wrap gap-3">
+          <Button
+            variant="outline"
+            onClick={() =>
+              toast('Booking saved', { description: 'Changes are live.' })
+            }
+          >
+            Default
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => toast.success('Payment received')}
+          >
+            Success
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => toast.error('Something went wrong')}
+          >
+            Error
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() =>
+              toast('Trip confirmed', {
+                action: { label: 'Undo', onClick: () => {} },
+              })
+            }
+          >
+            With action
+          </Button>
+        </div>
+      </Section>
+
+      <Separator />
+
       {/* ── Badges & Buttons ── */}
       <Section title="Badges">
         <div className="flex flex-wrap gap-2">
@@ -294,9 +604,9 @@ export function ShowcasePage() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="role-demo">Role</Label>
+              <Label htmlFor="role-select-demo">Role (Select)</Label>
               <Select>
-                <SelectTrigger id="role-demo">
+                <SelectTrigger id="role-select-demo">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -305,6 +615,24 @@ export function ShowcasePage() {
                   <SelectItem value="viewer">Viewer</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Role (Combobox)</Label>
+              <Combobox
+                options={comboboxOptions}
+                value={comboValue}
+                onChange={setComboValue}
+                placeholder="Search roles…"
+                clearable
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="date-demo">Date Picker</Label>
+              <DatePicker
+                id="date-demo"
+                value={dateValue}
+                onChange={(e) => setDateValue(e.target.value)}
+              />
             </div>
           </div>
 
@@ -320,8 +648,8 @@ export function ShowcasePage() {
             <div className="flex items-center gap-3">
               <Switch
                 id="dark-demo"
-                checked={toggled}
-                onCheckedChange={setToggled}
+                checked={theme === 'dark'}
+                onCheckedChange={toggleTheme}
               />
               <Label htmlFor="dark-demo">Dark mode</Label>
             </div>

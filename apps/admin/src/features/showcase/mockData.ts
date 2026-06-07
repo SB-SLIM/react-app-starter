@@ -139,6 +139,46 @@ export const pageViews = [
   { month: 'Dec', views: 118000, unique: 80000 },
 ]
 
+export const sampleClients = [
+  {
+    id: '1',
+    name: 'Acme Corp',
+    email: 'ops@acme.com',
+    plan: 'Enterprise',
+    mrr: 4800,
+  },
+  { id: '2', name: 'Globex', email: 'hi@globex.io', plan: 'Pro', mrr: 1200 },
+  {
+    id: '3',
+    name: 'Initech',
+    email: 'team@initech.com',
+    plan: 'Pro',
+    mrr: 1200,
+  },
+  {
+    id: '4',
+    name: 'Umbrella',
+    email: 'contact@umbrella.co',
+    plan: 'Starter',
+    mrr: 290,
+  },
+  {
+    id: '5',
+    name: 'Soylent',
+    email: 'green@soylent.com',
+    plan: 'Enterprise',
+    mrr: 5200,
+  },
+]
+
+export const countryOptions = [
+  { value: 'tn', label: 'Tunisia' },
+  { value: 'fr', label: 'France' },
+  { value: 'de', label: 'Germany' },
+  { value: 'us', label: 'United States' },
+  { value: 'jp', label: 'Japan' },
+]
+
 export const teamMembers = [
   {
     id: '1',

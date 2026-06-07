@@ -44,6 +44,13 @@ function RootLayout() {
                   Dashboard
                 </Link>
                 <Link
+                  to="/clients"
+                  className="text-gray-600 hover:text-gray-900"
+                  activeProps={{ className: 'text-primary-600 font-medium' }}
+                >
+                  Clients
+                </Link>
+                <Link
                   to="/showcase"
                   className="text-gray-600 hover:text-gray-900"
                   activeProps={{ className: 'text-primary-600 font-medium' }}
