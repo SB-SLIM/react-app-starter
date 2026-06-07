@@ -41,6 +41,7 @@ import {
   Textarea,
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from '@sb-codex/ui-components'
 import { monthlyRevenue, pageViews, teamMembers, userGrowth } from './mockData'
@@ -225,25 +226,27 @@ export function ShowcasePage() {
       {/* ── Avatars ── */}
       <Section title="Avatars">
         <div className="flex items-center gap-4">
-          {teamMembers.map((m) => (
-            <Tooltip key={m.id}>
-              <TooltipTrigger>
-                <Avatar>
-                  <AvatarImage
-                    src={m.avatarUrl}
-                    alt={`${m.firstName} ${m.lastName}`}
-                  />
-                  <AvatarFallback>
-                    {m.firstName[0]}
-                    {m.lastName[0]}
-                  </AvatarFallback>
-                </Avatar>
-              </TooltipTrigger>
-              <TooltipContent>
-                {m.firstName} {m.lastName} · {m.description}
-              </TooltipContent>
-            </Tooltip>
-          ))}
+          <TooltipProvider>
+            {teamMembers.map((m) => (
+              <Tooltip key={m.id}>
+                <TooltipTrigger>
+                  <Avatar>
+                    <AvatarImage
+                      src={m.avatarUrl}
+                      alt={`${m.firstName} ${m.lastName}`}
+                    />
+                    <AvatarFallback>
+                      {m.firstName[0]}
+                      {m.lastName[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {m.firstName} {m.lastName} · {m.description}
+                </TooltipContent>
+              </Tooltip>
+            ))}
+          </TooltipProvider>
           <Avatar className="h-16 w-16">
             <AvatarFallback>LG</AvatarFallback>
           </Avatar>
