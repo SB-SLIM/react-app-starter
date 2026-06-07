@@ -5,8 +5,16 @@
 /* react-datepicker base styles (consumed by ui-components <DatePicker />). */
 @import 'react-datepicker/dist/react-datepicker.css';
 
-/* Override the shared palette for this app by re-declaring tokens here, e.g.:
- * @theme {
- *   --color-primary-600: #db2777;
- * }
- */
+/* App-level palette. The package ships only the semantic `primary-*` base;
+ * each app declares its own secondary/surface scale (and may override primary).
+ * The /showcase "Runtime theme override" demo swaps these tokens at runtime. */
+@theme {
+  --color-secondary-50: #f5f3ff;
+  --color-secondary-500: #8b5cf6;
+  --color-secondary-600: #7c3aed;
+  --color-secondary-700: #6d28d9;
+
+  --color-surface-50: #ffffff;
+  --color-surface-100: #f9fafb;
+  --color-surface-200: #f3f4f6;
+}
