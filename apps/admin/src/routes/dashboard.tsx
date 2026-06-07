@@ -154,41 +154,42 @@ function formatNum(v: unknown) {
 
 const bookingColumns: ColumnDef<Booking>[] = [
   {
-    key: 'ref',
+    accessorKey: 'ref',
     header: 'Ref',
-    cell: (b) => (
+    cell: ({ row }) => (
       <span className="font-medium text-gray-900 dark:text-gray-100">
-        {b.ref}
+        {row.original.ref}
       </span>
     ),
   },
-  { key: 'traveler', header: 'Traveler', cell: (b) => b.traveler },
-  { key: 'destination', header: 'Destination', cell: (b) => b.destination },
+  { accessorKey: 'traveler', header: 'Traveler' },
+  { accessorKey: 'destination', header: 'Destination' },
+  { accessorKey: 'departure', header: 'Departure' },
   {
-    key: 'departure',
-    header: 'Departure',
-    cell: (b) => b.departure,
-    sortable: true,
-  },
-  {
-    key: 'pax',
+    accessorKey: 'pax',
     header: 'Pax',
-    cell: (b) => b.pax,
-    className: 'text-center tabular-nums',
-    headerClassName: 'text-center',
+    meta: {
+      className: 'text-center tabular-nums',
+      headerClassName: 'text-center',
+    },
   },
   {
-    key: 'status',
+    accessorKey: 'status',
     header: 'Status',
-    cell: (b) => <Badge variant={statusVariant[b.status]}>{b.status}</Badge>,
+    cell: ({ row }) => (
+      <Badge variant={statusVariant[row.original.status]}>
+        {row.original.status}
+      </Badge>
+    ),
   },
   {
-    key: 'amount',
+    accessorKey: 'amount',
     header: 'Amount',
-    cell: (b) => formatTnd(b.amount),
-    sortable: true,
-    className: 'text-right font-medium tabular-nums',
-    headerClassName: 'text-right',
+    cell: ({ row }) => formatTnd(row.original.amount),
+    meta: {
+      className: 'text-right font-medium tabular-nums',
+      headerClassName: 'text-right',
+    },
   },
 ]
 
@@ -296,7 +297,7 @@ function DashboardPage() {
             <DataTable
               columns={bookingColumns}
               data={recentBookings}
-              getRowKey={(b) => b.ref}
+              enableGlobalFilter={false}
               emptyMessage="No bookings yet."
             />
           </CardContent>

@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@sb-codex/auth": "workspace:^",
     "@hookform/resolvers": "^5.2.2",
     "@sb-codex/api-contracts": "workspace:^",
+    "@sb-codex/auth": "workspace:^",
     "@sb-codex/ui-components": "workspace:^",
     "@tanstack/react-query": "^5.100.10",
     "@tanstack/react-query-devtools": "^5.100.10",
@@ -22,6 +22,7 @@
     "@trpc/react-query": "^11.0.0",
     "lucide-react": "^1.17.0",
     "react": "^19.1.1",
+    "react-datepicker": "^9.1.0",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.76.0",
     "superjson": "^2.2.2",
