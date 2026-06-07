@@ -11,7 +11,7 @@
 Design-system build-out.
 
 - Components: `DropdownMenu`, `ConfirmDialog`, `Pagination`, `Spinner`,
-  `Breadcrumb`, `Popover`, `Stepper`; wired `Table`, `Combobox` exports.
+  `Breadcrumb`, `Popover`, `Stepper`, `RadioGroup`; wired `Table`, `Combobox` exports.
 - `DataTable` rebuilt on `@tanstack/react-table` (global search, sorting,
   pagination); `DatePicker` rebuilt on `react-datepicker`; `Select` rebuilt on
   react-select v5, themed via the `primary-*` tokens.

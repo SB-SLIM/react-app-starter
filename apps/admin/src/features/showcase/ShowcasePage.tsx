@@ -38,6 +38,8 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  RadioGroup,
+  RadioGroupItem,
   SbAreaChart,
   SbBarChart,
   SbLineChart,
@@ -191,37 +193,53 @@ const roleOptions = [
   { value: 'viewer', label: 'Viewer' },
 ]
 
-// Runtime theme presets — each overrides the `--color-primary-*` tokens on
-// :root, recoloring every component live (the per-tenant branding mechanism).
+// Runtime theme presets — each overrides the `--color-primary-*`,
+// `--color-secondary-*` and `--color-surface-*` tokens on :root, recoloring
+// every component live (the per-tenant branding mechanism).
 const themePresets = [
   {
-    value: 'indigo',
-    label: 'Indigo (default)',
+    value: 'theme1',
+    label: 'Theme 1 (default)',
     vars: {
       '--color-primary-50': '#eef2ff',
       '--color-primary-500': '#6366f1',
       '--color-primary-600': '#4f46e5',
       '--color-primary-700': '#4338ca',
+      '--color-secondary-500': '#8b5cf6',
+      '--color-secondary-600': '#7c3aed',
+      '--color-secondary-700': '#6d28d9',
+      '--color-surface-100': '#f9fafb',
+      '--color-surface-200': '#f3f4f6',
     },
   },
   {
-    value: 'emerald',
-    label: 'Emerald',
+    value: 'theme2',
+    label: 'Theme 2',
     vars: {
       '--color-primary-50': '#ecfdf5',
       '--color-primary-500': '#10b981',
       '--color-primary-600': '#059669',
       '--color-primary-700': '#047857',
+      '--color-secondary-500': '#14b8a6',
+      '--color-secondary-600': '#0d9488',
+      '--color-secondary-700': '#0f766e',
+      '--color-surface-100': '#f0fdf4',
+      '--color-surface-200': '#dcfce7',
     },
   },
   {
-    value: 'rose',
-    label: 'Rose',
+    value: 'theme3',
+    label: 'Theme 3',
     vars: {
       '--color-primary-50': '#fff1f2',
       '--color-primary-500': '#f43f5e',
       '--color-primary-600': '#e11d48',
       '--color-primary-700': '#be123c',
+      '--color-secondary-500': '#f59e0b',
+      '--color-secondary-600': '#d97706',
+      '--color-secondary-700': '#b45309',
+      '--color-surface-100': '#fff7f7',
+      '--color-surface-200': '#ffe4e6',
     },
   },
 ]
@@ -270,7 +288,7 @@ export function ShowcasePage() {
   const [checked, setChecked] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [roleValue, setRoleValue] = useState<string | undefined>('member')
-  const [themePreset, setThemePreset] = useState('indigo')
+  const [themePreset, setThemePreset] = useState('theme1')
   const [comboValue, setComboValue] = useState<string | undefined>('member')
   const [dateValue, setDateValue] = useState<Date | undefined>(
     () => new Date('2026-06-07'),
@@ -299,31 +317,62 @@ export function ShowcasePage() {
       {/* ── Runtime theme override ── */}
       <Section title="Runtime theme override">
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Pick a palette — it rewrites the <code>--color-primary-*</code> tokens
-          on <code>:root</code>, recoloring every component on this page live.
-          This is the per-tenant branding mechanism.
+          Pick a theme — it rewrites the <code>--color-primary-*</code>,{' '}
+          <code>--color-secondary-*</code> and <code>--color-surface-*</code>{' '}
+          tokens on <code>:root</code>, recoloring the page live. This is the
+          per-tenant branding mechanism (tokens declared in the app, not the
+          package).
         </p>
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="w-56">
-            <Select
-              options={themePresets.map((p) => ({
-                value: p.value,
-                label: p.label,
-              }))}
-              value={themePreset}
-              onChange={(v) => {
-                if (!v) return
-                setThemePreset(v)
-                applyThemePreset(v)
-              }}
-              isSearchable={false}
-            />
-          </div>
-          <div className="flex items-center gap-2">
+        <RadioGroup
+          value={themePreset}
+          onValueChange={(v) => {
+            setThemePreset(v)
+            applyThemePreset(v)
+          }}
+          className="grid-cols-1 sm:grid-cols-3"
+        >
+          {themePresets.map((preset) => (
+            <label
+              key={preset.value}
+              htmlFor={`theme-${preset.value}`}
+              className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 dark:border-gray-700"
+            >
+              <RadioGroupItem
+                id={`theme-${preset.value}`}
+                value={preset.value}
+              />
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {preset.label}
+              </span>
+            </label>
+          ))}
+        </RadioGroup>
+
+        {/* Live preview — primary / secondary / surface all follow the theme */}
+        <div className="rounded-lg border border-gray-200 bg-surface-100 p-4 dark:border-gray-700 dark:bg-gray-800/40">
+          <div className="flex flex-wrap items-center gap-3">
             <Button>Primary</Button>
-            <Button variant="outline">Outline</Button>
+            <span className="rounded-md bg-secondary-600 px-3 py-1.5 text-sm font-medium text-white">
+              Secondary
+            </span>
             <Badge>Badge</Badge>
             <Switch defaultChecked />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-4">
+            {[
+              { label: 'Primary', className: 'bg-primary-600' },
+              { label: 'Secondary', className: 'bg-secondary-600' },
+              { label: 'Surface', className: 'bg-surface-200' },
+            ].map((s) => (
+              <div key={s.label} className="space-y-1 text-center">
+                <div
+                  className={`h-10 w-16 rounded border border-gray-200 dark:border-gray-700 ${s.className}`}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {s.label}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </Section>

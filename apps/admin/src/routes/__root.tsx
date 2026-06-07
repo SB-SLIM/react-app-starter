@@ -28,40 +28,45 @@ function RootLayout() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b border-gray-200 bg-white">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="text-lg font-semibold">
+      <header className="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+        <nav className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:px-6 sm:py-4">
+          <Link
+            to="/"
+            className="text-lg font-semibold text-gray-900 dark:text-gray-100"
+          >
             SaaS Starter
           </Link>
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex flex-wrap items-center gap-3 text-sm sm:gap-4">
             {session ? (
               <>
                 <Link
                   to="/dashboard"
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                   activeProps={{ className: 'text-primary-600 font-medium' }}
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/clients"
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                   activeProps={{ className: 'text-primary-600 font-medium' }}
                 >
                   Clients
                 </Link>
                 <Link
                   to="/showcase"
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                   activeProps={{ className: 'text-primary-600 font-medium' }}
                 >
                   Showcase
                 </Link>
-                <span className="text-gray-400">|</span>
-                <span className="text-gray-600">{session.user.email}</span>
+                <span className="hidden text-gray-400 sm:inline">|</span>
+                <span className="hidden text-gray-600 dark:text-gray-300 md:inline">
+                  {session.user.email}
+                </span>
                 <button
                   onClick={handleSignOut}
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                 >
                   Sign out
                 </button>
@@ -70,7 +75,7 @@ function RootLayout() {
               <>
                 <Link
                   to="/"
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                   activeProps={{ className: 'text-primary-600 font-medium' }}
                   activeOptions={{ exact: true }}
                 >
@@ -78,7 +83,7 @@ function RootLayout() {
                 </Link>
                 <Link
                   to="/sign-in"
-                  className="text-gray-600 hover:text-gray-900"
+                  className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                   activeProps={{ className: 'text-primary-600 font-medium' }}
                 >
                   Sign in
@@ -88,7 +93,7 @@ function RootLayout() {
           </div>
         </nav>
       </header>
-      <main className="flex-1 bg-gray-50">
+      <main className="flex-1 bg-gray-50 dark:bg-gray-950">
         <Outlet />
       </main>
       <TanStackRouterDevtools position="bottom-right" />
