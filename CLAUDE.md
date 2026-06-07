@@ -26,7 +26,7 @@ pnpm workspace + Turborepo with two layers:
 
 - `packages/` — shared libraries built with `tsup`, consumed by apps
   - `@sb-codex/core` — pure utils: `slugify`, `formatDate/DateTime/Relative`, `formatCurrency`, `formatNumber`, `debounce`, `throttle`, `sleep`, `groupBy`, `uniqueBy`, `pick`, `omit`, `isDefined`, `assertNever`
-  - `@sb-codex/ui-components` — RSC-aware design system: `components/` (primitives + charts), `layout/`, `hooks/`, `lib/` — each folder has `index.ts`
+  - `@sb-codex/ui-components` — RSC-aware design system: `components/` (primitives + charts; `DataTable` on `@tanstack/react-table`, `Select` on react-select v5, `DatePicker` on react-datepicker, `Popover`/`DropdownMenu`/`Dialog` on Radix, `Stepper`, `Toaster` on sonner), `layout/`, `hooks/` (`useStepper`, `useModal`, `useTheme`), `lib/` — each folder has `index.ts`. Components theme off the semantic `primary-*` tokens. Consumers of `DatePicker` must import `react-datepicker/dist/react-datepicker.css`.
   - `@sb-codex/config` — Zod-validated `createEnv()` loader
   - `@sb-codex/db` — Drizzle ORM platform schema (auth + tenant), migrations, RLS, `createDb()`
   - `@sb-codex/auth` — better-auth server config (`createAuth()`) + client facade (`./client`) — includes `signInWithGoogle`, `signInWithProvider`

@@ -56,6 +56,9 @@ Every plugin is **product-agnostic** — reusable in any project, with no busine
 | Frontend server-state    | TanStack Query                                                                                                                      |
 | Styling                  | Tailwind CSS v4 — semantic tokens, overridable per app/tenant                                                                       |
 | Component primitives     | Radix UI + shadcn-style copy-in                                                                                                     |
+| Data tables              | TanStack Table (headless) — `DataTable` wrapper with search/sort/pagination                                                         |
+| Date picker              | react-datepicker (styled to the design system)                                                                                      |
+| Select / dropdown        | react-select v5 (`unstyled` + Tailwind `primary-*` tokens)                                                                          |
 | Forms                    | React Hook Form + Zod (via `useZodForm` wrapper)                                                                                    |
 | Unit tests               | Vitest + Testing Library                                                                                                            |
 | E2E tests                | Playwright                                                                                                                          |
@@ -66,28 +69,31 @@ Every plugin is **product-agnostic** — reusable in any project, with no busine
 
 ## Phase status
 
-| #   | Phase                                                                                                 | Status  |
-| --- | ----------------------------------------------------------------------------------------------------- | ------- |
-| 1   | Frontend foundations (Tailwind v4, TanStack Router/Query, RHF+Zod, feature folder layout)             | ✅ Done |
-| 2   | Backend skeleton (Fastify + tRPC v11 + Pino + Zod env, admin↔server health pipeline)                 | ✅ Done |
-| 3   | Multi-tenant core (Drizzle, RLS, better-auth org plugin, Fastify auth/tenant plugins, `clients` CRUD) | ✅ Done |
-| 4   | Infra (Dockerfiles, docker-compose, Traefik, Postgres, Valkey, MinIO, Meilisearch)                    | ✅ Done |
-| 5   | Auth UI (login/signup pages, workspace auto-creation, feature-based frontend structure)               | ✅ Done |
-| 6   | Theme system (UIProvider, `theme.css`, semantic `primary-*` tokens, dark mode, runtime override)      | ✅ Done |
-| 7   | CI/CD (GitHub Actions: `ci.yml`, `build-images.yml`, `deploy.yml`, GHCR, native arm64 runner)         | ✅ Done |
-| 8   | Production deploy (hub.slimbouchoucha.tn, Let's Encrypt TLS, Traefik file provider)                   | ✅ Done |
-| 9   | Publishable plugins: `@sb-codex/*` on npm (beta) + `@sb-codex/create-sb-app` scaffolder (apps-only)   | ✅ Done |
-| 10  | Plugin boundary: `AppRouter`+domain routers move to server; all plugins product-agnostic              | ✅ Done |
-| 11  | `core` utils: slugify, format\*, truncate, initials, debounce, groupBy, pick, type guards             | ✅ Done |
-| 12  | `ui-components` primitives (RSC-aware): Input, Dialog, Badge, Avatar, Card, Toast, charts…            | ✅ Done |
-| 13  | `ui-components` layouts: `BlankLayout`, `MainLayout` (sidebar+header), `LandingHeader`, `Footer`      | ✅ Done |
-| 14  | `ui-components` patterns: `PageHeader`, `EmptyState`, `StatCard`; showcase route + landing page       | ✅ Done |
-| 15  | `auth` Google: `signInWithGoogle` + `signInWithProvider` in client facade                             | ✅ Done |
-| 16  | `jobs` queues: typed payloads — `emailQueue`, `exportQueue`, `searchIndexQueue`, `webhookQueue`       | ✅ Done |
-| 17  | Testing (Vitest workspace + Playwright `apps/e2e` with tenant-isolation suite)                        | ⏳      |
-| 18  | Client management UI (list/create/edit/delete — API exists, frontend missing)                         | ⏳      |
-| 19  | Member management (invite flow, role management)                                                      | ⏳      |
-| 20  | Billing (Stripe via better-auth plugin)                                                               | ⏳      |
+| #   | Phase                                                                                                                                          | Status  |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| 1   | Frontend foundations (Tailwind v4, TanStack Router/Query, RHF+Zod, feature folder layout)                                                      | ✅ Done |
+| 2   | Backend skeleton (Fastify + tRPC v11 + Pino + Zod env, admin↔server health pipeline)                                                          | ✅ Done |
+| 3   | Multi-tenant core (Drizzle, RLS, better-auth org plugin, Fastify auth/tenant plugins, `clients` CRUD)                                          | ✅ Done |
+| 4   | Infra (Dockerfiles, docker-compose, Traefik, Postgres, Valkey, MinIO, Meilisearch)                                                             | ✅ Done |
+| 5   | Auth UI (login/signup pages, workspace auto-creation, feature-based frontend structure)                                                        | ✅ Done |
+| 6   | Theme system (UIProvider, `theme.css`, semantic `primary-*` tokens, dark mode, runtime override)                                               | ✅ Done |
+| 7   | CI/CD (GitHub Actions: `ci.yml`, `build-images.yml`, `deploy.yml`, GHCR, native arm64 runner)                                                  | ✅ Done |
+| 8   | Production deploy (hub.slimbouchoucha.tn, Let's Encrypt TLS, Traefik file provider)                                                            | ✅ Done |
+| 9   | Publishable plugins: `@sb-codex/*` on npm (beta) + `@sb-codex/create-sb-app` scaffolder (apps-only)                                            | ✅ Done |
+| 10  | Plugin boundary: `AppRouter`+domain routers move to server; all plugins product-agnostic                                                       | ✅ Done |
+| 11  | `core` utils: slugify, format\*, truncate, initials, debounce, groupBy, pick, type guards                                                      | ✅ Done |
+| 12  | `ui-components` primitives (RSC-aware): Input, Dialog, Badge, Avatar, Card, Toast, charts…                                                     | ✅ Done |
+| 13  | `ui-components` layouts: `BlankLayout`, `MainLayout` (sidebar+header), `LandingHeader`, `Footer`                                               | ✅ Done |
+| 14  | `ui-components` patterns: `PageHeader`, `EmptyState`, `StatCard`; showcase route + landing page                                                | ✅ Done |
+| 15  | `auth` Google: `signInWithGoogle` + `signInWithProvider` in client facade                                                                      | ✅ Done |
+| 16  | `jobs` queues: typed payloads — `emailQueue`, `exportQueue`, `searchIndexQueue`, `webhookQueue`                                                | ✅ Done |
+| 17  | Testing (Vitest workspace + Playwright `apps/e2e` with tenant-isolation suite)                                                                 | ⏳      |
+| 18  | Client management UI — list + global search + delete shipped (`DataTable`); create/edit pending                                                | 🔨      |
+| 19  | Member management (invite flow, role management)                                                                                               | ⏳      |
+| 20  | Billing (Stripe via better-auth plugin)                                                                                                        | ⏳      |
+| 21  | `ui-components` round 2: `DropdownMenu`, `ConfirmDialog`, `Pagination`, `Spinner`, `Breadcrumb`, `Popover`, `Stepper`; travel-agency dashboard | ✅ Done |
+| 22  | `DataTable` on `@tanstack/react-table` (search/sort/pagination) + `DatePicker` on `react-datepicker`                                           | ✅ Done |
+| 23  | `ui-components` hooks: `useStepper`, `useModal` (multi-modal control with typed per-modal data)                                                | ✅ Done |
 
 ---
 

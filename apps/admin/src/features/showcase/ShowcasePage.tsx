@@ -42,10 +42,6 @@ import {
   SbBarChart,
   SbLineChart,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Separator,
   Skeleton,
   Spinner,
@@ -189,6 +185,55 @@ const comboboxOptions = [
   { value: 'developer', label: 'Developer' },
 ]
 
+const roleOptions = [
+  { value: 'admin', label: 'Admin' },
+  { value: 'member', label: 'Member' },
+  { value: 'viewer', label: 'Viewer' },
+]
+
+// Runtime theme presets — each overrides the `--color-primary-*` tokens on
+// :root, recoloring every component live (the per-tenant branding mechanism).
+const themePresets = [
+  {
+    value: 'indigo',
+    label: 'Indigo (default)',
+    vars: {
+      '--color-primary-50': '#eef2ff',
+      '--color-primary-500': '#6366f1',
+      '--color-primary-600': '#4f46e5',
+      '--color-primary-700': '#4338ca',
+    },
+  },
+  {
+    value: 'emerald',
+    label: 'Emerald',
+    vars: {
+      '--color-primary-50': '#ecfdf5',
+      '--color-primary-500': '#10b981',
+      '--color-primary-600': '#059669',
+      '--color-primary-700': '#047857',
+    },
+  },
+  {
+    value: 'rose',
+    label: 'Rose',
+    vars: {
+      '--color-primary-50': '#fff1f2',
+      '--color-primary-500': '#f43f5e',
+      '--color-primary-600': '#e11d48',
+      '--color-primary-700': '#be123c',
+    },
+  },
+]
+
+function applyThemePreset(value: string) {
+  const preset = themePresets.find((p) => p.value === value)
+  if (!preset) return
+  for (const [token, color] of Object.entries(preset.vars)) {
+    document.documentElement.style.setProperty(token, color)
+  }
+}
+
 function formatMoney(v: unknown) {
   const n = Number(v ?? 0)
   return n >= 1000 ? `$${(n / 1000).toFixed(1)}k` : `$${n}`
@@ -224,6 +269,8 @@ export function ShowcasePage() {
   const { theme, toggleTheme } = useTheme()
   const [checked, setChecked] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [roleValue, setRoleValue] = useState<string | undefined>('member')
+  const [themePreset, setThemePreset] = useState('indigo')
   const [comboValue, setComboValue] = useState<string | undefined>('member')
   const [dateValue, setDateValue] = useState<Date | undefined>(
     () => new Date('2026-06-07'),
@@ -248,6 +295,40 @@ export function ShowcasePage() {
           </>
         }
       />
+
+      {/* ── Runtime theme override ── */}
+      <Section title="Runtime theme override">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Pick a palette — it rewrites the <code>--color-primary-*</code> tokens
+          on <code>:root</code>, recoloring every component on this page live.
+          This is the per-tenant branding mechanism.
+        </p>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="w-56">
+            <Select
+              options={themePresets.map((p) => ({
+                value: p.value,
+                label: p.label,
+              }))}
+              value={themePreset}
+              onChange={(v) => {
+                if (!v) return
+                setThemePreset(v)
+                applyThemePreset(v)
+              }}
+              isSearchable={false}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Button>Primary</Button>
+            <Button variant="outline">Outline</Button>
+            <Badge>Badge</Badge>
+            <Switch defaultChecked />
+          </div>
+        </div>
+      </Section>
+
+      <Separator />
 
       {/* ── Stats ── */}
       <Section title="Stat Cards">
@@ -717,16 +798,14 @@ export function ShowcasePage() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="role-select-demo">Role (Select)</Label>
-              <Select>
-                <SelectTrigger id="role-select-demo">
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="member">Member</SelectItem>
-                  <SelectItem value="viewer">Viewer</SelectItem>
-                </SelectContent>
-              </Select>
+              <Select
+                id="role-select-demo"
+                options={roleOptions}
+                value={roleValue}
+                onChange={setRoleValue}
+                placeholder="Select a role"
+                isClearable
+              />
             </div>
             <div className="space-y-1.5">
               <Label>Role (Combobox)</Label>

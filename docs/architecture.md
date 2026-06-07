@@ -108,6 +108,9 @@ apps/admin/src/
       api/          authClient.ts (instance of createSbAuthClient)
       hooks/        useSignIn, useSignUp
       components/   LoginForm, SignupForm
+    clients/
+      hooks/        useClients (trpc.clients.list/count)
+      components/   ClientsTable (DataTable + DropdownMenu + ConfirmDialog + toasts)
   routes/       TanStack file-based routes — thin, only wiring
 ```
 
@@ -146,7 +149,7 @@ document.documentElement.style.setProperty(
 )
 ```
 
-`<UIProvider>` manages light/dark theme state, persists to `localStorage`, and toggles the `.dark` class on `<html>`.
+`<UIProvider>` manages light/dark theme state, persists to `localStorage`, and toggles the `.dark` class on `<html>`. The admin `/showcase` route includes a live demo: a `Select` of palette presets that rewrites the `--color-primary-*` tokens on `:root`, recoloring every component on the fly.
 
 ---
 
@@ -165,15 +168,15 @@ No application-level rewrites required — `workspace_id` is the natural shard k
 
 ## Package map
 
-| Package                   | Purpose                                                                                                         |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `@sb-codex/core`          | Pure utils: format\*, slugify, debounce, throttle, sleep, groupBy, uniqueBy, pick, omit, isDefined, assertNever |
-| `@sb-codex/ui-components` | RSC-aware design system: `components/` (primitives + charts), `layout/`, `hooks/`, `lib/`                       |
-| `@sb-codex/config`        | Zod-validated `createEnv()` loader                                                                              |
-| `@sb-codex/db`            | Drizzle **platform** schema (auth + tenant) + migrations + RLS + `createDb()`                                   |
-| `@sb-codex/auth`          | better-auth server config + auth client facade (`./client`) — includes `signInWithGoogle`, `signInWithProvider` |
-| `@sb-codex/api-contracts` | tRPC factory (`workspaceProcedure`, middlewares, `Context`) + `healthRouter`; no `AppRouter` export             |
-| `@sb-codex/jobs`          | BullMQ queue definitions + typed payloads (email, export, searchIndex, webhook) + worker entrypoint             |
+| Package                   | Purpose                                                                                                                                                  |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@sb-codex/core`          | Pure utils: format\*, slugify, debounce, throttle, sleep, groupBy, uniqueBy, pick, omit, isDefined, assertNever                                          |
+| `@sb-codex/ui-components` | RSC-aware design system: `components/` (primitives, `DataTable`, `Select`, `DatePicker`, charts), `layout/`, `hooks/` (`useStepper`, `useModal`), `lib/` |
+| `@sb-codex/config`        | Zod-validated `createEnv()` loader                                                                                                                       |
+| `@sb-codex/db`            | Drizzle **platform** schema (auth + tenant) + migrations + RLS + `createDb()`                                                                            |
+| `@sb-codex/auth`          | better-auth server config + auth client facade (`./client`) — includes `signInWithGoogle`, `signInWithProvider`                                          |
+| `@sb-codex/api-contracts` | tRPC factory (`workspaceProcedure`, middlewares, `Context`) + `healthRouter`; no `AppRouter` export                                                      |
+| `@sb-codex/jobs`          | BullMQ queue definitions + typed payloads (email, export, searchIndex, webhook) + worker entrypoint                                                      |
 
 Each package is an independent npm plugin (`@sb-codex` scope), **published to npm** (currently `beta`). Shared-instance libs are `peerDependencies`; `@sb-codex/auth` keeps `better-auth` as a regular dependency (facade engine). New projects are scaffolded **apps-only** with `pnpm create @sb-codex/sb-app@latest` — plugins resolved from npm, no `packages/`. See [plugins/README.md](plugins/README.md) and [starting-a-new-project.md](starting-a-new-project.md).
 

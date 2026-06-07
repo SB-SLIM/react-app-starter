@@ -50,7 +50,7 @@ apps/
   e2e/        Playwright test suite
 packages/
   core/             Pure utils: format*, slugify, debounce, groupBy, pick/omit, type guards
-  ui-components/    RSC-aware design system: components (primitives + charts), layout, hooks, lib
+  ui-components/    RSC-aware design system: components (primitives, DataTable, charts), layout, hooks (useStepper/useModal), lib
   config/           Zod env loader (createEnv)
   db/               Drizzle platform schema (auth + tenant), migrations, RLS, createDb()
   auth/             better-auth server config + client facade (@sb-codex/auth/client)
@@ -90,7 +90,7 @@ pnpm db:studio        # open Drizzle Studio
 | API           | Fastify 5 + tRPC v11                                                         |
 | ORM           | Drizzle + Postgres 16 RLS                                                    |
 | Cache / Queue | Valkey (Redis OSS fork) + BullMQ                                             |
-| Frontend      | React 19 + TanStack Router/Query + Tailwind v4                               |
+| Frontend      | React 19 + TanStack Router/Query/Table + Tailwind v4 + Radix UI              |
 | Theme         | Semantic `primary-*` tokens, overridable per app and per tenant at runtime   |
 | Infra         | Docker + Traefik + PgBouncer + MinIO + Meilisearch                           |
 | Tests         | Vitest + Playwright                                                          |

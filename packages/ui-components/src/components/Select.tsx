@@ -1,152 +1,99 @@
 'use client'
 
-import * as SelectPrimitive from '@radix-ui/react-select'
-import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { clsx } from 'clsx'
-import React from 'react'
+import ReactSelect, { type ClassNamesConfig } from 'react-select'
 
-export const Select = SelectPrimitive.Root
-export const SelectGroup = SelectPrimitive.Group
-export const SelectValue = SelectPrimitive.Value
+export type SelectOption = { value: string; label: string }
 
-export const SelectTrigger = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Trigger
-    ref={ref}
-    className={clsx(
-      'flex h-10 w-full items-center justify-between rounded border border-gray-300 bg-white px-3 py-2 text-sm',
-      'placeholder:text-gray-400',
-      'focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent',
-      'disabled:cursor-not-allowed disabled:opacity-50',
-      'dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100',
-      '[&>span]:line-clamp-1',
-      className,
-    )}
-    {...props}
-  >
-    {children}
-    <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 opacity-50" />
-    </SelectPrimitive.Icon>
-  </SelectPrimitive.Trigger>
-))
-SelectTrigger.displayName = 'SelectTrigger'
+export type SelectProps = {
+  options: SelectOption[]
+  value?: string | null
+  onChange?: (value: string | undefined) => void
+  placeholder?: string
+  isDisabled?: boolean
+  isClearable?: boolean
+  isSearchable?: boolean
+  isMulti?: false
+  id?: string
+  name?: string
+  className?: string
+}
 
-export const SelectScrollUpButton = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.ScrollUpButton
-    ref={ref}
-    className={clsx(
-      'flex cursor-default items-center justify-center py-1',
-      className,
-    )}
-    {...props}
-  >
-    <ChevronUp className="h-4 w-4" />
-  </SelectPrimitive.ScrollUpButton>
-))
-SelectScrollUpButton.displayName = 'SelectScrollUpButton'
+// Tailwind-token classNames — selected option + focus ring use the app's
+// semantic `primary-*` colors, so the Select inherits each tenant's theme.
+const classNames: ClassNamesConfig<SelectOption, false> = {
+  control: (state) =>
+    clsx(
+      'flex min-h-10 w-full rounded border bg-white px-1 text-sm dark:bg-gray-900',
+      state.isFocused
+        ? 'border-transparent ring-2 ring-primary-600'
+        : 'border-gray-300 dark:border-gray-600',
+      state.isDisabled && 'cursor-not-allowed opacity-50',
+    ),
+  valueContainer: () => 'gap-1 px-2 py-1',
+  placeholder: () => 'text-gray-400',
+  singleValue: () => 'text-gray-900 dark:text-gray-100',
+  input: () => 'text-gray-900 dark:text-gray-100',
+  indicatorsContainer: () => 'text-gray-400',
+  dropdownIndicator: () => 'px-2',
+  clearIndicator: () =>
+    'cursor-pointer px-1 hover:text-gray-600 dark:hover:text-gray-300',
+  indicatorSeparator: () => 'my-2 w-px bg-gray-200 dark:bg-gray-700',
+  menu: () =>
+    'mt-1 overflow-hidden rounded border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-900',
+  menuList: () => 'p-1',
+  option: (state) =>
+    clsx(
+      'cursor-pointer rounded-sm px-2 py-1.5 text-sm',
+      state.isSelected
+        ? 'bg-primary-600 text-white dark:bg-primary-500'
+        : state.isFocused
+          ? 'bg-gray-100 dark:bg-gray-800'
+          : 'text-gray-900 dark:text-gray-100',
+    ),
+  noOptionsMessage: () => 'px-2 py-4 text-center text-sm text-gray-400',
+}
 
-export const SelectScrollDownButton = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.ScrollDownButton
-    ref={ref}
-    className={clsx(
-      'flex cursor-default items-center justify-center py-1',
-      className,
-    )}
-    {...props}
-  >
-    <ChevronDown className="h-4 w-4" />
-  </SelectPrimitive.ScrollDownButton>
-))
-SelectScrollDownButton.displayName = 'SelectScrollDownButton'
+/**
+ * Single-select built on react-select v5, themed with the design-system tokens.
+ *
+ * ```tsx
+ * <Select options={roles} value={role} onChange={setRole} isClearable />
+ * ```
+ */
+export const Select = ({
+  options,
+  value,
+  onChange,
+  placeholder = 'Select…',
+  isDisabled = false,
+  isClearable = false,
+  isSearchable = true,
+  id,
+  name,
+  className,
+}: SelectProps) => {
+  const selected = options.find((o) => o.value === value) ?? null
 
-export const SelectContent = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = 'popper', ...props }, ref) => (
-  <SelectPrimitive.Portal>
-    <SelectPrimitive.Content
-      ref={ref}
-      className={clsx(
-        'relative z-50 min-w-[8rem] overflow-hidden rounded border border-gray-200 bg-white shadow-md dark:border-gray-700 dark:bg-gray-900',
-        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-        position === 'popper' &&
-          'data-[side=bottom]:translate-y-1 data-[side=top]:-translate-y-1',
-        className,
-      )}
-      position={position}
-      {...props}
-    >
-      <SelectScrollUpButton />
-      <SelectPrimitive.Viewport
-        className={clsx(
-          'p-1',
-          position === 'popper' && 'min-w-[var(--radix-select-trigger-width)]',
-        )}
-      >
-        {children}
-      </SelectPrimitive.Viewport>
-      <SelectScrollDownButton />
-    </SelectPrimitive.Content>
-  </SelectPrimitive.Portal>
-))
-SelectContent.displayName = 'SelectContent'
-
-export const SelectLabel = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Label>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.Label
-    ref={ref}
-    className={clsx(
-      'py-1.5 pl-8 pr-2 text-xs font-semibold text-gray-500',
-      className,
-    )}
-    {...props}
-  />
-))
-SelectLabel.displayName = 'SelectLabel'
-
-export const SelectItem = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
->(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Item
-    ref={ref}
-    className={clsx(
-      'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none',
-      'focus:bg-gray-100 focus:text-gray-900 dark:focus:bg-gray-800 dark:focus:text-gray-100',
-      'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      className,
-    )}
-    {...props}
-  >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
-      </SelectPrimitive.ItemIndicator>
-    </span>
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-  </SelectPrimitive.Item>
-))
-SelectItem.displayName = 'SelectItem'
-
-export const SelectSeparator = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Separator>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.Separator
-    ref={ref}
-    className={clsx('-mx-1 my-1 h-px bg-gray-100 dark:bg-gray-800', className)}
-    {...props}
-  />
-))
-SelectSeparator.displayName = 'SelectSeparator'
+  return (
+    <ReactSelect<SelectOption>
+      inputId={id}
+      name={name}
+      options={options}
+      value={selected}
+      onChange={(option) => onChange?.(option?.value)}
+      placeholder={placeholder}
+      isDisabled={isDisabled}
+      isClearable={isClearable}
+      isSearchable={isSearchable}
+      unstyled
+      className={className}
+      classNamePrefix="sb-select"
+      menuPortalTarget={
+        typeof document !== 'undefined' ? document.body : undefined
+      }
+      styles={{ menuPortal: (base) => ({ ...base, zIndex: 50 }) }}
+      classNames={classNames}
+    />
+  )
+}
