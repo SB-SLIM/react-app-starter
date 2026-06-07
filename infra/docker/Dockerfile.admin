@@ -22,6 +22,7 @@ COPY --from=deps /app/ .
 COPY --from=pruner /app/out/full/ .
 COPY scripts/ ./scripts/
 COPY tsconfig.base.json ./
+COPY --from=pruner /app/apps/server/src/trpc ./apps/server/src/trpc
 ARG VITE_TRPC_URL
 ENV VITE_TRPC_URL=$VITE_TRPC_URL
 ARG VITE_BETTER_AUTH_URL

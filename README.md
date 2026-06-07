@@ -46,16 +46,16 @@ pnpm dev
 apps/
   admin/      Vite + React 19 + Tailwind v4 + TanStack Router/Query — workspace dashboard
   server/     Fastify 5 + tRPC v11 + Pino — stateless API
-  web/        Next.js 15 — marketing / public site
+  web/        Next.js 16 — marketing / public site
   e2e/        Playwright test suite
 packages/
-  core/             cn() utility
-  ui-components/    Tailwind + Radix primitives + UIProvider + theme.css
+  core/             Pure utils: format*, slugify, debounce, groupBy, pick/omit, type guards
+  ui-components/    RSC-aware design system: components (primitives + charts), layout, hooks, lib
   config/           Zod env loader (createEnv)
-  db/               Drizzle platform schema (auth + tenant), migrations, RLS
+  db/               Drizzle platform schema (auth + tenant), migrations, RLS, createDb()
   auth/             better-auth server config + client facade (@sb-codex/auth/client)
-  api-contracts/    tRPC router + Zod schemas (shared client/server)
-  jobs/             BullMQ queues + worker entrypoint
+  api-contracts/    tRPC factory (workspaceProcedure, middlewares, Context) + healthRouter
+  jobs/             BullMQ typed queues (email, export, searchIndex, webhook) + worker
 infra/
   docker/     Multi-stage Dockerfiles (arm64 + amd64)
   compose/    docker-compose files (dev + prod)

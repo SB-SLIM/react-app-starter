@@ -25,17 +25,17 @@ Update docs **at the end of a session**, once a feature is working, validated, a
 pnpm workspace + Turborepo with two layers:
 
 - `packages/` — shared libraries built with `tsup`, consumed by apps
-  - `@sb-codex/core` — utilities (`cn` classname helper)
-  - `@sb-codex/ui-components` — React component library + `UIProvider` + `theme.css`
+  - `@sb-codex/core` — pure utils: `slugify`, `formatDate/DateTime/Relative`, `formatCurrency`, `formatNumber`, `debounce`, `throttle`, `sleep`, `groupBy`, `uniqueBy`, `pick`, `omit`, `isDefined`, `assertNever`
+  - `@sb-codex/ui-components` — RSC-aware design system: `components/` (primitives + charts), `layout/`, `hooks/`, `lib/` — each folder has `index.ts`
   - `@sb-codex/config` — Zod-validated `createEnv()` loader
-  - `@sb-codex/db` — Drizzle ORM schema, migrations, RLS, `createDb()`
-  - `@sb-codex/auth` — better-auth server config (`createAuth()`) + client facade (`./client`)
-  - `@sb-codex/api-contracts` — tRPC router, procedures, shared Zod schemas
-  - `@sb-codex/jobs` — BullMQ queue definitions + worker entrypoint
+  - `@sb-codex/db` — Drizzle ORM platform schema (auth + tenant), migrations, RLS, `createDb()`
+  - `@sb-codex/auth` — better-auth server config (`createAuth()`) + client facade (`./client`) — includes `signInWithGoogle`, `signInWithProvider`
+  - `@sb-codex/api-contracts` — tRPC factory (`router`, `publicProcedure`, `protectedProcedure`, `workspaceProcedure`, middlewares, `Context`) + `healthRouter`. Does **not** export `AppRouter` — the server assembles its own.
+  - `@sb-codex/jobs` — BullMQ queue definitions + typed payloads (email, export, searchIndex, webhook) + worker entrypoint
 - `apps/` — end-user applications
   - `admin` — React 19 + Vite + Tailwind v4 + TanStack Router/Query
-  - `server` — Fastify 5 + tRPC v11 + Pino
-  - `web` — Next.js 15 marketing site
+  - `server` — Fastify 5 + tRPC v11 + Pino — owns `appRouter` and `AppRouter` type in `src/trpc/_app.ts`
+  - `web` — Next.js 16 marketing site
   - `e2e` — Playwright test suite
 
 Workspace packages resolve via pnpm `overrides` in the root `package.json`.
@@ -85,8 +85,9 @@ A clean rebuild: `pnpm clean && pnpm build`.
 - **Connection role is the linchpin**: the **server** connects as the non-privileged `app` role (RLS applies). **Migrations** connect as the superuser (`POSTGRES_USER`) and intentionally bypass RLS. Superusers/table owners bypass RLS — never point the server at the superuser. Regression test: `packages/db/src/__tests__/rls.test.ts` (CI job `rls-isolation`).
 - **Context shape** (`packages/api-contracts/src/context.ts`): `{ requestId, user, workspace, db }`. `db` is a Drizzle instance; inside `enforceWorkspace` it becomes a transaction.
 - **Auth routes** skip the tenant plugin (`/api/auth/*` prefix check in `tenant.plugin.ts`).
-- **Admin app** only imports `AppRouter` as `import type` — never bundles server code.
+- **Admin app** only imports `AppRouter` as `import type` from `apps/server/src/trpc/_app.ts` — type-only, Vite strips it at build. Never bundles server code.
 - **Auth client**: apps import from `@sb-codex/auth/client` — never from `better-auth` directly. `createSbAuthClient(baseURL)` is the library-agnostic facade.
+- **`AGENTS.md`**: repo root `AGENTS.md` tells AI agents to read `node_modules/next/dist/docs/` before writing Next.js code (requires Next.js 16.2.0+). `CLAUDE.md` imports it via `@AGENTS.md`.
 
 ## Frontend structure (feature-based)
 
@@ -116,8 +117,8 @@ Rules:
 
 1. Add schema to `packages/db/src/schema/`.
 2. Run `pnpm db:generate` then append RLS to the new migration.
-3. Add CRUD procedures to `packages/api-contracts/src/routers/` using `workspaceProcedure`.
-4. Export the new router from `packages/api-contracts/src/routers/_app.ts`.
+3. Add CRUD procedures to `apps/server/src/trpc/routers/` using `workspaceProcedure` from `@sb-codex/api-contracts`.
+4. Wire the new router into `apps/server/src/trpc/_app.ts`.
 5. Run `pnpm db:migrate`.
 
 ## Adding a New Package

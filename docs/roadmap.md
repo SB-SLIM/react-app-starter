@@ -77,13 +77,13 @@ Every plugin is **product-agnostic** — reusable in any project, with no busine
 | 7   | CI/CD (GitHub Actions: `ci.yml`, `build-images.yml`, `deploy.yml`, GHCR, native arm64 runner)         | ✅ Done |
 | 8   | Production deploy (hub.slimbouchoucha.tn, Let's Encrypt TLS, Traefik file provider)                   | ✅ Done |
 | 9   | Publishable plugins: `@sb-codex/*` on npm (beta) + `@sb-codex/create-sb-app` scaffolder (apps-only)   | ✅ Done |
-| 10  | Plugin boundary: `AppRouter`+domain routers move to server; all plugins product-agnostic              | ⏳      |
-| 11  | `core` utils: slugify, format\*, truncate, initials, debounce, groupBy, pick, type guards             | ⏳      |
-| 12  | `ui-components` primitives (RSC-aware): Input, Dialog, Badge, Avatar, Card, Table, Toast…             | ⏳      |
-| 13  | `ui-components` layouts: `BlankLayout`, `MainLayout` (sidebar+header), `LandingHeader`, `Footer`      | ⏳      |
-| 14  | `ui-components` patterns: `DataTable`, `FilterBar`, `PageHeader`, `EmptyState`, `StatCard`            | ⏳      |
-| 15  | `auth` Google: `signInWithGoogle` in client facade + Google button in auth UI + env vars              | ⏳      |
-| 16  | `jobs` queues: typed payloads — `emailQueue`, `exportQueue`, `indexQueue`, `webhookQueue`             | ⏳      |
+| 10  | Plugin boundary: `AppRouter`+domain routers move to server; all plugins product-agnostic              | ✅ Done |
+| 11  | `core` utils: slugify, format\*, truncate, initials, debounce, groupBy, pick, type guards             | ✅ Done |
+| 12  | `ui-components` primitives (RSC-aware): Input, Dialog, Badge, Avatar, Card, Toast, charts…            | ✅ Done |
+| 13  | `ui-components` layouts: `BlankLayout`, `MainLayout` (sidebar+header), `LandingHeader`, `Footer`      | ✅ Done |
+| 14  | `ui-components` patterns: `PageHeader`, `EmptyState`, `StatCard`; showcase route + landing page       | ✅ Done |
+| 15  | `auth` Google: `signInWithGoogle` + `signInWithProvider` in client facade                             | ✅ Done |
+| 16  | `jobs` queues: typed payloads — `emailQueue`, `exportQueue`, `searchIndexQueue`, `webhookQueue`       | ✅ Done |
 | 17  | Testing (Vitest workspace + Playwright `apps/e2e` with tenant-isolation suite)                        | ⏳      |
 | 18  | Client management UI (list/create/edit/delete — API exists, frontend missing)                         | ⏳      |
 | 19  | Member management (invite flow, role management)                                                      | ⏳      |
