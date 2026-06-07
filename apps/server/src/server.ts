@@ -9,7 +9,7 @@ import {
   fastifyTRPCPlugin,
   type FastifyTRPCPluginOptions,
 } from '@trpc/server/adapters/fastify'
-import { appRouter, type AppRouter } from '@sb-codex/api-contracts'
+import { appRouter, type AppRouter } from './trpc/_app'
 import { client } from '@sb-codex/db'
 import { env } from './env'
 import { db } from './db'

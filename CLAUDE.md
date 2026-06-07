@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+@AGENTS.md
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 See [docs/architecture.md](docs/architecture.md) for full architecture details.
@@ -110,6 +112,8 @@ Rules:
 
 ## Adding a new tenant-scoped table
 
+> `client` is the **example/template** of this pattern, not a shared schema. Only platform tables (auth + tenant) are permanent in `@sb-codex/db`. In an **apps-only** project (plugins from npm), put new business tables in the consuming app or a project-owned package — never edit `@sb-codex/db`. The steps below are for the full monorepo / scaffold where the package is `workspace:^` and editable.
+
 1. Add schema to `packages/db/src/schema/`.
 2. Run `pnpm db:generate` then append RLS to the new migration.
 3. Add CRUD procedures to `packages/api-contracts/src/routers/` using `workspaceProcedure`.
@@ -127,6 +131,7 @@ Rules:
 
 Every `packages/*` is an independent npm plugin under `@sb-codex`, published to npm (currently `beta`, `0.0.1-beta.x`). Conventions:
 
+- **Every package must be reusable in any project.** A plugin is product-agnostic infrastructure — it contains **no business/domain logic or schema specific to one product**. Anything tied to a particular vertical (travel, e-commerce, …) belongs in the consuming `apps/`, not in `packages/`. Concretely: `@sb-codex/db` ships only **platform schemas** (auth + tenant). The `client` table is an **example/template** of the tenant-scoped pattern, not a shared schema — real domain tables live in the app (or a project-owned package).
 - Each has a `README.md` (canonical docs), publish metadata, and `publishConfig.access: public`.
 - Shared-instance libs (`react`, `zod`, `drizzle-orm`, `@trpc/server`) are **`peerDependencies`** (mirrored in `devDependencies`), not `dependencies`. **Exception**: `@sb-codex/auth` keeps `better-auth` as a regular dependency — it's the internal engine of the facade, hidden from consumers.
 - Publishing is via changesets (prerelease `beta` mode) — see [docs/plugins/README.md](docs/plugins/README.md). `pnpm release` builds packages only (`build:packages`) then `changeset publish`.

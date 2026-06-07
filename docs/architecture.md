@@ -168,12 +168,18 @@ No application-level rewrites required — `workspace_id` is the natural shard k
 | `@sb-codex/core`          | `cn()` classname utility                                    |
 | `@sb-codex/ui-components` | Tailwind + Radix primitives + `UIProvider` + `theme.css`    |
 | `@sb-codex/config`        | Zod-validated `createEnv()` loader                          |
-| `@sb-codex/db`            | Drizzle schema, migrations, `createDb()`                    |
+| `@sb-codex/db`            | Drizzle **platform** schema (auth + tenant) + migrations    |
 | `@sb-codex/auth`          | better-auth server config + auth client facade (`./client`) |
 | `@sb-codex/api-contracts` | tRPC router, procedures, shared Zod schemas                 |
 | `@sb-codex/jobs`          | BullMQ queue definitions + worker entrypoint                |
 
 Each package is an independent npm plugin (`@sb-codex` scope), **published to npm** (currently `beta`). Shared-instance libs are `peerDependencies`; `@sb-codex/auth` keeps `better-auth` as a regular dependency (facade engine). New projects are scaffolded **apps-only** with `pnpm create @sb-codex/sb-app@latest` — plugins resolved from npm, no `packages/`. See [plugins/README.md](plugins/README.md) and [starting-a-new-project.md](starting-a-new-project.md).
+
+### Plugin reusability boundary
+
+Every `packages/*` plugin must be **reusable in any project** — it is product-agnostic infrastructure with **no business/domain logic or schema** tied to a specific vertical. Business code lives in the consuming `apps/`.
+
+This is why `@sb-codex/db` ships **only platform schemas** (auth tables + `organization`/tenant model). The `client` table is an **example/template** of the tenant-scoped pattern (workspace_id + RLS + CRUD), kept so you can clone it — it is _not_ a shared domain schema. When you build a real product, your domain tables go in the app (full monorepo / scaffold: copy the pattern; apps-only: a project-owned package), never inside the published `@sb-codex/db`.
 
 ---
 

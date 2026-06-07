@@ -13,6 +13,23 @@ Build an **open-source, multi-tenant SaaS starter** that can be forked to ship v
 - **~90% open source.** Paid infra (VPS, CDN) and a handful of hosted services are acceptable. No proprietary lock-in inside application code.
 - **Stateless application tier** behind a load balancer.
 - **Multi-tenant from day one** — every domain model is tenant-scoped.
+- **Batteries-included plugins** — `@sb-codex/*` cover the full platform layer so a new product starts with auth, UI, typed API, background jobs, and infra already wired up.
+
+### Plugin boundary (applies to every `packages/*`)
+
+Every plugin is **product-agnostic** — reusable in any project, with no business logic or domain schema.
+
+| Plugin                    | Ships                                                             | Does NOT ship                                           |
+| ------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------- |
+| `@sb-codex/core`          | Pure utils (format, slugify, type guards, …)                      | Product-specific helpers                                |
+| `@sb-codex/ui-components` | Design system — primitives, layouts, patterns                     | Brand colors, product copy                              |
+| `@sb-codex/config`        | `createEnv()` Zod loader                                          | App-specific env vars                                   |
+| `@sb-codex/db`            | Platform schema (auth + tenant) + RLS + `createDb()`              | Business/domain tables (`client` = example template)    |
+| `@sb-codex/auth`          | Auth server config + client facade (email + Google)               | Custom auth flows                                       |
+| `@sb-codex/api-contracts` | tRPC factory (`workspaceProcedure`, middlewares) + `healthRouter` | Project `AppRouter` — assembled in the consuming server |
+| `@sb-codex/jobs`          | BullMQ queue definitions + typed payloads                         | Domain-specific job processors                          |
+
+**`AppRouter` lives in the project, not the plugin.** The server assembles its own `appRouter` from the platform `healthRouter` plus project-specific routers. The admin imports `AppRouter` as `import type` from the server (monorepo: relative path; deployed: a project-owned type package).
 
 ---
 
@@ -43,6 +60,7 @@ Build an **open-source, multi-tenant SaaS starter** that can be forked to ship v
 | Unit tests               | Vitest + Testing Library                                                                                                            |
 | E2E tests                | Playwright                                                                                                                          |
 | Pre-commit               | Husky + lint-staged + commitlint                                                                                                    |
+| Plugin boundary          | `packages/*` product-agnostic — no business schema (db: platform only)                                                              |
 
 ---
 
@@ -59,10 +77,31 @@ Build an **open-source, multi-tenant SaaS starter** that can be forked to ship v
 | 7   | CI/CD (GitHub Actions: `ci.yml`, `build-images.yml`, `deploy.yml`, GHCR, native arm64 runner)         | ✅ Done |
 | 8   | Production deploy (hub.slimbouchoucha.tn, Let's Encrypt TLS, Traefik file provider)                   | ✅ Done |
 | 9   | Publishable plugins: `@sb-codex/*` on npm (beta) + `@sb-codex/create-sb-app` scaffolder (apps-only)   | ✅ Done |
-| 10  | Testing (Vitest workspace + Playwright `apps/e2e` with tenant-isolation suite)                        | ⏳      |
-| 11  | Client management UI (list/create/edit/delete — API exists, frontend missing)                         | ⏳      |
-| 12  | Member management (invite flow, role management)                                                      | ⏳      |
-| 13  | Billing (Stripe via better-auth plugin)                                                               | ⏳      |
+| 10  | Plugin boundary: `AppRouter`+domain routers move to server; all plugins product-agnostic              | ⏳      |
+| 11  | `core` utils: slugify, format\*, truncate, initials, debounce, groupBy, pick, type guards             | ⏳      |
+| 12  | `ui-components` primitives (RSC-aware): Input, Dialog, Badge, Avatar, Card, Table, Toast…             | ⏳      |
+| 13  | `ui-components` layouts: `BlankLayout`, `MainLayout` (sidebar+header), `LandingHeader`, `Footer`      | ⏳      |
+| 14  | `ui-components` patterns: `DataTable`, `FilterBar`, `PageHeader`, `EmptyState`, `StatCard`            | ⏳      |
+| 15  | `auth` Google: `signInWithGoogle` in client facade + Google button in auth UI + env vars              | ⏳      |
+| 16  | `jobs` queues: typed payloads — `emailQueue`, `exportQueue`, `indexQueue`, `webhookQueue`             | ⏳      |
+| 17  | Testing (Vitest workspace + Playwright `apps/e2e` with tenant-isolation suite)                        | ⏳      |
+| 18  | Client management UI (list/create/edit/delete — API exists, frontend missing)                         | ⏳      |
+| 19  | Member management (invite flow, role management)                                                      | ⏳      |
+| 20  | Billing (Stripe via better-auth plugin)                                                               | ⏳      |
+
+---
+
+## Releases
+
+Versioned delivery milestones. The phases above roll up into these releases. The first vertical product built on the starter is a **travel app**, whose lifecycle drives the deployment-target shift.
+
+| Release                                       | Scope                                                                                                                                                        | Deploy target                 | Status     |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------- | ---------- |
+| **v0.x — Starter beta**                       | Phases 1–9: multi-tenant RLS core, auth UI, theme system, CI/CD, prod deploy, `@sb-codex/*` plugins on npm (`beta`) + `create-sb-app` scaffolder             | VPS (`hub.slimbouchoucha.tn`) | ✅ Shipped |
+| **v1.0 — Production starter + Travel app v1** | Phases 10–13: testing (Vitest + Playwright), client management UI, member management, billing. First vertical (travel app) built on the starter and launched | VPS                           | ⏳ Next    |
+| **v2.0 — Cloud-native**                       | Migrate off the single VPS to **Google Cloud or AWS**: managed Postgres / cache / object storage, IaC (Terraform), k8s optional. Travel app v2 runs here     | GCP / AWS                     | 🔭 Planned |
+
+The VPS compose stack is the baseline **through v1**. Cloud manifests and IaC are intentionally deferred to the **v2.0 — Cloud-native** release — see the Scope guard.
 
 ---
 
@@ -122,5 +161,5 @@ push → main
 This roadmap does **not** include:
 
 - Building a specific vertical (travel, e-commerce, cars) — those are forks
-- Cloud deployment manifests (k8s, Terraform) — VPS compose stack is the baseline
+- Cloud deployment manifests (k8s, Terraform) — VPS compose stack is the baseline **through v1**; cloud + IaC arrive in the **v2.0 — Cloud-native** release (GCP/AWS)
 - Mobile clients — tRPC router types are reusable for React Native later

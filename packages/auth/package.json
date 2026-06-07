@@ -49,6 +49,7 @@
     }
   },
   "dependencies": {
+    "@sb-codex/core": "workspace:0.0.1-beta.0",
     "@sb-codex/db": "workspace:^",
     "better-auth": "^1.0.0"
   }

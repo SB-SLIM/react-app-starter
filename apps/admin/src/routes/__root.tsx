@@ -43,6 +43,13 @@ function RootLayout() {
                 >
                   Dashboard
                 </Link>
+                <Link
+                  to="/showcase"
+                  className="text-gray-600 hover:text-gray-900"
+                  activeProps={{ className: 'text-primary-600 font-medium' }}
+                >
+                  Showcase
+                </Link>
                 <span className="text-gray-400">|</span>
                 <span className="text-gray-600">{session.user.email}</span>
                 <button

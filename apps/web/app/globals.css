@@ -1,3 +1,5 @@
+@import '@sb-codex/ui-components/theme.css';
+
 *,
 *::before,
 *::after {
@@ -10,4 +12,8 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
 }

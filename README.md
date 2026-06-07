@@ -52,7 +52,7 @@ packages/
   core/             cn() utility
   ui-components/    Tailwind + Radix primitives + UIProvider + theme.css
   config/           Zod env loader (createEnv)
-  db/               Drizzle schema, migrations, RLS
+  db/               Drizzle platform schema (auth + tenant), migrations, RLS
   auth/             better-auth server config + client facade (@sb-codex/auth/client)
   api-contracts/    tRPC router + Zod schemas (shared client/server)
   jobs/             BullMQ queues + worker entrypoint
@@ -64,6 +64,8 @@ docs/
   architecture.md   Tenant model, request lifecycle, theme system, scaling path
   roadmap.md        Phase status, what's shipped, what's next
 ```
+
+> **Plugin boundary:** every `packages/*` is product-agnostic and reusable in any project — no business schema or logic specific to one vertical. `@sb-codex/db` ships only platform schemas (auth + tenant); the `client` table is an example template of the tenant-scoped pattern. Your domain tables live in the apps, not in the published plugins.
 
 ## Commands
 

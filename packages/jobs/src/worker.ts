@@ -1,6 +1,11 @@
 import { Worker } from 'bullmq'
 import IORedis from 'ioredis'
-import type { EmailJobData, SearchIndexJobData, WebhookJobData } from './queues'
+import type {
+  EmailJobData,
+  ExportJobData,
+  SearchIndexJobData,
+  WebhookJobData,
+} from './queues'
 
 const REDIS_URL = process.env['REDIS_URL'] ?? 'redis://localhost:6379'
 const connection = new IORedis(REDIS_URL, { maxRetriesPerRequest: null })
@@ -8,8 +13,20 @@ const connection = new IORedis(REDIS_URL, { maxRetriesPerRequest: null })
 const emailWorker = new Worker<EmailJobData>(
   'email',
   async (job) => {
-    console.log(`[email] Sending to ${job.data.to}: ${job.data.subject}`)
-    // Wire real SMTP/Nodemailer here
+    const to = Array.isArray(job.data.to) ? job.data.to.join(', ') : job.data.to
+    console.log(`[email] Sending to ${to}: ${job.data.subject}`)
+    // Wire Nodemailer here
+  },
+  { connection },
+)
+
+const exportWorker = new Worker<ExportJobData>(
+  'export',
+  async (job) => {
+    console.log(
+      `[export] ${job.data.resource} (${job.data.format}) for workspace ${job.data.workspaceId}`,
+    )
+    // Wire CSV/Excel generation + MinIO upload here
   },
   { connection },
 )
@@ -40,6 +57,7 @@ const webhookWorker = new Worker<WebhookJobData>(
 process.on('SIGTERM', async () => {
   await Promise.all([
     emailWorker.close(),
+    exportWorker.close(),
     searchIndexWorker.close(),
     webhookWorker.close(),
   ])
@@ -47,5 +65,5 @@ process.on('SIGTERM', async () => {
 })
 
 console.log(
-  'Worker started — listening for jobs on email, search-index, webhook',
+  'Worker started — listening for jobs on email, export, search-index, webhook',
 )

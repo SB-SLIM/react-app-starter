@@ -2,6 +2,7 @@
 
 import { createAuthClient } from 'better-auth/react'
 import { organizationClient } from 'better-auth/client/plugins'
+import { slugify } from '@sb-codex/core'
 
 // ── Clean types exposed to consumers ──────────────────────────────────────────
 
@@ -40,13 +41,6 @@ export function createSbAuthClient(baseURL: string) {
     baseURL,
     plugins: [organizationClient()],
   })
-
-  function slugify(name: string): string {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-  }
 
   return {
     /** Sign in with email + password. */
@@ -155,6 +149,25 @@ export function createSbAuthClient(baseURL: string) {
         data: orgs.map((o) => ({ id: o.id, slug: o.slug, name: o.name })),
         error: null,
       }
+    },
+
+    /** Sign in with Google (or any configured social provider). */
+    async signInWithProvider(
+      provider: 'google',
+      callbackURL?: string,
+    ): Promise<void> {
+      await internal.signIn.social({
+        provider,
+        callbackURL: callbackURL ?? '/',
+      })
+    },
+
+    /** Convenience alias for Google sign-in. */
+    async signInWithGoogle(callbackURL?: string): Promise<void> {
+      await internal.signIn.social({
+        provider: 'google',
+        callbackURL: callbackURL ?? '/',
+      })
     },
   }
 }

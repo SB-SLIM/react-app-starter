@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
+import { UIProvider } from '@sb-codex/ui-components'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Web',
-  description: 'Front office',
+  title: 'SB Codex — Batteries-included SaaS starter',
+  description:
+    'Auth, multi-tenant API, background jobs, and a full design system — ready to ship.',
 }
 
 export default function RootLayout({
@@ -11,7 +13,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <UIProvider>{children}</UIProvider>
+      </body>
     </html>
   )
 }
