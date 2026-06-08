@@ -16,13 +16,10 @@ interface Props {
 export function RoleSelect({ value, onChange, disabled }: Props) {
   return (
     <Select
-      value={options.find((o) => o.value === value) ?? null}
-      onChange={(opt) => opt && onChange(opt.value as MemberRole)}
+      value={value}
+      onChange={(val) => val && onChange(val as MemberRole)}
       options={options}
       isDisabled={disabled}
-      menuPortalTarget={
-        typeof document !== 'undefined' ? document.body : undefined
-      }
     />
   )
 }
