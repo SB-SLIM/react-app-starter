@@ -30,9 +30,59 @@ jobs:
           echo "CI workflow concluded with '${{ github.event.workflow_run.conclusion }}' — aborting build."
           exit 1
 
+  changes:
+    name: Detect changed apps
+    needs: gate
+    runs-on: ubuntu-latest
+    outputs:
+      server: ${{ steps.filter.outputs.server }}
+      web: ${{ steps.filter.outputs.web }}
+      admin: ${{ steps.filter.outputs.admin }}
+      superadmin: ${{ steps.filter.outputs.superadmin }}
+      worker: ${{ steps.filter.outputs.worker }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            shared: &shared
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+              - 'turbo.json'
+            server:
+              - *shared
+              - 'apps/server/**'
+              - 'infra/docker/Dockerfile.server'
+            web:
+              - *shared
+              - 'apps/web/**'
+              - 'infra/docker/Dockerfile.web'
+            admin:
+              - *shared
+              - 'apps/admin/**'
+              - 'infra/docker/Dockerfile.admin'
+            superadmin:
+              - *shared
+              - 'apps/superadmin/**'
+              - 'infra/docker/Dockerfile.superadmin'
+            worker:
+              - *shared
+              - 'infra/docker/Dockerfile.worker'
+
   build:
     name: Build ${{ matrix.app }}
-    needs: gate
+    needs: [gate, changes]
+    if: ${{
+      (matrix.app == 'server'     && needs.changes.outputs.server     == 'true') ||
+      (matrix.app == 'web'        && needs.changes.outputs.web        == 'true') ||
+      (matrix.app == 'admin'      && needs.changes.outputs.admin      == 'true') ||
+      (matrix.app == 'superadmin' && needs.changes.outputs.superadmin == 'true') ||
+      (matrix.app == 'worker'     && needs.changes.outputs.worker     == 'true')
+      }}
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read

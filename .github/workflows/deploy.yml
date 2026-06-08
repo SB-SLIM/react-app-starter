@@ -16,7 +16,8 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    # Only deploy when the build workflow succeeded.
+    # Deploy when build workflow succeeded (some or all images may have been skipped —
+    # deploy still runs migrations and brings up any newly built containers).
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
