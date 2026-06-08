@@ -199,7 +199,7 @@ export function MembersTable() {
         confirmLabel="Remove"
         loading={remove.isPending}
         onConfirm={() => {
-          if (toRemove) remove.mutate({ memberId: toRemove.id })
+          if (toRemove) remove.mutate({ userId: toRemove.userId })
         }}
       />
     </div>

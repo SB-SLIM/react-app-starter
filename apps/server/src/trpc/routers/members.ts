@@ -194,23 +194,19 @@ export const membersRouter = router({
     }),
 
   remove: adminProcedure
-    .input(z.object({ memberId: z.string() }))
+    .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const [existing] = await ctx.db
-        .select({ userId: member.userId })
-        .from(member)
+      if (input.userId === ctx.user!.id)
+        throw new Error('You cannot remove yourself')
+
+      await ctx.db
+        .delete(member)
         .where(
           and(
-            eq(member.id, input.memberId),
+            eq(member.userId, input.userId),
             eq(member.organizationId, ctx.workspace!.id),
           ),
         )
-        .limit(1)
-      if (!existing) throw new Error('Member not found')
-      if (existing.userId === ctx.user!.id)
-        throw new Error('You cannot remove yourself')
-
-      await ctx.db.delete(member).where(eq(member.id, input.memberId))
       return { success: true }
     }),
 
