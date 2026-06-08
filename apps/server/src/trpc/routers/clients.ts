@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { eq, count } from 'drizzle-orm'
 import { client } from '@sb-codex/db'
 import { router, workspaceProcedure } from '@sb-codex/api-contracts'
+import { adminProcedure } from '@sb-codex/acl'
 
 const clientInput = z.object({
   name: z.string().min(1),
@@ -56,7 +57,7 @@ export const clientsRouter = router({
       return rows[0] ?? null
     }),
 
-  create: workspaceProcedure
+  create: adminProcedure
     .input(clientInput)
     .output(clientSchema)
     .mutation(async ({ ctx, input }) => {
@@ -70,7 +71,7 @@ export const clientsRouter = router({
       return row
     }),
 
-  update: workspaceProcedure
+  update: adminProcedure
     .input(z.object({ id: z.uuid() }).extend(clientInput.partial().shape))
     .output(clientSchema)
     .mutation(async ({ ctx, input }) => {
@@ -85,7 +86,7 @@ export const clientsRouter = router({
       return row
     }),
 
-  delete: workspaceProcedure
+  delete: adminProcedure
     .input(z.object({ id: z.uuid() }))
     .output(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {

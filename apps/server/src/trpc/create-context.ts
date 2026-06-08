@@ -7,6 +7,7 @@ export function createContext({ req }: CreateFastifyContextOptions): Context {
     requestId: req.id as string,
     user: req.user ?? null,
     workspace: req.workspace ?? null,
+    memberRole: req.memberRole ?? null,
     db,
   }
 }
