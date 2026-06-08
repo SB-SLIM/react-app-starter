@@ -76,13 +76,6 @@ jobs:
   build:
     name: Build ${{ matrix.app }}
     needs: [gate, changes]
-    if: ${{
-      (matrix.app == 'server'     && needs.changes.outputs.server     == 'true') ||
-      (matrix.app == 'web'        && needs.changes.outputs.web        == 'true') ||
-      (matrix.app == 'admin'      && needs.changes.outputs.admin      == 'true') ||
-      (matrix.app == 'superadmin' && needs.changes.outputs.superadmin == 'true') ||
-      (matrix.app == 'worker'     && needs.changes.outputs.worker     == 'true')
-      }}
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
@@ -102,10 +95,18 @@ jobs:
           - app: worker
             dockerfile: infra/docker/Dockerfile.worker
 
+    # The `matrix` context is not allowed in a job-level `if`, so the
+    # per-app skip is applied at the step level. The `changes` outputs are
+    # named exactly like the apps, so we index them by `matrix.app`.
+    env:
+      BUILD_APP: ${{ needs.changes.outputs[matrix.app] }}
+
     steps:
-      - uses: actions/checkout@v4
+      - if: ${{ env.BUILD_APP == 'true' }}
+        uses: actions/checkout@v4
 
       - name: Log in to GHCR
+        if: ${{ env.BUILD_APP == 'true' }}
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -113,10 +114,12 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
+        if: ${{ env.BUILD_APP == 'true' }}
         uses: docker/setup-buildx-action@v3
 
       - name: Extract metadata
         id: meta
+        if: ${{ env.BUILD_APP == 'true' }}
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.app }}
@@ -128,6 +131,7 @@ jobs:
       # Set in GitHub repo settings: Settings → Variables → Actions.
       - name: Resolve build args
         id: args
+        if: ${{ env.BUILD_APP == 'true' }}
         run: |
           if [ "${{ matrix.app }}" = "admin" ] || [ "${{ matrix.app }}" = "superadmin" ]; then
             {
@@ -139,6 +143,7 @@ jobs:
           fi
 
       - name: Build and push
+        if: ${{ env.BUILD_APP == 'true' }}
         uses: docker/build-push-action@v6
         with:
           context: .
