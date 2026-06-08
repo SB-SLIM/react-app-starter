@@ -67,8 +67,10 @@ Browser → Traefik → Fastify
 Traefik uses a **static file provider** (`infra/traefik/dynamic.prod.yml`) — NOT the Docker label provider. Docker Engine 27+ dropped support for the Docker API version that Traefik's Docker client requires.
 
 ```
-https://hub.slimbouchoucha.tn/api/*  →  Fastify server :3001  (priority 10)
-https://hub.slimbouchoucha.tn/*      →  nginx/admin SPA :80   (priority 1)
+https://hub.slimbouchoucha.tn/api/*          →  Fastify server  :3001  (priority 10)
+https://hub.slimbouchoucha.tn/*              →  Next.js web     :3000  (priority 1)
+https://hub-admin.slimbouchoucha.tn/*        →  Admin SPA nginx :80    (priority 1)
+https://hub-superadmin.slimbouchoucha.tn/*   →  Superadmin nginx :80   (priority 1)
 ```
 
 TLS via Let's Encrypt `tlsChallenge` (TLS-ALPN-01 on port 443).
@@ -178,7 +180,8 @@ No application-level rewrites required — `workspace_id` is the natural shard k
 | `@sb-codex/db`            | Drizzle **platform** schema (auth + tenant) + migrations + RLS + `createDb()`                                                                                          |
 | `@sb-codex/auth`          | better-auth server config + auth client facade (`./client`) — includes `signInWithGoogle`, `signInWithProvider`                                                        |
 | `@sb-codex/api-contracts` | tRPC factory (`workspaceProcedure`, middlewares, `Context`) + `healthRouter`; no `AppRouter` export                                                                    |
-| `@sb-codex/jobs`          | BullMQ queue definitions + typed payloads (email, export, searchIndex, webhook) + worker entrypoint                                                                    |
+| `@sb-codex/jobs`          | BullMQ queue definitions + typed payloads (email, export, searchIndex, webhook) + worker entrypoint (Nodemailer, Meilisearch, HMAC webhook, export scaffold)           |
+| `@sb-codex/acl`           | RBAC: `hasRole`, `ROLE_HIERARCHY`, `enforceRole`, `adminProcedure`, `ownerProcedure`; React client `AclProvider`, `useRole`, `AccessGuard`                             |
 
 Each package is an independent npm plugin (`@sb-codex` scope), **published to npm** (currently `beta`). Shared-instance libs are `peerDependencies`; `@sb-codex/auth` keeps `better-auth` as a regular dependency (facade engine). New projects are scaffolded **apps-only** with `pnpm create @sb-codex/sb-app@latest` — plugins resolved from npm, no `packages/`. See [plugins/README.md](plugins/README.md) and [starting-a-new-project.md](starting-a-new-project.md).
 
