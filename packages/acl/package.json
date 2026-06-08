@@ -35,7 +35,8 @@
   "scripts": {
     "clean": "premove ./dist",
     "build": "tsup --tsconfig tsconfig.json",
-    "dev": "tsup --watch --tsconfig tsconfig.json"
+    "dev": "tsup --watch --tsconfig tsconfig.json",
+    "test": "vitest run"
   },
   "exports": {
     ".": {
@@ -56,8 +57,11 @@
   },
   "devDependencies": {
     "@sb-codex/api-contracts": "workspace:^",
+    "@testing-library/react": "^16.0.0",
     "@trpc/server": "^11.0.0",
     "@types/react": "^19.0.1",
-    "react": "^19.0.0"
+    "happy-dom": "^17.0.0",
+    "react": "^19.0.0",
+    "vitest": "^3.0.0"
   }
 }
