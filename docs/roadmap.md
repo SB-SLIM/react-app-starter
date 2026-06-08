@@ -19,15 +19,16 @@ Build an **open-source, multi-tenant SaaS starter** that can be forked to ship v
 
 Every plugin is **product-agnostic** — reusable in any project, with no business logic or domain schema.
 
-| Plugin                    | Ships                                                             | Does NOT ship                                           |
-| ------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------- |
-| `@sb-codex/core`          | Pure utils (format, slugify, type guards, …)                      | Product-specific helpers                                |
-| `@sb-codex/ui-components` | Design system — primitives, layouts, patterns                     | Brand colors, product copy                              |
-| `@sb-codex/config`        | `createEnv()` Zod loader                                          | App-specific env vars                                   |
-| `@sb-codex/db`            | Platform schema (auth + tenant) + RLS + `createDb()`              | Business/domain tables (`client` = example template)    |
-| `@sb-codex/auth`          | Auth server config + client facade (email + Google)               | Custom auth flows                                       |
-| `@sb-codex/api-contracts` | tRPC factory (`workspaceProcedure`, middlewares) + `healthRouter` | Project `AppRouter` — assembled in the consuming server |
-| `@sb-codex/jobs`          | BullMQ queue definitions + typed payloads                         | Domain-specific job processors                          |
+| Plugin                    | Ships                                                                                                         | Does NOT ship                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `@sb-codex/core`          | Pure utils (format, slugify, type guards, …)                                                                  | Product-specific helpers                                |
+| `@sb-codex/ui-components` | Design system — primitives, layouts, patterns                                                                 | Brand colors, product copy                              |
+| `@sb-codex/config`        | `createEnv()` Zod loader                                                                                      | App-specific env vars                                   |
+| `@sb-codex/db`            | Platform schema (auth + tenant) + RLS + `createDb()`                                                          | Business/domain tables (`client` = example template)    |
+| `@sb-codex/auth`          | Auth server config + client facade (email + Google)                                                           | Custom auth flows                                       |
+| `@sb-codex/api-contracts` | tRPC factory (`workspaceProcedure`, middlewares) + `healthRouter`                                             | Project `AppRouter` — assembled in the consuming server |
+| `@sb-codex/jobs`          | BullMQ queue definitions + typed payloads + worker entrypoint (email/search-index/webhook/export)             | Domain-specific job processors                          |
+| `@sb-codex/acl`           | RBAC middleware (`adminProcedure`, `ownerProcedure`) + React client (`AclProvider`, `useRole`, `AccessGuard`) | Product-specific role sets                              |
 
 **`AppRouter` lives in the project, not the plugin.** The server assembles its own `appRouter` from the platform `healthRouter` plus project-specific routers. The admin imports `AppRouter` as `import type` from the server (monorepo: relative path; deployed: a project-owned type package).
 
@@ -87,13 +88,17 @@ Every plugin is **product-agnostic** — reusable in any project, with no busine
 | 14  | `ui-components` patterns: `PageHeader`, `EmptyState`, `StatCard`; showcase route + landing page                                                                                                                     | ✅ Done |
 | 15  | `auth` Google: `signInWithGoogle` + `signInWithProvider` in client facade                                                                                                                                           | ✅ Done |
 | 16  | `jobs` queues: typed payloads — `emailQueue`, `exportQueue`, `searchIndexQueue`, `webhookQueue`                                                                                                                     | ✅ Done |
-| 17  | Testing (Vitest workspace + Playwright `apps/e2e` with tenant-isolation suite)                                                                                                                                      | ⏳      |
+| 17  | Testing — Vitest workspace (db/auth/api-contracts/core/acl); Playwright `apps/e2e` tenant-isolation suite                                                                                                           | 🔨      |
 | 18  | Client management UI — list + global search + delete shipped (`DataTable`); create/edit pending                                                                                                                     | 🔨      |
-| 19  | Member management (invite flow, role management)                                                                                                                                                                    | ⏳      |
+| 19  | Member management (invite flow, role management, workspace settings)                                                                                                                                                | ✅ Done |
 | 20  | Billing (Stripe via better-auth plugin)                                                                                                                                                                             | ⏳      |
 | 21  | `ui-components` round 2: `DropdownMenu`, `ConfirmDialog`, `Pagination`, `Spinner`, `Breadcrumb`, `Popover`, `Stepper`, `RadioGroup`; travel-agency dashboard; header dark/light toggle + runtime theme presets demo | ✅ Done |
 | 22  | `DataTable` on `@tanstack/react-table` (search/sort/pagination) + `DatePicker` on `react-datepicker`                                                                                                                | ✅ Done |
 | 23  | `ui-components` hooks: `useStepper`, `useModal` (multi-modal control with typed per-modal data)                                                                                                                     | ✅ Done |
+| 24  | `@sb-codex/acl` plugin — `hasRole`, `ROLE_HIERARCHY`, `enforceRole`, `adminProcedure`, `ownerProcedure`; React client `AclProvider`, `useRole`, `AccessGuard`; 18-test Vitest suite                                 | ✅ Done |
+| 25  | `jobs` worker implementations — Nodemailer email, Meilisearch search-index, HMAC-signed webhook, export scaffold; `src/env.ts` env extraction                                                                       | ✅ Done |
+| 26  | Multi-app subdomain routing — `hub.*` → Next.js web, `hub-admin.*` → admin SPA, `hub-superadmin.*` → superadmin SPA; Traefik file provider updated; `Dockerfile.web` + `Dockerfile.superadmin` added                | ✅ Done |
+| 27  | Super admin app (`apps/superadmin`) — platform-level overview, all-workspace stats, Fastify `superAdminRouter` protected by `superAdminProcedure`                                                                   | ✅ Done |
 
 ---
 
@@ -154,10 +159,17 @@ push → main
 - Deploy concurrency: `cancel-in-progress: false` — deploys queue, never interrupted mid-flight
 - Gate job: Build workflow fails (not skips) when CI didn't pass, preventing Deploy trigger
 
-### Production stack (hub.slimbouchoucha.tn)
+### Production stack
+
+| Subdomain                          | Service                   |
+| ---------------------------------- | ------------------------- |
+| `hub.slimbouchoucha.tn`            | Next.js web/marketing     |
+| `hub.slimbouchoucha.tn/api`        | Fastify API (priority 10) |
+| `hub-admin.slimbouchoucha.tn`      | Admin SPA (nginx)         |
+| `hub-superadmin.slimbouchoucha.tn` | Super admin SPA (nginx)   |
 
 - Traefik v3.1 with file provider + Let's Encrypt `tlsChallenge`
-- `PathPrefix(/api)` → Fastify, catch-all → nginx/admin SPA
+- `PathPrefix(/api)` on hub.\* → Fastify (priority 10), Host matchers → respective SPAs/Next.js (priority 1)
 - All services on internal Docker network — only Traefik exposes ports 80/443
 
 ---

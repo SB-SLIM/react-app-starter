@@ -44,18 +44,20 @@ pnpm dev
 
 ```text
 apps/
-  admin/      Vite + React 19 + Tailwind v4 + TanStack Router/Query — workspace dashboard
-  server/     Fastify 5 + tRPC v11 + Pino — stateless API
-  web/        Next.js 16 — marketing / public site
-  e2e/        Playwright test suite
+  admin/        Vite + React 19 + Tailwind v4 + TanStack Router/Query — workspace dashboard (hub-admin.*)
+  superadmin/   Vite + React 19 — platform super admin (hub-superadmin.*)
+  server/       Fastify 5 + tRPC v11 + Pino — stateless API (hub.*/api)
+  web/          Next.js 16 — marketing / public site (hub.*)
+  e2e/          Playwright test suite
 packages/
   core/             Pure utils: format*, slugify, debounce, groupBy, pick/omit, type guards
-  ui-components/    RSC-aware design system: components (primitives, DataTable, charts), layout, hooks (useStepper/useModal), lib
+  ui-components/    RSC-aware design system (Vite + Next.js): components, layout, hooks, lib
   config/           Zod env loader (createEnv)
   db/               Drizzle platform schema (auth + tenant), migrations, RLS, createDb()
   auth/             better-auth server config + client facade (@sb-codex/auth/client)
   api-contracts/    tRPC factory (workspaceProcedure, middlewares, Context) + healthRouter
-  jobs/             BullMQ typed queues (email, export, searchIndex, webhook) + worker
+  acl/              RBAC: enforceRole, adminProcedure, ownerProcedure; AclProvider, AccessGuard
+  jobs/             BullMQ typed queues + worker (Nodemailer email, Meilisearch, HMAC webhook)
 infra/
   docker/     Multi-stage Dockerfiles (arm64 + amd64)
   compose/    docker-compose files (dev + prod)
@@ -100,14 +102,14 @@ pnpm db:studio        # open Drizzle Studio
 
 Required in `.env` (local) or `.env.production` (VPS):
 
-| Variable             | Description                                                                 |
-| -------------------- | --------------------------------------------------------------------------- |
-| `DATABASE_URL`       | Postgres connection string used by **migrations** (privileged role)         |
-| `APP_DB_PASSWORD`    | Password for the non-privileged `app` role the **server** connects as (RLS) |
-| `BETTER_AUTH_SECRET` | 32+ char secret for session signing                                         |
-| `BETTER_AUTH_URL`    | Server base URL (e.g. `http://localhost:3001`)                              |
-| `REDIS_URL`          | Valkey/Redis connection string                                              |
-| `CORS_ORIGIN`        | Admin app URL (e.g. `http://localhost:5173`)                                |
+| Variable             | Description                                                                           |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| `DATABASE_URL`       | Postgres connection string used by **migrations** (privileged role)                   |
+| `APP_DB_PASSWORD`    | Password for the non-privileged `app` role the **server** connects as (RLS)           |
+| `BETTER_AUTH_SECRET` | 32+ char secret for session signing                                                   |
+| `BETTER_AUTH_URL`    | Server base URL (e.g. `http://localhost:3001`)                                        |
+| `REDIS_URL`          | Valkey/Redis connection string                                                        |
+| `CORS_ORIGIN`        | Comma-separated frontend origins (e.g. `http://localhost:5173,http://localhost:5174`) |
 
 > **Tenant isolation:** the server connects to Postgres as the non-privileged `app`
 > role so Row-Level Security is always enforced. Migrations connect as the superuser

@@ -31,11 +31,13 @@ pnpm workspace + Turborepo with two layers:
   - `@sb-codex/db` — Drizzle ORM platform schema (auth + tenant), migrations, RLS, `createDb()`
   - `@sb-codex/auth` — better-auth server config (`createAuth()`) + client facade (`./client`) — includes `signInWithGoogle`, `signInWithProvider`
   - `@sb-codex/api-contracts` — tRPC factory (`router`, `publicProcedure`, `protectedProcedure`, `workspaceProcedure`, middlewares, `Context`) + `healthRouter`. Does **not** export `AppRouter` — the server assembles its own.
-  - `@sb-codex/jobs` — BullMQ queue definitions + typed payloads (email, export, searchIndex, webhook) + worker entrypoint
+  - `@sb-codex/jobs` — BullMQ queue definitions + typed payloads (email, export, searchIndex, webhook) + worker entrypoint (Nodemailer, Meilisearch, HMAC-signed webhook, export scaffold); env vars in `src/env.ts`
+  - `@sb-codex/acl` — RBAC: `hasRole`, `ROLE_HIERARCHY`, `enforceRole(allowed)`, `adminProcedure`, `ownerProcedure`; React client export (`./client`): `AclProvider`, `useRole`, `AccessGuard`
 - `apps/` — end-user applications
-  - `admin` — React 19 + Vite + Tailwind v4 + TanStack Router/Query
-  - `server` — Fastify 5 + tRPC v11 + Pino — owns `appRouter` and `AppRouter` type in `src/trpc/_app.ts`
-  - `web` — Next.js 16 marketing site
+  - `admin` — React 19 + Vite + Tailwind v4 + TanStack Router/Query → `hub-admin.slimbouchoucha.tn`
+  - `superadmin` — React 19 + Vite — platform super admin → `hub-superadmin.slimbouchoucha.tn`
+  - `server` — Fastify 5 + tRPC v11 + Pino — owns `appRouter` and `AppRouter` type in `src/trpc/_app.ts` → `hub.slimbouchoucha.tn/api`
+  - `web` — Next.js 16 marketing site → `hub.slimbouchoucha.tn`
   - `e2e` — Playwright test suite
 
 Workspace packages resolve via pnpm `overrides` in the root `package.json`.
