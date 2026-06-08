@@ -7,7 +7,7 @@ import {
   DataTable,
   toast,
 } from '@sb-codex/ui-components'
-import { AccessGuard } from '@sb-codex/acl/client'
+import { usePermission } from '@sb-codex/acl/client'
 import { trpc } from '@/app/trpc'
 import { useMembers, useInvitations } from '../hooks/useMembers'
 import { RoleSelect } from './RoleSelect'
@@ -23,6 +23,10 @@ export function MembersTable() {
   const utils = trpc.useUtils()
   const [inviteOpen, setInviteOpen] = useState(false)
   const [toRemove, setToRemove] = useState<Member | null>(null)
+
+  const canInvite = usePermission('members:invite')
+  const canUpdate = usePermission('members:update')
+  const canRemove = usePermission('members:remove')
 
   const updateRole = trpc.members.updateRole.useMutation({
     onSuccess: async () => {
@@ -63,15 +67,8 @@ export function MembersTable() {
     {
       accessorKey: 'role',
       header: 'Role',
-      cell: ({ row }) => (
-        <AccessGuard
-          roles={['owner', 'admin']}
-          fallback={
-            <span className="capitalize text-sm text-gray-600 dark:text-gray-400">
-              {row.original.role}
-            </span>
-          }
-        >
+      cell: ({ row }) =>
+        canUpdate ? (
           <div className="w-36">
             <RoleSelect
               value={row.original.role as MemberRole}
@@ -81,8 +78,11 @@ export function MembersTable() {
               disabled={updateRole.isPending}
             />
           </div>
-        </AccessGuard>
-      ),
+        ) : (
+          <span className="capitalize text-sm text-gray-600 dark:text-gray-400">
+            {row.original.role}
+          </span>
+        ),
     },
     {
       id: 'actions',
@@ -90,8 +90,8 @@ export function MembersTable() {
       enableSorting: false,
       enableGlobalFilter: false,
       meta: { headerClassName: 'w-12' },
-      cell: ({ row }) => (
-        <AccessGuard roles={['owner', 'admin']}>
+      cell: ({ row }) =>
+        canRemove ? (
           <div className="text-right">
             <Button
               variant="ghost"
@@ -102,8 +102,7 @@ export function MembersTable() {
               Remove
             </Button>
           </div>
-        </AccessGuard>
-      ),
+        ) : null,
     },
   ]
 
@@ -127,21 +126,22 @@ export function MembersTable() {
       enableSorting: false,
       enableGlobalFilter: false,
       meta: { headerClassName: 'w-12' },
-      cell: ({ row }) => (
-        <div className="text-right">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-red-600 hover:text-red-700 dark:text-red-400"
-            disabled={cancelInvitation.isPending}
-            onClick={() =>
-              cancelInvitation.mutate({ invitationId: row.original.id })
-            }
-          >
-            Cancel
-          </Button>
-        </div>
-      ),
+      cell: ({ row }) =>
+        canInvite ? (
+          <div className="text-right">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-red-600 hover:text-red-700 dark:text-red-400"
+              disabled={cancelInvitation.isPending}
+              onClick={() =>
+                cancelInvitation.mutate({ invitationId: row.original.id })
+              }
+            >
+              Cancel
+            </Button>
+          </div>
+        ) : null,
     },
   ]
 
@@ -160,12 +160,12 @@ export function MembersTable() {
           <h2 className="text-base font-medium text-gray-900 dark:text-gray-100">
             Members ({members.length})
           </h2>
-          <AccessGuard roles={['owner', 'admin']}>
+          {canInvite && (
             <Button size="sm" onClick={() => setInviteOpen(true)}>
               <UserPlus className="mr-1.5 h-4 w-4" />
               Invite member
             </Button>
-          </AccessGuard>
+          )}
         </div>
         <DataTable
           columns={memberColumns}

@@ -15,6 +15,11 @@ export function useSignIn() {
         setError(res.error)
         return
       }
+      if (!res.data.user.isSuperAdmin) {
+        await authClient.signOut()
+        setError('This account is not authorized for the admin console.')
+        return
+      }
       await navigate({ to: '/' })
     })
   }

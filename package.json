@@ -20,6 +20,7 @@
     "db:generate": "pnpm --filter @sb-codex/db db:generate",
     "db:migrate": "pnpm --filter @sb-codex/db db:migrate",
     "db:studio": "pnpm --filter @sb-codex/db db:studio",
+    "seed:superadmin": "pnpm --filter server seed:superadmin",
     "changeset": "changeset",
     "version": "changeset version",
     "build:packages": "turbo run build --filter=./packages/*",

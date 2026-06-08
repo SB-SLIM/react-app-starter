@@ -4,6 +4,8 @@ import type { MemberRole } from '@sb-codex/acl/client'
 const options = [
   { value: 'owner', label: 'Owner' },
   { value: 'admin', label: 'Admin' },
+  { value: 'manager', label: 'Manager' },
+  { value: 'commercial', label: 'Commercial' },
   { value: 'member', label: 'Member' },
 ]
 

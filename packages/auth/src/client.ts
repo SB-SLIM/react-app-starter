@@ -10,6 +10,7 @@ export type AuthUser = {
   id: string
   email: string
   name: string
+  isSuperAdmin: boolean
 }
 
 export type AuthSession = {
@@ -55,7 +56,13 @@ export function createSbAuthClient(baseURL: string) {
       if (!user) return { data: null, error: 'No user in response' }
       return {
         data: {
-          user: { id: user.id, email: user.email, name: user.name },
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            isSuperAdmin:
+              (user as { isSuperAdmin?: boolean }).isSuperAdmin ?? false,
+          },
           activeOrganizationId: null,
         },
         error: null,
@@ -75,7 +82,13 @@ export function createSbAuthClient(baseURL: string) {
       if (!user) return { data: null, error: 'No user in response' }
       return {
         data: {
-          user: { id: user.id, email: user.email, name: user.name },
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            isSuperAdmin:
+              (user as { isSuperAdmin?: boolean }).isSuperAdmin ?? false,
+          },
           activeOrganizationId: null,
         },
         error: null,
@@ -93,7 +106,13 @@ export function createSbAuthClient(baseURL: string) {
       const user = res?.data?.user
       if (!user) return null
       return {
-        user: { id: user.id, email: user.email, name: user.name },
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          isSuperAdmin:
+            (user as { isSuperAdmin?: boolean }).isSuperAdmin ?? false,
+        },
         activeOrganizationId: res.data?.session?.activeOrganizationId ?? null,
       }
     },
@@ -108,7 +127,13 @@ export function createSbAuthClient(baseURL: string) {
       return {
         session: user
           ? {
-              user: { id: user.id, email: user.email, name: user.name },
+              user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                isSuperAdmin:
+                  (user as { isSuperAdmin?: boolean }).isSuperAdmin ?? false,
+              },
               activeOrganizationId: data?.session?.activeOrganizationId ?? null,
             }
           : null,

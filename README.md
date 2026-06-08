@@ -32,7 +32,10 @@ docker compose -f infra/compose/docker-compose.yml up -d postgres valkey mailhog
 # 4. Run migrations
 pnpm db:migrate
 
-# 5. Start all apps in watch mode
+# 5. (optional) Create the first platform super admin
+SUPERADMIN_PASSWORD=<strong-password> pnpm seed:superadmin
+
+# 6. Start all apps in watch mode
 pnpm dev
 ```
 
@@ -56,7 +59,7 @@ packages/
   db/               Drizzle platform schema (auth + tenant), migrations, RLS, createDb()
   auth/             better-auth server config + client facade (@sb-codex/auth/client)
   api-contracts/    tRPC factory (workspaceProcedure, middlewares, Context) + healthRouter
-  acl/              RBAC: enforceRole, adminProcedure, ownerProcedure; AclProvider, AccessGuard
+  acl/              RBAC: permission-based (requirePermission, permissionsFor, can, PERMISSIONS); roles owner/admin/manager/commercial/member; client AclProvider, Can, usePermission (+ legacy enforceRole, AccessGuard)
   jobs/             BullMQ typed queues + worker (Nodemailer email, Meilisearch, HMAC webhook)
 infra/
   docker/     Multi-stage Dockerfiles (arm64 + amd64)
@@ -82,6 +85,7 @@ pnpm typecheck        # tsc --noEmit across all packages
 pnpm db:migrate       # apply Drizzle migrations
 pnpm db:generate      # generate migration SQL from schema changes
 pnpm db:studio        # open Drizzle Studio
+pnpm seed:superadmin  # create/promote the first super admin (needs SUPERADMIN_PASSWORD)
 ```
 
 ## Stack

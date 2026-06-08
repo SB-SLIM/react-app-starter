@@ -99,6 +99,23 @@ To swap the auth library: rewrite only `packages/auth/src/client.ts`. No app cod
 
 ---
 
+## Roles, permissions & super admin
+
+Two **independent** authority axes:
+
+1. **Workspace permissions** (per-tenant) — `@sb-codex/acl`. Roles `owner | admin | manager | commercial | member` (text in the `member` row; no migration to add one). Access is checked by **permission**, not rank: permissions are `resource:action` strings (`clients:create`, `members:invite`, `settings:update`, …). The `ROLE_PERMISSIONS` map lives **server-side only**; `permissionsFor(role)` resolves it to concrete strings.
+   - **Backend** gates with `requirePermission('clients:delete')` (a `workspaceProcedure` that asserts the permission). Used in `clients`, `members`, `workspace` routers.
+   - **Frontend** never sees the map. On login, `members.me` returns `{ role, permissions }`; the admin app feeds `permissions` into `AclProvider`, and UI gates with `<Can permission="…">` / `usePermission`. This is **UI show/hide only** — the server is the real enforcement.
+
+   ```
+   member.role ──► permissionsFor() ──► members.me { permissions[] } ──► AclProvider ──► <Can>
+        (server, source of truth)                              (browser, resolved strings only)
+   ```
+
+2. **Platform super admin** (cross-tenant) — the `user.is_super_admin` boolean, surfaced on the better-auth session (`additionalFields`, `input: false` so it can't be self-granted). The `superadmin` app and `superAdminProcedure` gate on it. Bootstrap with `pnpm seed:superadmin`. This is **not** a `MemberRole` — it sits above all workspaces.
+
+---
+
 ## Frontend structure (feature-based)
 
 ```
@@ -172,16 +189,16 @@ No application-level rewrites required — `workspace_id` is the natural shard k
 
 ## Package map
 
-| Package                   | Purpose                                                                                                                                                                |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@sb-codex/core`          | Pure utils: format\*, slugify, debounce, throttle, sleep, groupBy, uniqueBy, pick, omit, isDefined, assertNever                                                        |
-| `@sb-codex/ui-components` | RSC-aware design system: `components/` (primitives, `DataTable`, `Select`, `DatePicker`, `RadioGroup`, charts), `layout/`, `hooks/` (`useStepper`, `useModal`), `lib/` |
-| `@sb-codex/config`        | Zod-validated `createEnv()` loader                                                                                                                                     |
-| `@sb-codex/db`            | Drizzle **platform** schema (auth + tenant) + migrations + RLS + `createDb()`                                                                                          |
-| `@sb-codex/auth`          | better-auth server config + auth client facade (`./client`) — includes `signInWithGoogle`, `signInWithProvider`                                                        |
-| `@sb-codex/api-contracts` | tRPC factory (`workspaceProcedure`, middlewares, `Context`) + `healthRouter`; no `AppRouter` export                                                                    |
-| `@sb-codex/jobs`          | BullMQ queue definitions + typed payloads (email, export, searchIndex, webhook) + worker entrypoint (Nodemailer, Meilisearch, HMAC webhook, export scaffold)           |
-| `@sb-codex/acl`           | RBAC: `hasRole`, `ROLE_HIERARCHY`, `enforceRole`, `adminProcedure`, `ownerProcedure`; React client `AclProvider`, `useRole`, `AccessGuard`                             |
+| Package                   | Purpose                                                                                                                                                                                                                                                                                                         |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@sb-codex/core`          | Pure utils: format\*, slugify, debounce, throttle, sleep, groupBy, uniqueBy, pick, omit, isDefined, assertNever                                                                                                                                                                                                 |
+| `@sb-codex/ui-components` | RSC-aware design system: `components/` (primitives, `DataTable`, `Select`, `DatePicker`, `RadioGroup`, charts), `layout/`, `hooks/` (`useStepper`, `useModal`), `lib/`                                                                                                                                          |
+| `@sb-codex/config`        | Zod-validated `createEnv()` loader                                                                                                                                                                                                                                                                              |
+| `@sb-codex/db`            | Drizzle **platform** schema (auth + tenant) + migrations + RLS + `createDb()`                                                                                                                                                                                                                                   |
+| `@sb-codex/auth`          | better-auth server config + auth client facade (`./client`) — includes `signInWithGoogle`, `signInWithProvider`                                                                                                                                                                                                 |
+| `@sb-codex/api-contracts` | tRPC factory (`workspaceProcedure`, middlewares, `Context`) + `healthRouter`; no `AppRouter` export                                                                                                                                                                                                             |
+| `@sb-codex/jobs`          | BullMQ queue definitions + typed payloads (email, export, searchIndex, webhook) + worker entrypoint (Nodemailer, Meilisearch, HMAC webhook, export scaffold)                                                                                                                                                    |
+| `@sb-codex/acl`           | RBAC. Permission-based (`resource:action`): `PERMISSIONS`, `requirePermission(perm)`, `permissionsFor`, `can`; server-only `ROLE_PERMISSIONS`. Roles: `owner/admin/manager/commercial/member`. Client: `AclProvider`, `Can`, `usePermission`; legacy `hasRole`, `adminProcedure`, `useRole`, `AccessGuard` kept |
 
 Each package is an independent npm plugin (`@sb-codex` scope), **published to npm** (currently `beta`). Shared-instance libs are `peerDependencies`; `@sb-codex/auth` keeps `better-auth` as a regular dependency (facade engine). New projects are scaffolded **apps-only** with `pnpm create @sb-codex/sb-app@latest` — plugins resolved from npm, no `packages/`. See [plugins/README.md](plugins/README.md) and [starting-a-new-project.md](starting-a-new-project.md).
 

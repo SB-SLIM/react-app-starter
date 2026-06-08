@@ -1,6 +1,6 @@
 import type { Database } from '@sb-codex/db'
 
-export type MemberRole = 'owner' | 'admin' | 'member'
+export type MemberRole = 'owner' | 'admin' | 'manager' | 'commercial' | 'member'
 
 export interface Context {
   requestId: string

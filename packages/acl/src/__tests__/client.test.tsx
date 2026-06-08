@@ -1,6 +1,12 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
-import { AclProvider, AccessGuard, useRole } from '../client'
+import {
+  AclProvider,
+  AccessGuard,
+  Can,
+  useRole,
+  usePermission,
+} from '../client'
 
 afterEach(cleanup)
 
@@ -97,5 +103,75 @@ describe('AccessGuard', () => {
     )
     expect(screen.queryByTestId('content')).toBeNull()
     expect(container.textContent).toBe('')
+  })
+})
+
+describe('Can + usePermission', () => {
+  it('renders children when the permission is held', () => {
+    render(
+      <AclProvider permissions={['clients:create']} isPending={false}>
+        <Can permission="clients:create">
+          <span data-testid="content">new client</span>
+        </Can>
+      </AclProvider>,
+    )
+    expect(screen.getByTestId('content')).toBeDefined()
+  })
+
+  it('renders fallback when the permission is missing', () => {
+    render(
+      <AclProvider permissions={['clients:read']} isPending={false}>
+        <Can
+          permission="clients:delete"
+          fallback={<span data-testid="fallback">denied</span>}
+        >
+          <span data-testid="content">delete</span>
+        </Can>
+      </AclProvider>,
+    )
+    expect(screen.queryByTestId('content')).toBeNull()
+    expect(screen.getByTestId('fallback')).toBeDefined()
+  })
+
+  it('requires all permissions when given an array', () => {
+    render(
+      <AclProvider permissions={['clients:read']} isPending={false}>
+        <Can permission={['clients:read', 'clients:update']}>
+          <span data-testid="content">edit</span>
+        </Can>
+      </AclProvider>,
+    )
+    expect(screen.queryByTestId('content')).toBeNull()
+  })
+
+  it('renders fallback while pending', () => {
+    render(
+      <AclProvider permissions={['clients:read']} isPending={true}>
+        <Can
+          permission="clients:read"
+          fallback={<span data-testid="fallback">loading</span>}
+        >
+          <span data-testid="content">list</span>
+        </Can>
+      </AclProvider>,
+    )
+    expect(screen.queryByTestId('content')).toBeNull()
+    expect(screen.getByTestId('fallback')).toBeDefined()
+  })
+
+  it('usePermission reflects the granted permissions', () => {
+    function Probe() {
+      return (
+        <span data-testid="probe">
+          {usePermission('clients:create') ? 'yes' : 'no'}
+        </span>
+      )
+    }
+    render(
+      <AclProvider permissions={['clients:create']} isPending={false}>
+        <Probe />
+      </AclProvider>,
+    )
+    expect(screen.getByTestId('probe').textContent).toBe('yes')
   })
 })
