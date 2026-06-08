@@ -175,26 +175,20 @@ export const membersRouter = router({
     }),
 
   updateRole: adminProcedure
-    .input(z.object({ memberId: z.string(), role: roleEnum }))
+    .input(z.object({ userId: z.string(), role: roleEnum }))
     .mutation(async ({ ctx, input }) => {
-      const [existing] = await ctx.db
-        .select({ id: member.id, userId: member.userId })
-        .from(member)
-        .where(
-          and(
-            eq(member.id, input.memberId),
-            eq(member.organizationId, ctx.workspace!.id),
-          ),
-        )
-        .limit(1)
-      if (!existing) throw new Error('Member not found')
-      if (existing.userId === ctx.user!.id)
+      if (input.userId === ctx.user!.id)
         throw new Error('You cannot change your own role')
 
       await ctx.db
         .update(member)
         .set({ role: input.role })
-        .where(eq(member.id, input.memberId))
+        .where(
+          and(
+            eq(member.userId, input.userId),
+            eq(member.organizationId, ctx.workspace!.id),
+          ),
+        )
 
       return { success: true }
     }),

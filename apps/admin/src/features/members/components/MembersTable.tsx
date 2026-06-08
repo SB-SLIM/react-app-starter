@@ -76,7 +76,7 @@ export function MembersTable() {
             <RoleSelect
               value={row.original.role as MemberRole}
               onChange={(role) =>
-                updateRole.mutate({ memberId: row.original.id, role })
+                updateRole.mutate({ userId: row.original.userId, role })
               }
               disabled={updateRole.isPending}
             />
