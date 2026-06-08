@@ -33,10 +33,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 fastify
 COPY --from=builder /app /build
-RUN cd /build && pnpm --filter=server deploy --prod --legacy /app
-COPY --from=builder /app/packages/db/migrations /app/migrations
-RUN sed -i '/"type": "module"/d' /app/package.json
-RUN chown -R fastify:nodejs /app
+RUN cd /build && pnpm --filter=server deploy --prod /app
+COPY --from=builder --chown=fastify:nodejs /app/packages/db/migrations /app/migrations
+RUN sed -i '/"type": "module"/d' /app/package.json && chown -R fastify:nodejs /app/dist /app/package.json
 USER fastify
 EXPOSE 3001
 CMD ["node", "dist/server.js"]
