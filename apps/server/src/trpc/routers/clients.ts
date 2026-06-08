@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { eq, count } from 'drizzle-orm'
+import { eq, count, and } from 'drizzle-orm'
 import { client } from '@sb-codex/db'
 import { router, workspaceProcedure } from '@sb-codex/api-contracts'
 import { adminProcedure } from '@sb-codex/acl'
@@ -62,6 +62,21 @@ export const clientsRouter = router({
     .output(clientSchema)
     .mutation(async ({ ctx, input }) => {
       if (!ctx.workspace) throw new Error('Workspace not found')
+
+      if (input.email) {
+        const [existing] = await ctx.db
+          .select({ id: client.id })
+          .from(client)
+          .where(
+            and(
+              eq(client.workspaceId, ctx.workspace.id),
+              eq(client.email, input.email),
+            ),
+          )
+          .limit(1)
+        if (existing) throw new Error('A client with this email already exists')
+      }
+
       const rows = await ctx.db
         .insert(client)
         .values({ ...input, workspaceId: ctx.workspace.id })
@@ -76,6 +91,22 @@ export const clientsRouter = router({
     .output(clientSchema)
     .mutation(async ({ ctx, input }) => {
       const { id, ...patch } = input
+
+      if (patch.email && ctx.workspace) {
+        const [existing] = await ctx.db
+          .select({ id: client.id })
+          .from(client)
+          .where(
+            and(
+              eq(client.workspaceId, ctx.workspace.id),
+              eq(client.email, patch.email),
+            ),
+          )
+          .limit(1)
+        if (existing && existing.id !== id)
+          throw new Error('A client with this email already exists')
+      }
+
       const rows = await ctx.db
         .update(client)
         .set({ ...patch, updatedAt: new Date() })
