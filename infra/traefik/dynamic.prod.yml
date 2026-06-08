@@ -16,6 +16,14 @@ http:
       tls:
         certResolver: letsencrypt
 
+    superadmin:
+      rule: 'Host(`hub-superadmin.slimbouchoucha.tn`)'
+      service: superadmin
+      priority: 1
+      entryPoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+
   services:
     server:
       loadBalancer:
@@ -26,3 +34,8 @@ http:
       loadBalancer:
         servers:
           - url: 'http://admin:80'
+
+    superadmin:
+      loadBalancer:
+        servers:
+          - url: 'http://superadmin:80'

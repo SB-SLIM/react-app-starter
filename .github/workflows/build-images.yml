@@ -45,6 +45,8 @@ jobs:
             dockerfile: infra/docker/Dockerfile.server
           - app: admin
             dockerfile: infra/docker/Dockerfile.admin
+          - app: superadmin
+            dockerfile: infra/docker/Dockerfile.superadmin
           - app: worker
             dockerfile: infra/docker/Dockerfile.worker
 
@@ -75,7 +77,7 @@ jobs:
       - name: Resolve build args
         id: args
         run: |
-          if [ "${{ matrix.app }}" = "admin" ]; then
+          if [ "${{ matrix.app }}" = "admin" ] || [ "${{ matrix.app }}" = "superadmin" ]; then
             {
               echo "value<<ARGS_EOF"
               echo "VITE_TRPC_URL=${{ vars.VITE_TRPC_URL }}"

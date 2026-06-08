@@ -182,6 +182,20 @@ services:
     networks: [saas_net]
     restart: unless-stopped
 
+  # ── Super Admin SPA (Vite, served via nginx) ─────────────────────────────────
+  # https://hub-superadmin.${DOMAIN}
+  # VITE_TRPC_URL is baked into the bundle at CI build time (build-images.yml).
+  superadmin:
+    image: ${GHCR_IMAGE_PREFIX}/superadmin:${IMAGE_TAG:-latest}
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.superadmin
+      args:
+        VITE_TRPC_URL: https://hub.${DOMAIN}/api/trpc
+        VITE_BETTER_AUTH_URL: https://hub.${DOMAIN}
+    networks: [saas_net]
+    restart: unless-stopped
+
   # ── BullMQ worker ─────────────────────────────────────────────────────────────
   worker:
     image: ${GHCR_IMAGE_PREFIX}/worker:${IMAGE_TAG:-latest}
