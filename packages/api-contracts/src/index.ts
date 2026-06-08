@@ -9,7 +9,7 @@ export {
   enforceAuth,
   enforceWorkspace,
 } from './init'
-export type { Context } from './context'
+export type { Context, MemberRole } from './context'
 
 // Platform routers shipped by the plugin (product-agnostic).
 export { healthRouter } from './routers/health'

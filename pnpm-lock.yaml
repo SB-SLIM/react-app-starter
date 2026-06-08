@@ -5,6 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  '@sb-codex/acl': workspace:^
   '@sb-codex/core': workspace:^
   '@sb-codex/ui-components': workspace:^
   '@sb-codex/api-contracts': workspace:^
@@ -89,6 +90,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.76.0(react@19.2.0))
+      '@sb-codex/acl':
+        specifier: workspace:^
+        version: link:../../packages/acl
       '@sb-codex/api-contracts':
         specifier: workspace:^
         version: link:../../packages/api-contracts
@@ -207,6 +211,9 @@ importers:
       '@fastify/sensible':
         specifier: ^6.0.1
         version: 6.0.4
+      '@sb-codex/acl':
+        specifier: workspace:^
+        version: link:../../packages/acl
       '@sb-codex/api-contracts':
         specifier: workspace:^
         version: link:../../packages/api-contracts
@@ -311,6 +318,21 @@ importers:
       typescript-eslint:
         specifier: ^8.45.0
         version: 8.46.0(eslint@9.37.0(jiti@2.7.0))(typescript@5.9.3)
+
+  packages/acl:
+    devDependencies:
+      '@sb-codex/api-contracts':
+        specifier: workspace:^
+        version: link:../api-contracts
+      '@trpc/server':
+        specifier: ^11.0.0
+        version: 11.17.0(typescript@5.9.3)
+      '@types/react':
+        specifier: ^19.0.1
+        version: 19.2.2
+      react:
+        specifier: ^19.0.0
+        version: 19.2.0
 
   packages/api-contracts:
     dependencies:

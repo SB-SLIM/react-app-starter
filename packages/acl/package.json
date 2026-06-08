@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@sb-codex/acl",
+  "version": "0.0.1-beta.0",
+  "description": "Role-based access control for the sb-codex SaaS starter — server middleware (enforceRole, adminProcedure, ownerProcedure) and React client (AclProvider, AccessGuard).",
+  "type": "module",
+  "license": "MIT",
+  "author": "Slim Bouchoucha",
+  "keywords": [
+    "sb-codex",
+    "saas-starter",
+    "acl",
+    "rbac",
+    "roles",
+    "permissions",
+    "access-control"
+  ],
+  "homepage": "https://github.com/SB-SLIM/react-app-starter/tree/main/packages/acl#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SB-SLIM/react-app-starter.git",
+    "directory": "packages/acl"
+  },
+  "bugs": "https://github.com/SB-SLIM/react-app-starter.git/issues",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "premove ./dist",
+    "build": "tsup --tsconfig tsconfig.json",
+    "dev": "tsup --watch --tsconfig tsconfig.json"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
+      "require": "./dist/client.cjs"
+    }
+  },
+  "peerDependencies": {
+    "@sb-codex/api-contracts": "workspace:^",
+    "@trpc/server": "^11.0.0",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@sb-codex/api-contracts": "workspace:^",
+    "@trpc/server": "^11.0.0",
+    "@types/react": "^19.0.1",
+    "react": "^19.0.0"
+  }
+}

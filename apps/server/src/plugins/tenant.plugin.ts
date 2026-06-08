@@ -7,6 +7,7 @@ import { db } from '../db'
 declare module 'fastify' {
   interface FastifyRequest {
     workspace: { id: string; slug: string; name: string } | null
+    memberRole: 'owner' | 'admin' | 'member' | null
   }
 }
 
@@ -24,6 +25,7 @@ const tenantPlugin: FastifyPluginAsync = async (app) => {
 
     if (!slug || !request.user) {
       request.workspace = null
+      request.memberRole = null
       return
     }
 
@@ -39,6 +41,7 @@ const tenantPlugin: FastifyPluginAsync = async (app) => {
 
     if (!ws) {
       request.workspace = null
+      request.memberRole = null
       return
     }
 
@@ -55,6 +58,7 @@ const tenantPlugin: FastifyPluginAsync = async (app) => {
       .limit(1)
 
     request.workspace = mem ? ws : null
+    request.memberRole = mem ? (mem.role as 'owner' | 'admin' | 'member') : null
   })
 }
 

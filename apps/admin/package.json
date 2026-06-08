@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@sb-codex/acl": "workspace:^",
     "@sb-codex/api-contracts": "workspace:^",
     "@sb-codex/auth": "workspace:^",
     "@sb-codex/ui-components": "workspace:^",

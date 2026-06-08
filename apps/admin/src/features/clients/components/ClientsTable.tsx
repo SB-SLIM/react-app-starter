@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
   toast,
 } from '@sb-codex/ui-components'
+import { AccessGuard } from '@sb-codex/acl/client'
 import { trpc } from '@/app/trpc'
 import { useClients } from '../hooks/useClients'
 
@@ -63,24 +64,26 @@ export function ClientsTable() {
       meta: { headerClassName: 'w-12' },
       cell: ({ row }) => (
         <div className="text-right">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Client actions">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem disabled>Edit</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                destructive
-                onSelect={() => setToDelete(row.original)}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AccessGuard roles={['owner', 'admin']}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Client actions">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem disabled>Edit</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  destructive
+                  onSelect={() => setToDelete(row.original)}
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </AccessGuard>
         </div>
       ),
     },
