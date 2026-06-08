@@ -29,7 +29,7 @@ jobs:
       - name: Start stack
         run: |
           cp .env.example .env
-          docker compose -f infra/compose/docker-compose.yml up -d postgres valkey mailhog
+          docker compose -f infra/compose/docker-compose.yml up -d --wait postgres valkey mailhog
           pnpm db:migrate
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/saas
