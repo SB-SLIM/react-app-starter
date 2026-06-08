@@ -1,5 +1,5 @@
 import { createTransport } from 'nodemailer'
-import { MeiliSearch } from 'meilisearch'
+import { Meilisearch } from 'meilisearch'
 import { createHmac } from 'crypto'
 import { Worker } from 'bullmq'
 import IORedis from 'ioredis'
@@ -23,7 +23,7 @@ const mailer = env.SMTP_HOST
     })
   : null
 
-const meili = new MeiliSearch({ host: env.MEILI_URL, apiKey: env.MEILI_KEY })
+const meili = new Meilisearch({ host: env.MEILI_URL, apiKey: env.MEILI_KEY })
 
 const emailWorker = new Worker<EmailJobData>(
   'email',
