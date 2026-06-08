@@ -20,7 +20,7 @@ function AcceptInvitePage() {
   const navigate = useNavigate()
 
   const accept = trpc.members.acceptInvitation.useMutation({
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       toast.success('You have joined the workspace!')
       await navigate({ to: '/dashboard' })
       window.location.reload()
