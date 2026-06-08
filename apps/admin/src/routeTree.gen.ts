@@ -11,9 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ShowcaseRouteImport } from './routes/showcase'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as MembersRouteImport } from './routes/members'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InviteInvitationIdRouteImport } from './routes/invite.$invitationId'
 
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
@@ -23,6 +26,16 @@ const SignInRoute = SignInRouteImport.update({
 const ShowcaseRoute = ShowcaseRouteImport.update({
   id: '/showcase',
   path: '/showcase',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembersRoute = MembersRouteImport.update({
+  id: '/members',
+  path: '/members',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -40,43 +53,85 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InviteInvitationIdRoute = InviteInvitationIdRouteImport.update({
+  id: '/invite/$invitationId',
+  path: '/invite/$invitationId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/dashboard': typeof DashboardRoute
+  '/members': typeof MembersRoute
+  '/settings': typeof SettingsRoute
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
+  '/invite/$invitationId': typeof InviteInvitationIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/dashboard': typeof DashboardRoute
+  '/members': typeof MembersRoute
+  '/settings': typeof SettingsRoute
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
+  '/invite/$invitationId': typeof InviteInvitationIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/dashboard': typeof DashboardRoute
+  '/members': typeof MembersRoute
+  '/settings': typeof SettingsRoute
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
+  '/invite/$invitationId': typeof InviteInvitationIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/clients' | '/dashboard' | '/showcase' | '/sign-in'
+  fullPaths:
+    | '/'
+    | '/clients'
+    | '/dashboard'
+    | '/members'
+    | '/settings'
+    | '/showcase'
+    | '/sign-in'
+    | '/invite/$invitationId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/clients' | '/dashboard' | '/showcase' | '/sign-in'
-  id: '__root__' | '/' | '/clients' | '/dashboard' | '/showcase' | '/sign-in'
+  to:
+    | '/'
+    | '/clients'
+    | '/dashboard'
+    | '/members'
+    | '/settings'
+    | '/showcase'
+    | '/sign-in'
+    | '/invite/$invitationId'
+  id:
+    | '__root__'
+    | '/'
+    | '/clients'
+    | '/dashboard'
+    | '/members'
+    | '/settings'
+    | '/showcase'
+    | '/sign-in'
+    | '/invite/$invitationId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ClientsRoute: typeof ClientsRoute
   DashboardRoute: typeof DashboardRoute
+  MembersRoute: typeof MembersRoute
+  SettingsRoute: typeof SettingsRoute
   ShowcaseRoute: typeof ShowcaseRoute
   SignInRoute: typeof SignInRoute
+  InviteInvitationIdRoute: typeof InviteInvitationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -93,6 +148,20 @@ declare module '@tanstack/react-router' {
       path: '/showcase'
       fullPath: '/showcase'
       preLoaderRoute: typeof ShowcaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/members': {
+      id: '/members'
+      path: '/members'
+      fullPath: '/members'
+      preLoaderRoute: typeof MembersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -116,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invite/$invitationId': {
+      id: '/invite/$invitationId'
+      path: '/invite/$invitationId'
+      fullPath: '/invite/$invitationId'
+      preLoaderRoute: typeof InviteInvitationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -123,8 +199,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ClientsRoute: ClientsRoute,
   DashboardRoute: DashboardRoute,
+  MembersRoute: MembersRoute,
+  SettingsRoute: SettingsRoute,
   ShowcaseRoute: ShowcaseRoute,
   SignInRoute: SignInRoute,
+  InviteInvitationIdRoute: InviteInvitationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

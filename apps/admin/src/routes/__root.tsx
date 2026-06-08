@@ -11,6 +11,7 @@ import { Moon, Sun } from 'lucide-react'
 import { AclProvider } from '@sb-codex/acl/client'
 import { authClient } from '@/features/auth/api/authClient'
 import { useMemberRole } from '@/features/auth/hooks/useMemberRole'
+import { WorkspaceSwitcher } from '@/features/workspace/components/WorkspaceSwitcher'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -64,6 +65,12 @@ function RootLayout() {
               </Button>
               {session ? (
                 <>
+                  {(() => {
+                    const slug = localStorage.getItem('workspace-slug')
+                    return slug ? (
+                      <WorkspaceSwitcher currentSlug={slug} />
+                    ) : null
+                  })()}
                   <Link
                     to="/dashboard"
                     className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
@@ -94,6 +101,17 @@ function RootLayout() {
                       }}
                     >
                       Members
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link
+                      to="/settings"
+                      className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
+                      activeProps={{
+                        className: 'text-primary-600 font-medium',
+                      }}
+                    >
+                      Settings
                     </Link>
                   )}
                   <span className="hidden text-gray-400 sm:inline">|</span>

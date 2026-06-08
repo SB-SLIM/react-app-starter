@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import {
+  Building2,
   Globe,
   MapPin,
   Plane,
@@ -196,6 +197,8 @@ const bookingColumns: ColumnDef<Booking>[] = [
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 function DashboardPage() {
+  const stats = trpc.dashboard.stats.useQuery()
+
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-6 py-10">
       {/* Header */}
@@ -209,6 +212,20 @@ function DashboardPage() {
           </p>
         </div>
         <HealthBadge />
+      </div>
+
+      {/* Workspace stats */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <StatCard
+          label="Workspace Clients"
+          value={stats.data ? String(stats.data.clients) : '—'}
+          icon={<Building2 className="h-4 w-4" />}
+        />
+        <StatCard
+          label="Workspace Members"
+          value={stats.data ? String(stats.data.members) : '—'}
+          icon={<Users className="h-4 w-4" />}
+        />
       </div>
 
       {/* KPI Cards */}

@@ -1,0 +1,12 @@
+@import '@sb-codex/ui-components/theme.css';
+
+@theme {
+  --color-secondary-50: #f0fdf4;
+  --color-secondary-500: #22c55e;
+  --color-secondary-600: #16a34a;
+  --color-secondary-700: #15803d;
+
+  --color-surface-50: #ffffff;
+  --color-surface-100: #f9fafb;
+  --color-surface-200: #f3f4f6;
+}

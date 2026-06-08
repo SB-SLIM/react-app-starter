@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MoreHorizontal } from 'lucide-react'
+import { Plus, MoreHorizontal } from 'lucide-react'
 import {
   Button,
   type ColumnDef,
@@ -16,12 +16,16 @@ import {
 import { AccessGuard } from '@sb-codex/acl/client'
 import { trpc } from '@/app/trpc'
 import { useClients } from '../hooks/useClients'
+import { ClientCreateDialog } from './ClientCreateDialog'
+import { ClientEditDialog } from './ClientEditDialog'
 
 type Client = ReturnType<typeof useClients>['clients'][number]
 
 export function ClientsTable() {
   const { clients, total, isLoading, isError, error } = useClients()
   const utils = trpc.useUtils()
+  const [createOpen, setCreateOpen] = useState(false)
+  const [toEdit, setToEdit] = useState<Client | null>(null)
   const [toDelete, setToDelete] = useState<Client | null>(null)
 
   const deleteClient = trpc.clients.delete.useMutation({
@@ -73,7 +77,9 @@ export function ClientsTable() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem disabled>Edit</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setToEdit(row.original)}>
+                  Edit
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   destructive
@@ -99,15 +105,29 @@ export function ClientsTable() {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        {total} total {total === 1 ? 'client' : 'clients'}
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {total} total {total === 1 ? 'client' : 'clients'}
+        </p>
+        <AccessGuard roles={['owner', 'admin']}>
+          <Button size="sm" onClick={() => setCreateOpen(true)}>
+            <Plus className="mr-1.5 h-4 w-4" />
+            Add client
+          </Button>
+        </AccessGuard>
+      </div>
       <DataTable
         columns={columns}
         data={clients}
         isLoading={isLoading}
         searchPlaceholder="Search clients…"
         emptyMessage="No clients yet."
+      />
+
+      <ClientCreateDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <ClientEditDialog
+        client={toEdit}
+        onOpenChange={(open) => !open && setToEdit(null)}
       />
       <ConfirmDialog
         open={toDelete !== null}

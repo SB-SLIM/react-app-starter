@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Breadcrumb, PageHeader } from '@sb-codex/ui-components'
+import { MembersTable } from '@/features/members/components/MembersTable'
 import { requireRole } from '@/shared/lib/roleGuard'
 
 export const Route = createFileRoute('/members')({
@@ -18,11 +19,9 @@ function MembersPage() {
       />
       <PageHeader
         title="Members"
-        description="Manage workspace members and roles. Only owners and admins can access this page."
+        description="Manage workspace members and roles."
       />
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        Member management coming soon.
-      </p>
+      <MembersTable />
     </div>
   )
 }
