@@ -144,11 +144,10 @@ Every `packages/*` is an independent npm plugin under `@sb-codex`, published to 
 
 ### Domain & Subdomains
 
-| Env  | Admin                               | Super Admin                                | API                                     |
-| ---- | ----------------------------------- | ------------------------------------------ | --------------------------------------- |
-| Prod | `https://hub.slimbouchoucha.tn`     | `https://hub-superadmin.slimbouchoucha.tn` | `https://hub.slimbouchoucha.tn/api`     |
-| Dev  | `https://hub-dev.slimbouchoucha.tn` | `http://localhost:5174`                    | `https://hub-dev.slimbouchoucha.tn/api` |
-| QA   | `https://hub-qa.slimbouchoucha.tn`  | —                                          | `https://hub-qa.slimbouchoucha.tn/api`  |
+| Env  | Web (marketing)                 | Admin                                 | Super Admin                                | API                                 |
+| ---- | ------------------------------- | ------------------------------------- | ------------------------------------------ | ----------------------------------- |
+| Prod | `https://hub.slimbouchoucha.tn` | `https://hub-admin.slimbouchoucha.tn` | `https://hub-superadmin.slimbouchoucha.tn` | `https://hub.slimbouchoucha.tn/api` |
+| Dev  | `http://localhost:3000`         | `http://localhost:5173`               | `http://localhost:5174`                    | `http://localhost:3001`             |
 
 **VPS IP:** _kept private — set it in your local deployment notes / `.env.production`, not in the repo._
 
@@ -156,9 +155,10 @@ Every `packages/*` is an independent npm plugin under `@sb-codex`, published to 
 
 Traefik uses a **static file provider** (`infra/traefik/dynamic.prod.yml`) — NOT the Docker label provider. Docker Engine 27+ dropped support for Docker API < 1.40 which Traefik's Docker client requires.
 
-- `PathPrefix(/api)` → Fastify server (priority 10)
+- `PathPrefix(/api)` on `hub.*` → Fastify server (priority 10)
+- `Host(hub-admin.*)` → nginx/admin SPA (priority 1)
 - `Host(hub-superadmin.*)` → nginx/superadmin SPA (priority 1)
-- `Host(hub.*)` catch-all → nginx/admin SPA (priority 1)
+- `Host(hub.*)` catch-all → Next.js web/marketing site (priority 1)
 - HTTPS redirect at entrypoint level (port 80 → 443)
 - TLS via Let's Encrypt `tlsChallenge` (port 443, stored in `infra/traefik/acme.json`)
 
@@ -210,7 +210,7 @@ VALKEY_PASSWORD=<secret>
 APP_DB_PASSWORD=<secret>
 BETTER_AUTH_SECRET=<32+ chars>
 BETTER_AUTH_URL=https://hub.slimbouchoucha.tn
-CORS_ORIGIN=https://hub.slimbouchoucha.tn,https://hub-superadmin.slimbouchoucha.tn
+CORS_ORIGIN=https://hub.slimbouchoucha.tn,https://hub-admin.slimbouchoucha.tn,https://hub-superadmin.slimbouchoucha.tn
 # Used by the MIGRATE service only (superuser). The server uses app:APP_DB_PASSWORD.
 DATABASE_URL=postgresql://postgres:<password>@postgres:5432/saas
 GHCR_IMAGE_PREFIX=ghcr.io/sb-slim/react-app-starter

@@ -46,7 +46,7 @@ jobs:
             # Pull new images BEFORE touching running containers.
             # If pull fails, the running stack is untouched.
             docker compose -f infra/compose/docker-compose.prod.yml \
-              --env-file .env.production pull server admin superadmin worker
+              --env-file .env.production pull server web admin superadmin worker
 
             # Bring up the new containers (replaces only changed services).
             # No --build (images come from GHCR), no explicit `down`

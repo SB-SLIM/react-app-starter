@@ -43,6 +43,8 @@ jobs:
         include:
           - app: server
             dockerfile: infra/docker/Dockerfile.server
+          - app: web
+            dockerfile: infra/docker/Dockerfile.web
           - app: admin
             dockerfile: infra/docker/Dockerfile.admin
           - app: superadmin

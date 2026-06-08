@@ -127,7 +127,7 @@ services:
       REDIS_URL: redis://:${VALKEY_PASSWORD}@valkey:6379
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
       BETTER_AUTH_URL: https://hub.${DOMAIN}
-      CORS_ORIGIN: https://hub.${DOMAIN}
+      CORS_ORIGIN: https://hub.${DOMAIN},https://hub-admin.${DOMAIN},https://hub-superadmin.${DOMAIN}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       SMTP_HOST: ${SMTP_HOST}
@@ -169,8 +169,18 @@ services:
     restart: 'no'
     profiles: ['migrate']
 
-  # ── Admin SPA (Vite, served via nginx) ───────────────────────────────────────
+  # ── Marketing site (Next.js) ─────────────────────────────────────────────────
   # https://hub.${DOMAIN}
+  web:
+    image: ${GHCR_IMAGE_PREFIX}/web:${IMAGE_TAG:-latest}
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.web
+    networks: [saas_net]
+    restart: unless-stopped
+
+  # ── Admin SPA (Vite, served via nginx) ───────────────────────────────────────
+  # https://hub-admin.${DOMAIN}
   # VITE_TRPC_URL is baked into the bundle at CI build time (build-images.yml).
   admin:
     image: ${GHCR_IMAGE_PREFIX}/admin:${IMAGE_TAG:-latest}
@@ -179,6 +189,7 @@ services:
       dockerfile: infra/docker/Dockerfile.admin
       args:
         VITE_TRPC_URL: https://hub.${DOMAIN}/api/trpc
+        VITE_BETTER_AUTH_URL: https://hub.${DOMAIN}
     networks: [saas_net]
     restart: unless-stopped
 

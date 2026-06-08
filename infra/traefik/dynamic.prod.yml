@@ -8,8 +8,16 @@ http:
       tls:
         certResolver: letsencrypt
 
-    admin:
+    web:
       rule: 'Host(`hub.slimbouchoucha.tn`)'
+      service: web
+      priority: 1
+      entryPoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+
+    admin:
+      rule: 'Host(`hub-admin.slimbouchoucha.tn`)'
       service: admin
       priority: 1
       entryPoints: [websecure]
@@ -29,6 +37,11 @@ http:
       loadBalancer:
         servers:
           - url: 'http://server:3001'
+
+    web:
+      loadBalancer:
+        servers:
+          - url: 'http://web:3000'
 
     admin:
       loadBalancer:
