@@ -13,7 +13,10 @@
     "create-sb-app": "0.0.0",
     "@sb-codex/db": "0.0.0",
     "@sb-codex/jobs": "0.0.0",
-    "@sb-codex/ui-components": "0.0.0"
+    "@sb-codex/ui-components": "0.0.0",
+    "superadmin": "0.0.1-beta.0",
+    "@sb-codex/acl": "0.0.1-beta.0",
+    "@sb-codex/create-sb-app": "0.0.6"
   },
-  "changesets": ["initial-beta"]
+  "changesets": ["initial-beta", "ui-components-round-1"]
 }
