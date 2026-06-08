@@ -32,6 +32,13 @@ export function createAuth(db: Database, config: AuthConfig) {
       enabled: true,
       requireEmailVerification: false, // set true in production
     },
+    user: {
+      additionalFields: {
+        // Surfaced on the session so apps can gate access. `input: false`
+        // prevents clients from self-granting it via signup/update payloads.
+        isSuperAdmin: { type: 'boolean', input: false, defaultValue: false },
+      },
+    },
     socialProviders:
       config.googleClientId && config.googleClientSecret
         ? {

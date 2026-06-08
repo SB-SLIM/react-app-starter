@@ -4,6 +4,7 @@ import type { MemberRole } from '@sb-codex/acl'
 
 export function useMemberRole(): {
   role: MemberRole | null
+  permissions: string[]
   isPending: boolean
 } {
   const { session } = authClient.useSession()
@@ -15,6 +16,7 @@ export function useMemberRole(): {
 
   return {
     role: query.data?.role ?? null,
+    permissions: query.data?.permissions ?? [],
     isPending: query.isPending && !!session,
   }
 }

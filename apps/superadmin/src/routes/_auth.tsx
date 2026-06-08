@@ -11,7 +11,7 @@ import { authClient } from '@/features/auth/api/authClient'
 export const Route = createFileRoute('/_auth')({
   beforeLoad: async () => {
     const session = await authClient.getSession()
-    if (!session) throw redirect({ to: '/login' })
+    if (!session || !session.user.isSuperAdmin) throw redirect({ to: '/login' })
   },
   component: AuthLayout,
 })

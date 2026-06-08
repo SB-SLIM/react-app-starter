@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
   toast,
 } from '@sb-codex/ui-components'
-import { AccessGuard } from '@sb-codex/acl/client'
+import { usePermission } from '@sb-codex/acl/client'
 import { trpc } from '@/app/trpc'
 import { useClients } from '../hooks/useClients'
 import { ClientCreateDialog } from './ClientCreateDialog'
@@ -27,6 +27,11 @@ export function ClientsTable() {
   const [createOpen, setCreateOpen] = useState(false)
   const [toEdit, setToEdit] = useState<Client | null>(null)
   const [toDelete, setToDelete] = useState<Client | null>(null)
+
+  const canCreate = usePermission('clients:create')
+  const canUpdate = usePermission('clients:update')
+  const canDelete = usePermission('clients:delete')
+  const hasRowActions = canUpdate || canDelete
 
   const deleteClient = trpc.clients.delete.useMutation({
     onSuccess: async () => {
@@ -66,9 +71,9 @@ export function ClientsTable() {
       enableSorting: false,
       enableGlobalFilter: false,
       meta: { headerClassName: 'w-12' },
-      cell: ({ row }) => (
-        <div className="text-right">
-          <AccessGuard roles={['owner', 'admin']}>
+      cell: ({ row }) =>
+        hasRowActions ? (
+          <div className="text-right">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label="Client actions">
@@ -77,21 +82,24 @@ export function ClientsTable() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem onSelect={() => setToEdit(row.original)}>
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  destructive
-                  onSelect={() => setToDelete(row.original)}
-                >
-                  Delete
-                </DropdownMenuItem>
+                {canUpdate && (
+                  <DropdownMenuItem onSelect={() => setToEdit(row.original)}>
+                    Edit
+                  </DropdownMenuItem>
+                )}
+                {canUpdate && canDelete && <DropdownMenuSeparator />}
+                {canDelete && (
+                  <DropdownMenuItem
+                    destructive
+                    onSelect={() => setToDelete(row.original)}
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
-          </AccessGuard>
-        </div>
-      ),
+          </div>
+        ) : null,
     },
   ]
 
@@ -109,12 +117,12 @@ export function ClientsTable() {
         <p className="text-sm text-gray-500 dark:text-gray-400">
           {total} total {total === 1 ? 'client' : 'clients'}
         </p>
-        <AccessGuard roles={['owner', 'admin']}>
+        {canCreate && (
           <Button size="sm" onClick={() => setCreateOpen(true)}>
             <Plus className="mr-1.5 h-4 w-4" />
             Add client
           </Button>
-        </AccessGuard>
+        )}
       </div>
       <DataTable
         columns={columns}

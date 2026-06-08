@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { eq } from 'drizzle-orm'
 import { organization } from '@sb-codex/db'
 import { router, workspaceProcedure } from '@sb-codex/api-contracts'
-import { adminProcedure } from '@sb-codex/acl'
+import { requirePermission } from '@sb-codex/acl'
 
 const workspaceSchema = z.object({
   id: z.string(),
@@ -27,7 +27,7 @@ export const workspaceRouter = router({
     return ws
   }),
 
-  update: adminProcedure
+  update: requirePermission('settings:update')
     .input(z.object({ name: z.string().min(1) }))
     .output(workspaceSchema)
     .mutation(async ({ ctx, input }) => {

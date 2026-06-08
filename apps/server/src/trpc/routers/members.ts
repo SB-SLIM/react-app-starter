@@ -7,12 +7,12 @@ import {
   workspaceProcedure,
   protectedProcedure,
 } from '@sb-codex/api-contracts'
-import { adminProcedure } from '@sb-codex/acl'
+import { requirePermission, permissionsFor } from '@sb-codex/acl'
 import type { MemberRole } from '@sb-codex/api-contracts'
 import { sendEmail, inviteEmailHtml } from '../../email'
 import { env } from '../../env'
 
-const roleEnum = z.enum(['owner', 'admin', 'member'])
+const roleEnum = z.enum(['owner', 'admin', 'manager', 'commercial', 'member'])
 
 const memberSchema = z.object({
   id: z.string(),
@@ -33,8 +33,11 @@ const invitationSchema = z.object({
 
 export const membersRouter = router({
   me: workspaceProcedure
-    .output(z.object({ role: roleEnum }))
-    .query(({ ctx }) => ({ role: ctx.memberRole as MemberRole })),
+    .output(z.object({ role: roleEnum, permissions: z.array(z.string()) }))
+    .query(({ ctx }) => {
+      const role = ctx.memberRole as MemberRole
+      return { role, permissions: permissionsFor(role) }
+    }),
 
   list: workspaceProcedure
     .output(z.array(memberSchema))
@@ -54,7 +57,7 @@ export const membersRouter = router({
       return rows.map((r) => ({ ...r, role: r.role as MemberRole }))
     }),
 
-  invite: adminProcedure
+  invite: requirePermission('members:invite')
     .input(z.object({ email: z.email(), role: roleEnum.default('member') }))
     .mutation(async ({ ctx, input }) => {
       const workspaceId = ctx.workspace!.id
@@ -174,7 +177,7 @@ export const membersRouter = router({
       return { organizationId: inv.organizationId }
     }),
 
-  updateRole: adminProcedure
+  updateRole: requirePermission('members:update')
     .input(z.object({ userId: z.string(), role: roleEnum }))
     .mutation(async ({ ctx, input }) => {
       if (input.userId === ctx.user!.id)
@@ -193,7 +196,7 @@ export const membersRouter = router({
       return { success: true }
     }),
 
-  remove: adminProcedure
+  remove: requirePermission('members:remove')
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       if (input.userId === ctx.user!.id)
@@ -210,7 +213,7 @@ export const membersRouter = router({
       return { success: true }
     }),
 
-  listInvitations: adminProcedure
+  listInvitations: requirePermission('members:read')
     .output(z.array(invitationSchema))
     .query(async ({ ctx }) => {
       return ctx.db
@@ -230,7 +233,7 @@ export const membersRouter = router({
         )
     }),
 
-  cancelInvitation: adminProcedure
+  cancelInvitation: requirePermission('members:invite')
     .input(z.object({ invitationId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
