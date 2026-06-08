@@ -241,6 +241,9 @@ importers:
       ioredis:
         specifier: ^5.6.1
         version: 5.10.1
+      nodemailer:
+        specifier: ^8.0.10
+        version: 8.0.10
       pino-pretty:
         specifier: ^11.2.2
         version: 11.3.0
@@ -260,6 +263,9 @@ importers:
       '@types/node':
         specifier: ^24.6.0
         version: 24.7.2
+      '@types/nodemailer':
+        specifier: ^8.0.0
+        version: 8.0.0
       eslint:
         specifier: ^9.36.0
         version: 9.37.0(jiti@2.7.0)
@@ -3851,6 +3857,12 @@ packages:
         integrity: sha512-/NbVmcGTP+lj5oa4yiYxxeBjRivKQ5Ns1eSZeB99ExsEQ6rX5XYU1Zy/gGxY/ilqtD4Etx9mKyrPxZRetiahhA==,
       }
 
+  '@types/nodemailer@8.0.0':
+    resolution:
+      {
+        integrity: sha512-fyf8jWULsCo0d0BuoQ75i6IeoHs47qcqxWc7yUdUcV0pOZGjUTTOvwdG1PRXUDqN/8A64yQdQdnA2pZgcdi+cA==,
+      }
+
   '@types/parse-json@4.0.2':
     resolution:
       {
@@ -6660,6 +6672,13 @@ packages:
       {
         integrity: sha512-cCmFDMSm26S6tQSDpBCg/NR8NENrVPhAJSf+XbxBG4rPFaaonlEoE9wHQmun+cls499TQGSb7ZyPBRlzgKfpeg==,
       }
+
+  nodemailer@8.0.10:
+    resolution:
+      {
+        integrity: sha512-BLFuSth7QtHOkBzyqTehWWyub0NTRDuK2Q2SQfnGLsrJnzyU+Yeh4WpV1eZGuARFj1xQJHIdnTuJZLP+b9R1GQ==,
+      }
+    engines: { node: '>=6.0.0' }
 
   normalize-path@3.0.0:
     resolution:
@@ -10387,6 +10406,10 @@ snapshots:
     dependencies:
       undici-types: 7.14.0
 
+  '@types/nodemailer@8.0.0':
+    dependencies:
+      '@types/node': 24.7.2
+
   '@types/parse-json@4.0.2': {}
 
   '@types/react-dom@19.2.1(@types/react@19.2.2)':
@@ -11991,6 +12014,8 @@ snapshots:
     optional: true
 
   node-releases@2.0.23: {}
+
+  nodemailer@8.0.10: {}
 
   normalize-path@3.0.0: {}
 
