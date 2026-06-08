@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ShowcaseRouteImport } from './routes/showcase'
+import { Route as MembersRouteImport } from './routes/members'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as IndexRouteImport } from './routes/index'
@@ -23,6 +24,11 @@ const SignInRoute = SignInRouteImport.update({
 const ShowcaseRoute = ShowcaseRouteImport.update({
   id: '/showcase',
   path: '/showcase',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembersRoute = MembersRouteImport.update({
+  id: '/members',
+  path: '/members',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/dashboard': typeof DashboardRoute
+  '/members': typeof MembersRoute
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/dashboard': typeof DashboardRoute
+  '/members': typeof MembersRoute
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
 }
@@ -60,21 +68,36 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
   '/dashboard': typeof DashboardRoute
+  '/members': typeof MembersRoute
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/clients' | '/dashboard' | '/showcase' | '/sign-in'
+  fullPaths:
+    | '/'
+    | '/clients'
+    | '/dashboard'
+    | '/members'
+    | '/showcase'
+    | '/sign-in'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/clients' | '/dashboard' | '/showcase' | '/sign-in'
-  id: '__root__' | '/' | '/clients' | '/dashboard' | '/showcase' | '/sign-in'
+  to: '/' | '/clients' | '/dashboard' | '/members' | '/showcase' | '/sign-in'
+  id:
+    | '__root__'
+    | '/'
+    | '/clients'
+    | '/dashboard'
+    | '/members'
+    | '/showcase'
+    | '/sign-in'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ClientsRoute: typeof ClientsRoute
   DashboardRoute: typeof DashboardRoute
+  MembersRoute: typeof MembersRoute
   ShowcaseRoute: typeof ShowcaseRoute
   SignInRoute: typeof SignInRoute
 }
@@ -93,6 +116,13 @@ declare module '@tanstack/react-router' {
       path: '/showcase'
       fullPath: '/showcase'
       preLoaderRoute: typeof ShowcaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/members': {
+      id: '/members'
+      path: '/members'
+      fullPath: '/members'
+      preLoaderRoute: typeof MembersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -123,6 +153,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ClientsRoute: ClientsRoute,
   DashboardRoute: DashboardRoute,
+  MembersRoute: MembersRoute,
   ShowcaseRoute: ShowcaseRoute,
   SignInRoute: SignInRoute,
 }
