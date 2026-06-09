@@ -90,6 +90,7 @@ A clean rebuild: `pnpm clean && pnpm build`.
 - **Admin app** only imports `AppRouter` as `import type` from `apps/server/src/trpc/_app.ts` — type-only, Vite strips it at build. Never bundles server code.
 - **Auth client**: apps import from `@sb-codex/auth/client` — never from `better-auth` directly. `createSbAuthClient(baseURL)` is the library-agnostic facade.
 - **`AGENTS.md`**: repo root `AGENTS.md` tells AI agents to read `node_modules/next/dist/docs/` before writing Next.js code (requires Next.js 16.2.0+). `CLAUDE.md` imports it via `@AGENTS.md`.
+- **`apps/server` is CommonJS**: do not introduce ESM-only dependencies to `apps/server` until the ESM migration (audit TS-3) is complete. Packages under `packages/*` output both CJS + ESM via tsup and are not affected.
 
 ## Frontend structure (feature-based)
 

@@ -10,14 +10,31 @@ description: >
 
 # Code Review — sb-codex monorepo
 
-Perform a structured review across the four concern tiers below. Read only the
+Perform a structured review across the concern tiers below. Read only the
 files relevant to the diff — do not load the entire codebase.
+
+---
+
+## Tier 0 — Cross-cutting changes
+
+Use this checklist **in addition to** Tiers 1–4 when a change touches multiple
+packages, the database schema, the permission system, or the CI/CD pipeline:
+
+- [ ] Does it preserve the `workspace_id` invariant on all new tables?
+- [ ] Does it add RLS policies (`ENABLE`, `FORCE`, `CREATE POLICY`) to every new table?
+- [ ] Does it use the `app` role (not superuser) for runtime queries?
+- [ ] Does it keep `ROLE_PERMISSIONS` server-side only — never shipped to the browser?
+- [ ] Does it add new env vars to `apps/server/src/env.ts` and `.env.example`?
+- [ ] Does it keep all `packages/*` product-agnostic (no domain types or business rules)?
+- [ ] Is there an ADR if this reverses or significantly extends a locked architecture decision?
+- [ ] Does it scale to the 50k–500k DAU tier without a rewrite (workspace_id stays deterministic)?
 
 ---
 
 ## Tier 1 — Security & Data Isolation (block merge if violated)
 
 ### RLS / Multi-tenancy
+
 - [ ] Every new business table has `workspace_id TEXT NOT NULL`.
 - [ ] Every new Drizzle migration appends `ENABLE ROW LEVEL SECURITY`, `FORCE ROW LEVEL SECURITY`, and RLS policies (`USING` + `WITH CHECK`) keyed on `current_setting('app.workspace_id')`.
 - [ ] No procedure performs a raw `WHERE workspace_id = X` — isolation is handled by RLS + `SET LOCAL` in `enforceWorkspace`. Any explicit filter is redundant and a smell.
@@ -25,16 +42,19 @@ files relevant to the diff — do not load the entire codebase.
 - [ ] Migrations connect as superuser; the server connects as the `app` role. Never swap these.
 
 ### Permission enforcement
+
 - [ ] Any procedure that mutates data uses `workspaceProcedure` (not `protectedProcedure`).
 - [ ] Destructive or privileged operations use `requirePermission('resource:action')` from `@sb-codex/acl`.
 - [ ] `ROLE_PERMISSIONS` map (server-side only) is the source of truth. No permission logic in client code.
 - [ ] `AclProvider` in the UI receives resolved `permissions: string[]` from `members.me` — it is display-only. Never use it as the actual gate.
 
 ### Auth
+
 - [ ] Apps import from `@sb-codex/auth/client`, never from `better-auth` directly.
 - [ ] `isSuperAdmin` flag is only checked on the platform axis — never conflated with workspace roles.
 
 ### Dangerous Drizzle patterns
+
 - [ ] No `db.delete(table)` without a `.where(...)` clause.
 - [ ] No `db.update(table).set(...)` without a `.where(...)` clause.
 - [ ] Bulk deletes/updates are reviewed for blast radius before approval.
@@ -44,18 +64,21 @@ files relevant to the diff — do not load the entire codebase.
 ## Tier 2 — Correctness (flag for fix before merge)
 
 ### TypeScript
+
 - [ ] No `as any` or `@ts-ignore` without a comment explaining why.
 - [ ] Array index access (`arr[i]`) followed by property access without a guard — flag for `noUncheckedIndexedAccess`.
 - [ ] Async functions passed to `.forEach` — flag as unhandled promise (`no-misused-promises`).
 - [ ] `.then()` chains not returned or awaited — flag as floating promise (`no-floating-promises`).
 
 ### tRPC procedures
+
 - [ ] Input schemas use Zod and are as strict as possible (no `z.any()`).
 - [ ] List procedures have pagination input (`limit`/`cursor` or `page`/`pageSize`) — unbounded queries are not allowed.
 - [ ] Output is typed — no `as unknown as X` casts.
 - [ ] Error is thrown via `new TRPCError({ code, message })` with a structured code from the domain error taxonomy.
 
 ### Feature boundaries
+
 - [ ] No feature folder imports another feature folder directly (`features/clients` must not import from `features/members`). Shared code goes to `shared/`.
 - [ ] Route files are thin — no business logic, only wiring.
 - [ ] Packages under `packages/` contain no domain/business logic specific to one product vertical.
@@ -65,7 +88,7 @@ files relevant to the diff — do not load the entire codebase.
 ## Tier 3 — Code Quality (suggest, don't block)
 
 - Cognitive complexity: functions > 15 branches should be decomposed.
-- No comment that explains *what* the code does — only *why* (hidden constraints, workarounds).
+- No comment that explains _what_ the code does — only _why_ (hidden constraints, workarounds).
 - New packages: must have `README.md`, `publishConfig.access: public`, and be listed in `docs/plugins/README.md`.
 - Environment variables: new vars must be added to `apps/server/src/env.ts` (Zod-validated) and `.env.example`.
 - New Docker images: must have a non-root `USER` directive and a `HEALTHCHECK`.
