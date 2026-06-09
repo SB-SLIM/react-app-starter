@@ -28,7 +28,9 @@
       "Bash(git clean -f*)",
       "Bash(docker compose up --build*)",
       "Read(./.env)",
-      "Read(./.env.*)",
+      "Read(./.env.local)",
+      "Read(./.env.production)",
+      "Read(./.env.*.local)",
       "Read(./secrets/**)"
     ]
   },

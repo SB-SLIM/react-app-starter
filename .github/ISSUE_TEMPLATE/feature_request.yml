@@ -1,0 +1,55 @@
+name: Feature request
+description: Propose a new feature or improvement
+labels: ['type:feature', 'status:triage']
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Admin SPA (apps/admin)
+        - Super Admin SPA (apps/superadmin)
+        - API server (apps/server)
+        - Marketing site (apps/web)
+        - Auth (@sb-codex/auth)
+        - ACL / permissions (@sb-codex/acl)
+        - Database / RLS (@sb-codex/db)
+        - Jobs / queues (@sb-codex/jobs)
+        - UI components (@sb-codex/ui-components)
+        - Infrastructure / Docker
+        - CI / CD
+        - New package / plugin
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem does this solve? Who is affected?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What should the feature do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What else did you consider?
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Constraints to keep in mind
+      options:
+        - label: Must preserve tenant isolation (workspace_id + RLS)
+        - label: Must work in the publishable @sb-codex/* package model
+        - label: Must not add domain/business logic to shared packages

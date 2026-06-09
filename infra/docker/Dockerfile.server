@@ -38,4 +38,6 @@ COPY --from=builder --chown=fastify:nodejs /app/packages/db/migrations /app/migr
 RUN sed -i '/"type": "module"/d' /app/package.json && chown -R fastify:nodejs /app/dist /app/package.json
 USER fastify
 EXPOSE 3001
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD wget -qO- http://localhost:3001/api/health || exit 1
 CMD ["node", "dist/server.js"]

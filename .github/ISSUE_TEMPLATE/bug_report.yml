@@ -1,0 +1,65 @@
+name: Bug report
+description: Something is broken
+labels: ['type:bug', 'status:triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing a bug, check [open issues](../../issues) to avoid duplicates.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Admin SPA (apps/admin)
+        - Super Admin SPA (apps/superadmin)
+        - API server (apps/server)
+        - Marketing site (apps/web)
+        - Auth (@sb-codex/auth)
+        - ACL / permissions (@sb-codex/acl)
+        - Database / RLS (@sb-codex/db)
+        - Jobs / queues (@sb-codex/jobs)
+        - UI components (@sb-codex/ui-components)
+        - Infrastructure / Docker
+        - CI / CD
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is broken? What did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Sign in as workspace owner
+        2. Navigate to ...
+        3. Click ...
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: |
+        - Node.js version:
+        - pnpm version:
+        - OS:
+        - Browser (if UI):
+        - Commit SHA:
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or errors
+      render: shell

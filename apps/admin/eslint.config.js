@@ -11,7 +11,8 @@ export default defineConfig([
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
-      tseslint.configs.recommended,
+      // Type-checked rules — catches no-floating-promises, no-misused-promises, etc.
+      ...tseslint.configs.recommendedTypeChecked,
       reactHooks.configs['recommended-latest'],
       reactRefresh.configs.vite,
     ],
@@ -19,8 +20,16 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
       parserOptions: {
+        project: true,
         tsconfigRootDir: import.meta.dirname,
       },
+    },
+    rules: {
+      // Prevent silent async failures — the two most impactful async rules
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      // Prefer explicit return types on exported functions for better DX
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
     },
   },
 ])
