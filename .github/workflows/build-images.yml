@@ -41,7 +41,7 @@ jobs:
       superadmin: ${{ steps.filter.outputs.superadmin }}
       worker: ${{ steps.filter.outputs.worker }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -103,7 +103,7 @@ jobs:
 
     steps:
       - if: ${{ env.BUILD_APP == 'true' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Log in to GHCR
         if: ${{ env.BUILD_APP == 'true' }}
