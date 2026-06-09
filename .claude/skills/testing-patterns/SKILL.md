@@ -21,6 +21,7 @@ if only one is needed.
 **Workspace runner**: `vitest.workspace.ts` at repo root federates all packages.
 
 ### Minimal package vitest.config.ts
+
 ```ts
 import { defineConfig } from 'vitest/config'
 
@@ -36,6 +37,7 @@ export default defineConfig({
 ```
 
 ### @sb-codex/core — pure util tests
+
 Tests live in `packages/core/src/__tests__/`. No external deps, no mocks needed.
 
 ```ts
@@ -53,6 +55,7 @@ describe('slugify', () => {
 ```
 
 ### @sb-codex/acl — permission tests
+
 ```ts
 import { describe, it, expect } from 'vitest'
 import { can, permissionsFor } from '../permissions'
@@ -76,6 +79,7 @@ describe('can()', () => {
 **CI job**: `rls-isolation` spins a Postgres service container.
 
 ### Pattern
+
 ```ts
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { drizzle } from 'drizzle-orm/postgres-js'
@@ -92,7 +96,9 @@ beforeAll(async () => {
   // create two workspaces (ws-1, ws-2)
   // insert rows with each workspace_id
 
-  const appClient = postgres(process.env.TEST_DATABASE_URL!.replace('postgres:', 'postgresql://app:'))
+  const appClient = postgres(
+    process.env.TEST_DATABASE_URL!.replace('postgres:', 'postgresql://app:'),
+  )
   appDb = drizzle(appClient)
 })
 
@@ -102,12 +108,13 @@ it('app role cannot read rows from a different workspace', async () => {
     await tx.execute(sql`SET LOCAL app.workspace_id = 'ws-1'`)
     const rows = await tx.select().from(myTable)
     // must only see ws-1 rows
-    expect(rows.every(r => r.workspaceId === 'ws-1')).toBe(true)
+    expect(rows.every((r) => r.workspaceId === 'ws-1')).toBe(true)
   })
 })
 ```
 
 **Key rules**:
+
 - `SET LOCAL` only works inside a transaction.
 - The `app` role must NOT be a table owner or superuser — RLS is bypassed for owners.
 - Always test both directions: ws-1 cannot read ws-2, and ws-2 cannot read ws-1.
@@ -119,6 +126,7 @@ it('app role cannot read rows from a different workspace', async () => {
 Tests live in `apps/server/src/__tests__/`. Use a test Postgres instance (same `TEST_DATABASE_URL`).
 
 ### Setup helper
+
 ```ts
 import { createCallerFactory } from '@trpc/server'
 import { appRouter } from '../trpc/_app'
@@ -140,6 +148,7 @@ export function createTestCaller(overrides?: Partial<Context>) {
 ```
 
 ### Procedure test example
+
 ```ts
 describe('clients.list', () => {
   it('requires authentication', async () => {
@@ -169,6 +178,7 @@ describe('clients.list', () => {
 **Base URL**: `http://localhost:5173` (admin SPA)
 
 ### Auth fixture
+
 ```ts
 import { test as base } from '@playwright/test'
 
@@ -185,6 +195,7 @@ export const test = base.extend<{ authedPage: Page }>({
 ```
 
 ### Tenant isolation E2E pattern
+
 ```ts
 test('workspace A cannot see workspace B data', async ({ page }) => {
   // sign in as workspace A user
@@ -194,6 +205,7 @@ test('workspace A cannot see workspace B data', async ({ page }) => {
 ```
 
 ### Accessibility check (axe-core)
+
 ```ts
 import AxeBuilder from '@axe-core/playwright'
 
@@ -210,11 +222,53 @@ test('dashboard has no critical a11y violations', async ({ page }) => {
 
 ## Coverage targets
 
-| Package | Lines | Functions | Branches |
-|---|---|---|---|
-| @sb-codex/core | 90% | 90% | 85% |
-| @sb-codex/acl | 90% | 90% | 85% |
-| @sb-codex/auth | 80% | 80% | 70% |
-| @sb-codex/db | 80% | 80% | 70% |
-| @sb-codex/api-contracts | 80% | 80% | 70% |
-| apps/server (procedures) | 75% | 75% | 65% |
+| Package                  | Lines | Functions | Branches |
+| ------------------------ | ----- | --------- | -------- |
+| @sb-codex/core           | 90%   | 90%       | 85%      |
+| @sb-codex/acl            | 90%   | 90%       | 85%      |
+| @sb-codex/auth           | 80%   | 80%       | 70%      |
+| @sb-codex/db             | 80%   | 80%       | 70%      |
+| @sb-codex/api-contracts  | 80%   | 80%       | 70%      |
+| apps/server (procedures) | 75%   | 75%       | 65%      |
+
+---
+
+## Test file placement
+
+| What                  | Where                                                      |
+| --------------------- | ---------------------------------------------------------- |
+| Package unit test     | `packages/<name>/src/__tests__/<module>.test.ts`           |
+| Server procedure test | `apps/server/src/__tests__/<router>.test.ts`               |
+| E2E flow              | `apps/e2e/tests/<feature>.spec.ts`                         |
+| RLS isolation         | `packages/db/src/__tests__/rls.test.ts` (extend this file) |
+
+---
+
+## Running tests
+
+```bash
+pnpm test                              # all packages via vitest.workspace.ts
+pnpm --filter @sb-codex/<name> test   # single package
+pnpm --filter @sb-codex/db test       # RLS integration (needs TEST_DATABASE_URL)
+pnpm --filter e2e test                # Playwright (needs a running stack)
+pnpm test --coverage                  # generate coverage report
+```
+
+---
+
+## vitest.workspace.ts — adding a package
+
+When a package has no `vitest.config.ts` entry in the workspace file, add it:
+
+```ts
+// vitest.workspace.ts (repo root)
+export default defineWorkspace([
+  'packages/core/vitest.config.ts',
+  'packages/acl/vitest.config.ts',
+  // add the new package here, e.g.:
+  'packages/jobs/vitest.config.ts',
+  'packages/config/vitest.config.ts',
+])
+```
+
+Then create `packages/<name>/vitest.config.ts` following the minimal config in § 1 above.
