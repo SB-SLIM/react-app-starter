@@ -32,6 +32,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Audit dependencies
+        run: pnpm audit --audit-level=high
+        continue-on-error: false
+
       - name: Build packages
         run: pnpm turbo build --filter=!admin --filter=!web --filter=!server
 

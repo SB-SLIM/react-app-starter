@@ -1,0 +1,23 @@
+# CODEOWNERS — automatic review requests on PR open
+# Syntax: <path pattern> <GitHub username(s)>
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything not matched below
+*                               @sb-slim
+
+# Infrastructure — require explicit review for all infra changes
+infra/                          @sb-slim
+.github/workflows/              @sb-slim
+.github/dependabot.yml          @sb-slim
+
+# Security-critical packages
+packages/auth/                  @sb-slim
+packages/acl/                   @sb-slim
+packages/db/                    @sb-slim
+
+# Database migrations — always require review
+packages/db/migrations/         @sb-slim
+
+# Published package configs — bump requires intentional review
+packages/*/package.json         @sb-slim
+.changeset/                     @sb-slim

@@ -1,0 +1,92 @@
+version: 2
+
+updates:
+  # npm / pnpm workspace — covers all packages and apps
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: Africa/Tunis
+    open-pull-requests-limit: 10
+    groups:
+      # Group all @sb-codex internal bumps together (shouldn't happen via Dependabot
+      # but catches any accidental published version mismatches)
+      internal:
+        patterns:
+          - '@sb-codex/*'
+      # Group minor/patch React ecosystem updates to reduce PR noise
+      react-ecosystem:
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - '@types/react'
+          - '@types/react-dom'
+          - 'react-hook-form'
+          - '@hookform/*'
+        update-types:
+          - minor
+          - patch
+      # Group Radix UI primitives
+      radix-ui:
+        patterns:
+          - '@radix-ui/*'
+        update-types:
+          - minor
+          - patch
+      # Group TanStack libraries
+      tanstack:
+        patterns:
+          - '@tanstack/*'
+        update-types:
+          - minor
+          - patch
+      # Group TypeScript toolchain
+      typescript-toolchain:
+        patterns:
+          - 'typescript'
+          - 'typescript-eslint'
+          - '@typescript-eslint/*'
+          - 'tsup'
+          - 'tsx'
+        update-types:
+          - minor
+          - patch
+    labels:
+      - 'deps'
+      - 'automated'
+    commit-message:
+      prefix: 'chore(deps)'
+
+  # Docker base images
+  - package-ecosystem: docker
+    directory: /infra/docker
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: Africa/Tunis
+    open-pull-requests-limit: 5
+    labels:
+      - 'deps'
+      - 'docker'
+      - 'automated'
+    commit-message:
+      prefix: 'build(infra)'
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: Africa/Tunis
+    open-pull-requests-limit: 5
+    labels:
+      - 'deps'
+      - 'ci'
+      - 'automated'
+    commit-message:
+      prefix: 'ci'

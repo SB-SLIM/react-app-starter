@@ -32,4 +32,6 @@ COPY --from=builder /app /build
 RUN cd /build && pnpm --filter=@sb-codex/jobs deploy --prod --legacy /app
 RUN chown -R worker:nodejs /app
 USER worker
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD pgrep -f "node dist/worker.js" || exit 1
 CMD ["node", "dist/worker.js"]
