@@ -53,15 +53,15 @@
   "peerDependencies": {
     "@sb-codex/api-contracts": "workspace:^",
     "@trpc/server": "^11.0.0",
-    "react": "^19.0.0"
+    "react": "^19.2.7"
   },
   "devDependencies": {
     "@sb-codex/api-contracts": "workspace:^",
     "@testing-library/react": "^16.0.0",
     "@trpc/server": "^11.0.0",
-    "@types/react": "^19.0.1",
+    "@types/react": "^19.2.17",
     "happy-dom": "^17.0.0",
-    "react": "^19.0.0",
+    "react": "^19.2.7",
     "vitest": "^3.0.0"
   }
 }
