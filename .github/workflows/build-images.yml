@@ -120,7 +120,7 @@ jobs:
       - name: Extract metadata
         id: meta
         if: ${{ env.BUILD_APP == 'true' }}
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.app }}
           tags: |
