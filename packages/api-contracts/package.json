@@ -48,12 +48,12 @@
   },
   "peerDependencies": {
     "@trpc/server": "^11.0.0",
-    "drizzle-orm": "^0.44.0",
+    "drizzle-orm": "^0.45.2",
     "zod": "^4.0.0"
   },
   "devDependencies": {
     "@trpc/server": "^11.0.0",
-    "drizzle-orm": "^0.44.0",
+    "drizzle-orm": "^0.45.2",
     "zod": "^4.0.0"
   }
 }
