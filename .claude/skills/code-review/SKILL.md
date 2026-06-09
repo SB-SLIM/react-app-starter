@@ -35,6 +35,8 @@ packages, the database schema, the permission system, or the CI/CD pipeline:
 
 ### RLS / Multi-tenancy
 
+> Canonical RLS rules (template + connection-role linchpin): the `api-design` skill's `references/rls.md`.
+
 - [ ] Every new business table has `workspace_id TEXT NOT NULL`.
 - [ ] Every new Drizzle migration appends `ENABLE ROW LEVEL SECURITY`, `FORCE ROW LEVEL SECURITY`, and RLS policies (`USING` + `WITH CHECK`) keyed on `current_setting('app.workspace_id')`.
 - [ ] No procedure performs a raw `WHERE workspace_id = X` — isolation is handled by RLS + `SET LOCAL` in `enforceWorkspace`. Any explicit filter is redundant and a smell.

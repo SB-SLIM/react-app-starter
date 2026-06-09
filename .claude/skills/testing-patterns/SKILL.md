@@ -74,6 +74,8 @@ describe('can()', () => {
 
 ## 2. RLS integration tests
 
+**Canonical RLS rules** (policy template, connection-role linchpin): the `api-design` skill's `references/rls.md`.
+
 **Reference**: `packages/db/src/__tests__/rls.test.ts`
 **Requires**: `TEST_DATABASE_URL` env (Postgres 16 with app role created).
 **CI job**: `rls-isolation` spins a Postgres service container.
