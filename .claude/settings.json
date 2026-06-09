@@ -10,13 +10,23 @@
       "Bash(pnpm clean*)",
       "Bash(pnpm changeset*)",
       "Bash(pnpm run *)",
+      "Bash(pnpm test*)",
+      "Bash(pnpm typecheck*)",
       "Bash(turbo run*)",
       "Bash(git status)",
       "Bash(git diff*)",
       "Bash(git log*)",
-      "Bash(git branch*)"
+      "Bash(git branch*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git push -u origin*)"
     ],
     "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(docker compose up --build*)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./secrets/**)"
@@ -24,14 +34,37 @@
   },
 
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(echo \"$ARGUMENTS\" | jq -r '.command // empty' 2>/dev/null || echo \"$ARGUMENTS\"); echo \"$cmd\" | grep -qE '(push --force|push -f |reset --hard|clean -f|drop table|DROP TABLE|db\\.delete\\([^)]+\\)$)' && { echo '[GUARD] Blocked: destructive command detected. Ask the user first.'; exit 1; } || exit 0",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "pnpm prettier --write --ignore-unknown $ARGUMENTS",
+            "command": "file=$(echo \"$ARGUMENTS\" | jq -r '.file_path // empty' 2>/dev/null || echo \"$ARGUMENTS\"); [ -f \"$file\" ] && pnpm prettier --config .prettierrc.base.json --write --ignore-unknown \"$file\" 2>/dev/null || true",
             "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /home/user/react-app-starter && changes=$(git status --porcelain 2>/dev/null | wc -l); [ \"$changes\" -gt 0 ] && echo \"[SESSION] $changes changed file(s) not committed. Run: git status\" || echo '[SESSION] Working tree clean.'",
+            "timeout": 10
           }
         ]
       }
