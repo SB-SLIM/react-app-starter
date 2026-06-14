@@ -4,4 +4,4 @@ export const authClient = createSbAuthClient(
   import.meta.env.VITE_BETTER_AUTH_URL ?? 'http://localhost:3001',
 )
 
-export const { useSession } = authClient
+export const useSession = () => authClient.useSession()

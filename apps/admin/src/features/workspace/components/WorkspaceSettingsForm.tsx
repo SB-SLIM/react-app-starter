@@ -20,7 +20,7 @@ export function WorkspaceSettingsForm() {
   const update = trpc.workspace.update.useMutation({
     onSuccess: (data) => {
       toast.success('Workspace updated')
-      utils.workspace.get.invalidate()
+      void utils.workspace.get.invalidate()
       form.reset({ name: data.name })
     },
     onError: (err) => toast.error(err.message),
