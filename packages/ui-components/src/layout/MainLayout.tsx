@@ -22,7 +22,7 @@ export function MainLayout({
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-950">
+    <div className="flex h-dvh overflow-hidden bg-gray-50 dark:bg-gray-950">
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
@@ -55,7 +55,8 @@ export function MainLayout({
         <div className="flex h-16 shrink-0 items-center border-b border-gray-200 bg-white px-4 dark:border-gray-800 dark:bg-gray-950 lg:hidden">
           <button
             onClick={() => setMobileOpen(true)}
-            className="rounded p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+            aria-label="Open navigation menu"
           >
             <Menu className="h-5 w-5" />
           </button>
