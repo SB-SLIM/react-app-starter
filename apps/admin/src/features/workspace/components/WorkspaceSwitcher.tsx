@@ -19,7 +19,7 @@ export function WorkspaceSwitcher({ currentSlug }: { currentSlug: string }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([])
 
   useEffect(() => {
-    authClient.listWorkspaces().then((res) => {
+    void authClient.listWorkspaces().then((res) => {
       if (res.data) setWorkspaces(res.data)
     })
   }, [])

@@ -12,7 +12,6 @@ import { trpc } from '@/app/trpc'
 import { useMembers, useInvitations } from '../hooks/useMembers'
 import { RoleSelect } from './RoleSelect'
 import { InviteDialog } from './InviteDialog'
-import type { MemberRole } from '@sb-codex/acl/client'
 
 type Member = ReturnType<typeof useMembers>['members'][number]
 type Invitation = ReturnType<typeof useInvitations>['invitations'][number]
@@ -71,7 +70,7 @@ export function MembersTable() {
         canUpdate ? (
           <div className="w-36">
             <RoleSelect
-              value={row.original.role as MemberRole}
+              value={row.original.role}
               onChange={(role) =>
                 updateRole.mutate({ userId: row.original.userId, role })
               }
