@@ -7,7 +7,6 @@ import {
 } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
 import { Building2, LayoutDashboard, LogOut, Menu, Users } from 'lucide-react'
-import { clsx } from 'clsx'
 import { authClient } from '@/features/auth/api/authClient'
 
 export const Route = createFileRoute('/_auth')({
@@ -77,13 +76,7 @@ function AuthLayout() {
 
       {/* Sidebar */}
       <aside
-        className={clsx(
-          'fixed inset-y-0 left-0 z-40 flex w-56 shrink-0 flex-col',
-          'border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900',
-          'transform transition-transform duration-200 ease-in-out',
-          'lg:relative lg:z-auto lg:translate-x-0',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full',
-        )}
+        className={`fixed inset-y-0 left-0 z-40 flex w-56 shrink-0 flex-col border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 transform transition-transform duration-200 ease-in-out lg:relative lg:z-auto lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="border-b border-gray-200 px-4 py-4 dark:border-gray-800">
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
