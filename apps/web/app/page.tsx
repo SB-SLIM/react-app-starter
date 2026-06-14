@@ -1,218 +1,369 @@
 'use client'
 
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  Separator,
-} from '@sb-codex/ui-components'
+import { Badge, Button, Separator } from '@sb-codex/ui-components'
 
 const features = [
   {
     icon: '🔐',
+    iconBg: 'bg-indigo-500/15',
     title: 'Auth out of the box',
     description:
-      'Email/password + Google OAuth via better-auth. Session management, CSRF protection, email verification included.',
+      'Email/password + Google OAuth via better-auth. Sessions, CSRF, email verification — zero config.',
   },
   {
     icon: '🏢',
+    iconBg: 'bg-blue-500/15',
     title: 'Multi-tenant by design',
     description:
-      'Every table has workspace_id. Row-level security enforced at the database layer — no manual WHERE clauses.',
+      'Every table has workspace_id. Row-level security enforced at the DB layer — no manual WHERE clauses.',
   },
   {
     icon: '⚡',
+    iconBg: 'bg-emerald-500/15',
     title: 'End-to-end type safety',
     description:
-      'tRPC v11 + Zod schemas shared between Fastify and React. Refactor a procedure and TypeScript catches the breakage.',
-  },
-  {
-    icon: '🎨',
-    title: 'Design system included',
-    description:
-      'Radix UI primitives + Tailwind v4 + Recharts. StatCard, charts, dialogs, forms — all ready to use.',
-  },
-  {
-    icon: '🔄',
-    title: 'Background jobs',
-    description:
-      'BullMQ + Valkey queues for email, exports, search indexing, and webhooks. Typed payloads, retries built-in.',
+      'tRPC v11 + Zod between Fastify and React. Break a procedure — TypeScript catches it instantly.',
   },
   {
     icon: '🚀',
+    iconBg: 'bg-orange-500/15',
     title: 'CI/CD on day one',
     description:
-      "GitHub Actions → GHCR → VPS. Docker Compose + Traefik + Let's Encrypt. Push to main and it ships.",
+      "GitHub Actions → GHCR → VPS. Docker + Traefik + Let's Encrypt. Push to main and it ships.",
   },
 ]
 
 const stack = [
-  { label: 'React 19', category: 'Frontend' },
-  { label: 'Next.js 15', category: 'Marketing' },
-  { label: 'TanStack Router', category: 'Frontend' },
-  { label: 'Fastify 5', category: 'Backend' },
-  { label: 'tRPC v11', category: 'API' },
-  { label: 'Drizzle ORM', category: 'Database' },
-  { label: 'PostgreSQL', category: 'Database' },
-  { label: 'better-auth', category: 'Auth' },
-  { label: 'BullMQ', category: 'Jobs' },
-  { label: 'Valkey', category: 'Cache' },
-  { label: 'Tailwind v4', category: 'Styling' },
-  { label: 'Turborepo', category: 'Monorepo' },
+  {
+    heading: 'Frontend',
+    items: ['React 19', 'TanStack Router', 'Tailwind v4', 'Radix UI'],
+  },
+  {
+    heading: 'Backend',
+    items: ['Fastify 5', 'tRPC v11', 'Drizzle ORM', 'better-auth'],
+  },
+  {
+    heading: 'Data & Jobs',
+    items: ['PostgreSQL', 'Valkey (Redis)', 'BullMQ', 'Meilisearch'],
+  },
+  {
+    heading: 'Infra',
+    items: ['Docker Compose', 'Traefik v3', 'GitHub Actions', 'Turborepo'],
+  },
+]
+
+const stats = [
+  { num: '12+', label: 'npm plugins' },
+  { num: '100%', label: 'TypeScript' },
+  { num: '1', label: 'command to start' },
+  { num: '0', label: 'vendor lock-in' },
 ]
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
-      {/* Nav */}
-      <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/80 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            sb-codex
+    <div className="min-h-screen bg-zinc-950 text-white">
+      {/* ── NAV ── */}
+      <header className="sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur-md">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+          <span className="text-lg font-extrabold tracking-tight">
+            sb
+            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+              -codex
+            </span>
           </span>
-          <div className="flex items-center gap-3">
-            <Badge variant="secondary">beta</Badge>
+
+          <div className="hidden items-center gap-6 sm:flex">
+            <a
+              href="#features"
+              className="text-sm text-zinc-400 transition-colors hover:text-white"
+            >
+              Features
+            </a>
+            <a
+              href="#stack"
+              className="text-sm text-zinc-400 transition-colors hover:text-white"
+            >
+              Stack
+            </a>
             <a
               href="https://github.com/sb-slim/react-app-starter"
-              className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
               target="_blank"
               rel="noreferrer"
+              className="text-sm text-zinc-400 transition-colors hover:text-white"
             >
               GitHub
             </a>
-            <Button size="sm" asChild>
-              <a href="https://hub.slimbouchoucha.tn">Launch app</a>
-            </Button>
           </div>
+
+          <Button size="sm" asChild>
+            <a href="https://hub.slimbouchoucha.tn">Launch app →</a>
+          </Button>
         </nav>
       </header>
 
-      {/* Hero */}
-      <section className="mx-auto max-w-4xl px-6 py-24 text-center">
-        <Badge variant="outline" className="mb-6">
-          Open-source · MIT License
-        </Badge>
-        <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 sm:text-6xl">
-          Ship your SaaS
-          <br />
-          <span className="text-primary-600">in days, not months</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600 dark:text-gray-400">
-          A batteries-included monorepo starter with auth, multi-tenant API,
-          background jobs, a full design system, and a CI/CD pipeline — all
-          wired together and ready to ship.
-        </p>
-        <div className="mt-10 flex flex-wrap justify-center gap-4">
-          <Button size="lg" asChild>
-            <a href="https://github.com/sb-slim/react-app-starter">
-              Get started free
-            </a>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <a href="https://hub.slimbouchoucha.tn">View live demo</a>
-          </Button>
+      {/* ── HERO ── */}
+      <section className="relative overflow-hidden px-4 py-20 text-center sm:px-6 sm:py-28 lg:py-36">
+        <div className="pointer-events-none absolute inset-0 flex items-start justify-center">
+          <div className="h-[500px] w-full max-w-3xl translate-y-[-30%] rounded-full bg-indigo-600/10 blur-3xl" />
+        </div>
+
+        <div className="relative mx-auto max-w-4xl">
+          <Badge
+            variant="outline"
+            className="mb-6 border-indigo-500/30 bg-indigo-500/5 text-indigo-400"
+          >
+            <span className="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-400" />
+            Open-source · MIT License
+          </Badge>
+
+          <h1 className="text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-7xl">
+            The SaaS starter kit
+            <br />
+            that{' '}
+            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent">
+              ships everything.
+            </span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-xl text-base text-zinc-400 sm:text-lg">
+            Auth, multi-tenant API, background jobs, a full design system, and
+            CI/CD — wired together and ready on day one.
+          </p>
+
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Button size="lg" asChild>
+              <a href="https://github.com/sb-slim/react-app-starter">
+                Get started free →
+              </a>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <a href="https://hub.slimbouchoucha.tn">View live demo</a>
+            </Button>
+          </div>
+
+          {/* Terminal */}
+          <div className="mx-auto mt-12 max-w-lg overflow-hidden rounded-xl border border-white/10 bg-zinc-900 text-left shadow-2xl">
+            <div className="flex items-center gap-1.5 border-b border-white/5 px-4 py-3">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+              <span className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
+              <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
+            </div>
+            <div className="px-5 py-4 font-mono text-xs sm:text-sm">
+              <p className="text-zinc-500">
+                ${' '}
+                <span className="text-cyan-300">
+                  pnpm create @sb-codex/sb-app@latest my-saas
+                </span>
+              </p>
+              <p className="mt-3 text-emerald-400">
+                ✓ Created project in ./my-saas
+              </p>
+              <p className="text-emerald-400">
+                ✓ Installed 12 @sb-codex plugins
+              </p>
+              <p className="text-emerald-400">✓ Ready — run pnpm dev</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      <Separator />
+      {/* ── STATS ── */}
+      <div className="border-y border-white/5">
+        <div className="mx-auto grid max-w-3xl grid-cols-2 sm:grid-cols-4">
+          {stats.map((s, i) => (
+            <div
+              key={s.label}
+              className={`px-4 py-6 text-center sm:px-6 ${
+                i % 2 === 0 ? 'border-r border-white/5' : ''
+              } sm:border-r sm:last:border-r-0`}
+            >
+              <div className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-2xl font-extrabold text-transparent sm:text-3xl">
+                {s.num}
+              </div>
+              <div className="mt-1 text-xs uppercase tracking-wider text-zinc-500">
+                {s.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      {/* Features */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-            Everything you need to build a SaaS
+      {/* ── FEATURES ── */}
+      <section
+        id="features"
+        className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24"
+      >
+        <p className="text-xs font-bold uppercase tracking-widest text-indigo-400">
+          What's included
+        </p>
+        <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+          Everything you need.
+          <br />
+          Nothing you don't.
+        </h2>
+        <p className="mt-3 max-w-xl text-zinc-400">
+          Each piece is a standalone npm plugin — swap, extend, or skip any of
+          them.
+        </p>
+
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {features.map((f) => (
+            <div
+              key={f.title}
+              className="rounded-xl border border-white/8 bg-white/[0.02] p-6 transition-colors hover:border-indigo-500/40"
+            >
+              <div
+                className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg text-xl ${f.iconBg}`}
+              >
+                {f.icon}
+              </div>
+              <h3 className="mb-2 font-semibold text-zinc-100">{f.title}</h3>
+              <p className="text-sm leading-relaxed text-zinc-500">
+                {f.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <Separator className="opacity-10" />
+
+      {/* ── STACK ── */}
+      <section
+        id="stack"
+        className="bg-white/[0.015] px-4 py-16 sm:px-6 sm:py-24"
+      >
+        <div className="mx-auto max-w-5xl">
+          <p className="text-center text-xs font-bold uppercase tracking-widest text-indigo-400">
+            The stack
+          </p>
+          <h2 className="mt-3 text-center text-3xl font-extrabold tracking-tight sm:text-4xl">
+            Modern defaults. No lock-in.
           </h2>
-          <p className="mt-3 text-gray-600 dark:text-gray-400">
-            Every plugin is independently publishable to npm under{' '}
-            <code className="rounded bg-gray-100 px-1.5 py-0.5 text-sm dark:bg-gray-800">
-              @sb-codex
-            </code>
-            .
+
+          <div className="mt-12 grid grid-cols-2 gap-8 sm:grid-cols-4">
+            {stack.map((group) => (
+              <div key={group.heading}>
+                <h4 className="mb-4 text-xs font-bold uppercase tracking-widest text-zinc-600">
+                  {group.heading}
+                </h4>
+                <ul className="space-y-2.5">
+                  {group.items.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-2 text-sm text-zinc-400"
+                    >
+                      <span className="h-1 w-1 flex-shrink-0 rounded-full bg-indigo-500" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Separator className="opacity-10" />
+
+      {/* ── QUICK START / CTA ── */}
+      <section className="relative overflow-hidden px-4 py-20 text-center sm:px-6 sm:py-28">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="h-[400px] w-full max-w-xl rounded-full bg-indigo-600/8 blur-3xl" />
+        </div>
+
+        <div className="relative mx-auto max-w-2xl">
+          <p className="text-xs font-bold uppercase tracking-widest text-indigo-400">
+            Quick start
+          </p>
+          <h2 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
+            One command.
+            <br />
+            Your full SaaS stack.
+          </h2>
+          <p className="mx-auto mt-4 max-w-md text-zinc-400">
+            Bootstrap a new project with plugins from npm — no{' '}
+            <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-sm text-zinc-300">
+              packages/
+            </code>{' '}
+            to maintain.
+          </p>
+
+          <div className="mx-auto mt-10 overflow-hidden rounded-xl border border-white/10 bg-zinc-900 text-left shadow-2xl sm:max-w-md">
+            <div className="px-5 py-4 font-mono text-xs sm:text-sm">
+              <p className="text-zinc-500">
+                ${' '}
+                <span className="text-cyan-300">
+                  pnpm create @sb-codex/sb-app@latest
+                </span>
+              </p>
+              <p className="mt-2 text-zinc-500">
+                $ <span className="text-cyan-300">cd my-saas && pnpm dev</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Button size="lg" asChild>
+              <a href="https://github.com/sb-slim/react-app-starter">
+                ⭐ Star on GitHub
+              </a>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <a href="https://hub.slimbouchoucha.tn">View live demo</a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="border-t border-white/5 px-4 py-10 sm:px-6">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 text-center sm:flex-row sm:justify-between sm:text-left">
+          <span className="text-base font-extrabold">
+            sb
+            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+              -codex
+            </span>
+          </span>
+
+          <div className="flex flex-wrap justify-center gap-5 sm:gap-8">
+            <a
+              href="https://github.com/sb-slim/react-app-starter"
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm text-zinc-500 transition-colors hover:text-white"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://hub.slimbouchoucha.tn"
+              className="text-sm text-zinc-500 transition-colors hover:text-white"
+            >
+              Live demo
+            </a>
+            <a
+              href="https://github.com/sb-slim/react-app-starter/blob/main/CHANGELOG.md"
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm text-zinc-500 transition-colors hover:text-white"
+            >
+              Changelog
+            </a>
+          </div>
+
+          <p className="text-xs text-zinc-600">
+            Built by{' '}
+            <a
+              href="https://slimbouchoucha.tn"
+              target="_blank"
+              rel="noreferrer"
+              className="transition-colors hover:text-zinc-400"
+            >
+              Slim Bouchoucha
+            </a>{' '}
+            · MIT
           </p>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f) => (
-            <Card key={f.title} className="hover:shadow-md transition-shadow">
-              <CardContent className="pt-6">
-                <div className="mb-3 text-3xl">{f.icon}</div>
-                <h3 className="mb-2 font-semibold text-gray-900 dark:text-gray-100">
-                  {f.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
-                  {f.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* Stack */}
-      <section className="mx-auto max-w-4xl px-6 py-20 text-center">
-        <h2 className="mb-3 text-3xl font-bold text-gray-900 dark:text-gray-100">
-          Modern stack, no lock-in
-        </h2>
-        <p className="mb-10 text-gray-600 dark:text-gray-400">
-          Carefully chosen defaults — swap anything you need.
-        </p>
-        <div className="flex flex-wrap justify-center gap-2">
-          {stack.map(({ label, category }) => (
-            <span key={label} className="group relative">
-              <Badge
-                variant="secondary"
-                className="cursor-default text-sm px-3 py-1"
-              >
-                {label}
-              </Badge>
-              <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 dark:bg-gray-700">
-                {category}
-              </span>
-            </span>
-          ))}
-        </div>
-      </section>
-
-      <Separator />
-
-      {/* CTA */}
-      <section className="mx-auto max-w-3xl px-6 py-24 text-center">
-        <h2 className="text-4xl font-extrabold text-gray-900 dark:text-gray-100">
-          Ready to ship?
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-lg text-gray-600 dark:text-gray-400">
-          Bootstrap a new project in one command. Plugins from npm, no packages/
-          directory, just your app code.
-        </p>
-        <pre className="mx-auto mt-8 max-w-md rounded-xl bg-gray-900 p-5 text-left text-sm text-green-400 dark:bg-gray-800">
-          <code>pnpm create @sb-codex/sb-app@latest</code>
-        </pre>
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <Button size="lg" asChild>
-            <a href="https://github.com/sb-slim/react-app-starter">
-              Star on GitHub
-            </a>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <a href="https://hub.slimbouchoucha.tn">Live demo</a>
-          </Button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-100 py-8 dark:border-gray-800">
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-          Built by{' '}
-          <a
-            href="https://slimbouchoucha.tn"
-            className="font-medium hover:text-gray-900 dark:hover:text-gray-100"
-          >
-            Slim Bouchoucha
-          </a>{' '}
-          · MIT License
-        </p>
       </footer>
     </div>
   )
