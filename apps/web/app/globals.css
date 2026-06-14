@@ -1,5 +1,8 @@
 @import '@sb-codex/ui-components/theme.css';
 
+/* Scan this app's own components for Tailwind classes. */
+@source './**/*.{ts,tsx}';
+
 *,
 *::before,
 *::after {
