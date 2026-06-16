@@ -1,11 +1,11 @@
 name: Build & Push Images
 
 on:
-  # Only build images after CI (lint/typecheck/test) passes.
-  # Prevents pushing broken images and triggering a deploy from a failing commit.
-  workflow_run:
-    workflows: ['CI']
-    types: [completed]
+  # Trigger on push to main so dorny/paths-filter receives the native push
+  # before/after SHAs and correctly detects all changed files across every
+  # commit in the push (not just HEAD~1 as it would in workflow_run context).
+  # CI is enforced via branch protection — merges are blocked until CI passes.
+  push:
     branches: [main]
 
 concurrency:
@@ -17,22 +17,8 @@ env:
   IMAGE_PREFIX: ${{ github.repository_owner }}/${{ github.event.repository.name }}
 
 jobs:
-  # Gate job: runs unconditionally and fails if CI didn't pass.
-  # Without this, a workflow where all jobs are skipped still has
-  # conclusion 'success', which would incorrectly trigger Deploy.
-  gate:
-    name: Check CI passed
-    runs-on: ubuntu-latest
-    steps:
-      - name: Fail if CI did not succeed
-        if: ${{ github.event.workflow_run.conclusion != 'success' }}
-        run: |
-          echo "CI workflow concluded with '${{ github.event.workflow_run.conclusion }}' — aborting build."
-          exit 1
-
   changes:
     name: Detect changed apps
-    needs: gate
     runs-on: ubuntu-latest
     outputs:
       server: ${{ steps.filter.outputs.server }}
@@ -42,8 +28,6 @@ jobs:
       worker: ${{ steps.filter.outputs.worker }}
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - uses: dorny/paths-filter@v4
         id: filter
@@ -75,7 +59,7 @@ jobs:
 
   build:
     name: Build ${{ matrix.app }}
-    needs: [gate, changes]
+    needs: changes
     runs-on: ubuntu-24.04-arm
     permissions:
       contents: read
