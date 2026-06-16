@@ -463,7 +463,7 @@ export function ShowcasePage() {
 
       {/* ── Table ── */}
       <Section title="Table">
-        <CardSection flush>
+        <CardSection flush className="overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
