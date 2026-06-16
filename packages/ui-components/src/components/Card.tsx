@@ -3,10 +3,19 @@ import { clsx } from 'clsx'
 
 export type CardProps = React.HTMLAttributes<HTMLDivElement>
 
-export const Card: React.FC<CardProps> = ({ className, ...props }) => (
+export interface CardRootProps extends CardProps {
+  shadow?: boolean
+}
+
+export const Card: React.FC<CardRootProps> = ({
+  className,
+  shadow = true,
+  ...props
+}) => (
   <div
     className={clsx(
-      'rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900',
+      'rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900',
+      shadow && 'shadow-sm',
       className,
     )}
     {...props}
@@ -45,4 +54,8 @@ export const CardContent: React.FC<CardProps> = ({ className, ...props }) => (
 
 export const CardFooter: React.FC<CardProps> = ({ className, ...props }) => (
   <div className={clsx('flex items-center p-6 pt-0', className)} {...props} />
+)
+
+export const CardAction: React.FC<CardProps> = ({ className, ...props }) => (
+  <div className={clsx('flex items-center gap-2', className)} {...props} />
 )
