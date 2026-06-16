@@ -29,7 +29,7 @@ function AcceptInvitePage() {
   })
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-950">
+    <div className="flex min-h-dvh items-center justify-center bg-gray-50 dark:bg-gray-950">
       <div className="w-full max-w-sm rounded-xl bg-white p-8 shadow-sm ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-800 text-center">
         <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
           Workspace invitation

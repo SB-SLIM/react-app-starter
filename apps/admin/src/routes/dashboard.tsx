@@ -204,7 +204,7 @@ function DashboardPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-xl font-bold text-gray-900 sm:text-2xl dark:text-gray-100">
             Agency Dashboard
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">

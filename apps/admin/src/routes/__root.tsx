@@ -128,7 +128,7 @@ function RootLayout() {
                     </Link>
                   )}
                   <span className="hidden text-gray-400 sm:inline">|</span>
-                  <span className="hidden text-gray-600 dark:text-gray-300 md:inline">
+                  <span className="hidden min-w-0 max-w-[160px] truncate text-gray-600 dark:text-gray-300 md:inline">
                     {session.user.email}
                   </span>
                   <button onClick={handleSignOut} className={linkClass}>
