@@ -296,7 +296,7 @@ function DashboardPage() {
           title="Recent Bookings"
           description="Latest 5 reservations"
           flush
-          className="lg:col-span-2"
+          className="overflow-hidden lg:col-span-2"
         >
           <DataTable
             columns={bookingColumns}
