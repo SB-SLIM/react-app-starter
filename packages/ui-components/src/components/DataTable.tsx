@@ -95,7 +95,7 @@ export const DataTable = <TData,>({
         </div>
       )}
 
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -112,7 +112,7 @@ export const DataTable = <TData,>({
                         <button
                           type="button"
                           onClick={header.column.getToggleSortingHandler()}
-                          className="inline-flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200"
+                          className="inline-flex min-h-[44px] items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200"
                         >
                           {flexRender(
                             header.column.columnDef.header,

@@ -37,7 +37,7 @@ function OrgDetailPage() {
       </Link>
 
       <div>
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+        <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-gray-100">
           {org.name}
         </h1>
         <code className="mt-1 text-sm text-gray-500 dark:text-gray-400">

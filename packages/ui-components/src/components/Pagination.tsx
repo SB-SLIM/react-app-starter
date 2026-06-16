@@ -30,7 +30,7 @@ export function Pagination({
   return (
     <div
       className={clsx(
-        'flex items-center justify-between gap-4 text-sm',
+        'flex flex-wrap items-center justify-between gap-3 text-sm',
         className,
       )}
     >

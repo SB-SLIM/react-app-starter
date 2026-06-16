@@ -26,6 +26,8 @@ export const CardUser: React.FC<CardUserProps> = ({
       <img
         src={avatarUrl}
         alt={`${firstName} ${lastName}`}
+        width={80}
+        height={80}
         className="mb-3 h-20 w-20 rounded-full object-cover"
       />
       <h3 className="mb-2 text-lg font-semibold text-gray-900">
