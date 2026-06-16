@@ -36,7 +36,8 @@ export function createAuth(db: Database, config: AuthConfig) {
       additionalFields: {
         // Surfaced on the session so apps can gate access. `input: false`
         // prevents clients from self-granting it via signup/update payloads.
-        isSuperAdmin: { type: 'boolean', input: false, defaultValue: false },
+        // 'owner' | 'admin' | 'viewer' | null
+        platformRole: { type: 'string', input: false, defaultValue: null },
       },
     },
     socialProviders:

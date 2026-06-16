@@ -15,7 +15,7 @@ export function useSignIn() {
         setError(res.error)
         return
       }
-      if (!res.data.user.isSuperAdmin) {
+      if (!res.data.user.platformRole) {
         await authClient.signOut()
         setError('This account is not authorized for the admin console.')
         return

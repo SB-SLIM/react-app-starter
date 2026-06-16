@@ -4,12 +4,33 @@ import {
   workspaceProcedure,
   type MemberRole,
 } from '@sb-codex/api-contracts'
-import { PERMISSIONS, type Permission } from './permissions'
+import {
+  PERMISSIONS,
+  type Permission,
+  PLATFORM_ROLES,
+  type PlatformRole,
+} from './permissions'
 
 export type { MemberRole }
-export { PERMISSIONS, type Permission }
+export { PERMISSIONS, type Permission, PLATFORM_ROLES, type PlatformRole }
 
-// ── Role hierarchy (kept for genuine "rank" checks) ──────────────────────────
+// ── Platform role hierarchy (server-only) ────────────────────────────────────
+export const PLATFORM_ROLE_HIERARCHY: Record<PlatformRole, number> = {
+  owner: 3,
+  admin: 2,
+  viewer: 1,
+}
+
+/** Does the user's platform role meet the required minimum rank? */
+export function hasPlatformRole(
+  userRole: PlatformRole | null,
+  required: PlatformRole,
+): boolean {
+  if (!userRole) return false
+  return PLATFORM_ROLE_HIERARCHY[userRole] >= PLATFORM_ROLE_HIERARCHY[required]
+}
+
+// ── Tenant role hierarchy (kept for genuine "rank" checks) ───────────────────
 export const ROLE_HIERARCHY: Record<MemberRole, number> = {
   owner: 5,
   admin: 4,

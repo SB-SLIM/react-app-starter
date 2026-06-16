@@ -3,6 +3,7 @@
 import { createAuthClient } from 'better-auth/react'
 import { organizationClient } from 'better-auth/client/plugins'
 import { slugify } from '@sb-codex/core'
+import type { PlatformRole } from '@sb-codex/acl'
 
 // ── Clean types exposed to consumers ──────────────────────────────────────────
 
@@ -10,7 +11,7 @@ export type AuthUser = {
   id: string
   email: string
   name: string
-  isSuperAdmin: boolean
+  platformRole: PlatformRole | null
 }
 
 export type AuthSession = {
@@ -60,8 +61,9 @@ export function createSbAuthClient(baseURL: string) {
             id: user.id,
             email: user.email,
             name: user.name,
-            isSuperAdmin:
-              (user as { isSuperAdmin?: boolean }).isSuperAdmin ?? false,
+            platformRole:
+              ((user as { platformRole?: string })
+                .platformRole as PlatformRole | null) ?? null,
           },
           activeOrganizationId: null,
         },
@@ -86,8 +88,9 @@ export function createSbAuthClient(baseURL: string) {
             id: user.id,
             email: user.email,
             name: user.name,
-            isSuperAdmin:
-              (user as { isSuperAdmin?: boolean }).isSuperAdmin ?? false,
+            platformRole:
+              ((user as { platformRole?: string })
+                .platformRole as PlatformRole | null) ?? null,
           },
           activeOrganizationId: null,
         },
@@ -110,8 +113,9 @@ export function createSbAuthClient(baseURL: string) {
           id: user.id,
           email: user.email,
           name: user.name,
-          isSuperAdmin:
-            (user as { isSuperAdmin?: boolean }).isSuperAdmin ?? false,
+          platformRole:
+            ((user as { platformRole?: string })
+              .platformRole as PlatformRole | null) ?? null,
         },
         activeOrganizationId: res.data?.session?.activeOrganizationId ?? null,
       }
@@ -131,8 +135,9 @@ export function createSbAuthClient(baseURL: string) {
                 id: user.id,
                 email: user.email,
                 name: user.name,
-                isSuperAdmin:
-                  (user as { isSuperAdmin?: boolean }).isSuperAdmin ?? false,
+                platformRole:
+                  ((user as { platformRole?: string })
+                    .platformRole as PlatformRole | null) ?? null,
               },
               activeOrganizationId: data?.session?.activeOrganizationId ?? null,
             }

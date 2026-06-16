@@ -477,6 +477,9 @@ importers:
 
   packages/auth:
     dependencies:
+      '@sb-codex/acl':
+        specifier: workspace:^
+        version: link:../acl
       '@sb-codex/core':
         specifier: workspace:^
         version: link:../core
