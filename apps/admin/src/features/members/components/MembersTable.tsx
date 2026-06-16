@@ -68,7 +68,7 @@ export function MembersTable() {
       header: 'Role',
       cell: ({ row }) =>
         canUpdate ? (
-          <div className="w-36">
+          <div className="w-full max-w-[144px]">
             <RoleSelect
               value={row.original.role}
               onChange={(role) =>

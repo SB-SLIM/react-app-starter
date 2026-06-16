@@ -49,7 +49,7 @@ export function UsersTable() {
               <Shield className="h-4 w-4 text-primary-600 dark:text-primary-400" />
             )}
             <select
-              className="rounded border border-gray-200 bg-white px-2 py-1 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+              className="w-full rounded border border-gray-200 bg-white px-2 py-1 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
               value={role ?? ''}
               disabled={setPlatformRole.isPending}
               onChange={(e) =>

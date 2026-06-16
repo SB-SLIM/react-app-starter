@@ -31,7 +31,7 @@ export function WorkspaceSettingsForm() {
   return (
     <form
       onSubmit={form.handleSubmit((values) => update.mutate(values))}
-      className="space-y-4 max-w-md"
+      className="w-full max-w-md space-y-4"
     >
       <div className="space-y-1.5">
         <Label htmlFor="ws-name">Workspace name</Label>

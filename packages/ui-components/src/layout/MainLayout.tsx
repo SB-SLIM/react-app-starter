@@ -67,7 +67,7 @@ export function MainLayout({
         {header && <div className="hidden lg:block">{header}</div>}
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
       </div>
     </div>
   )
