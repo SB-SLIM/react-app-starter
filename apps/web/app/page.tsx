@@ -1,4 +1,5 @@
 import { Badge, Button, Separator } from '@sb-codex/ui-components'
+import { NavBar } from './NavBar'
 
 const features = [
   {
@@ -59,45 +60,9 @@ const stats = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-dvh bg-zinc-950 text-white">
       {/* ── NAV ── */}
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 backdrop-blur-md">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
-          <span className="text-base font-extrabold tracking-tight sm:text-lg">
-            sb
-            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
-              -codex
-            </span>
-          </span>
-
-          <div className="hidden items-center gap-6 sm:flex">
-            <a
-              href="#features"
-              className="text-sm text-zinc-400 transition-colors hover:text-white"
-            >
-              Features
-            </a>
-            <a
-              href="#stack"
-              className="text-sm text-zinc-400 transition-colors hover:text-white"
-            >
-              Stack
-            </a>
-            <a
-              href="https://github.com/sb-slim/react-app-starter"
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm text-zinc-400 transition-colors hover:text-white"
-            >
-              GitHub
-            </a>
-          </div>
-
-          <Button size="sm" asChild>
-            <a href="https://hub.slimbouchoucha.tn">Launch app →</a>
-          </Button>
-        </nav>
-      </header>
+      <NavBar />
 
       {/* ── HERO ── */}
       <section className="relative overflow-hidden px-4 py-14 text-center sm:px-6 sm:py-24 lg:py-36">
