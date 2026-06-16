@@ -114,6 +114,18 @@ Rules:
 - **Features don't import each other.** Shared needs go through `shared/`.
 - **Backend mirrors this**: each tRPC router in `packages/api-contracts/src/routers/` is one feature (`clients.ts`, `health.ts`), aggregated in `_app.ts`. A new frontend feature maps to a router of the same name.
 
+## Responsive UI conventions
+
+All apps use **mobile-first** Tailwind v4 (`sm:` 640 px, `md:` 768 px, `lg:` 1024 px).
+
+- **Viewport height**: use `min-h-dvh` (not `min-h-screen`) on full-height layouts — `dvh` accounts for iOS Safari's collapsible address bar.
+- **Touch targets**: interactive elements need `min-h-[44px] min-w-[44px]` (WCAG 2.5.5). This applies to buttons, nav links, hamburger toggles, table sort buttons.
+- **Table overflow**: the border wrapper around `DataTable` must carry `overflow-hidden`. The inner `<Table>` uses `overflow-auto`, but without a bounded parent that `overflow-auto` has no effect.
+- **Flex shrink**: flex children that contain truncated text must have `min-w-0` so they can shrink below intrinsic content width.
+- **`web` NavBar**: `NavBar.tsx` is `'use client'` with `useState` for the mobile drawer. Desktop links: `hidden sm:flex`. Hamburger: `sm:hidden`. Mobile links need `min-h-[44px]` touch targets and close the drawer `onClick`.
+- **Heading scale**: section titles use `text-xl sm:text-2xl` on app pages; hero copy uses `text-3xl sm:text-5xl lg:text-7xl`.
+- **Drizzle → tRPC type narrowing**: when a Drizzle column returns `string | null` but a tRPC output schema expects a union literal (`"admin" | "owner" | null`), cast the result row explicitly: `r.platformRole as PlatformRole | null`. Do not widen the Zod schema — it would lose the discriminant.
+
 ## Adding a new tenant-scoped table
 
 > `client` is the **example/template** of this pattern, not a shared schema. Only platform tables (auth + tenant) are permanent in `@sb-codex/db`. In an **apps-only** project (plugins from npm), put new business tables in the consuming app or a project-owned package — never edit `@sb-codex/db`. The steps below are for the full monorepo / scaffold where the package is `workspace:^` and editable.

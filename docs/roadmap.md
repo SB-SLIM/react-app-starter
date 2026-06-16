@@ -107,6 +107,7 @@ Every plugin is **product-agnostic** — reusable in any project, with no busine
 | 27 | Super admin app (`apps/superadmin`) — platform-level overview, all-workspace stats, Fastify `superAdminRouter` protected by `superAdminProcedure` | ✅ Done |
 | 28 | Super admin bootstrap + gate — `pnpm seed:superadmin` (only path to the first super admin); `is_super_admin` surfaced on the better-auth session (`additionalFields`, `input: false`); superadmin app signs out non-super-admins | ✅ Done |
 | 29 | Permission-based RBAC — `@sb-codex/acl` `resource:action` permissions + `requirePermission`; roles `manager`/`commercial` added; server-resolved `permissions` via `members.me` → `AclProvider`/`Can`/`usePermission`; clients + members + settings gated end-to-end; 23-test suite | ✅ Done |
+| 30 | Responsive UI — mobile-first audit across all apps (admin, superadmin, web); `DataTable` overflow fix (`overflow-hidden` on border container); `min-h-dvh` for iOS Safari; 44 px touch targets; `NavBar` hamburger on web; `Tabs` horizontal scroll; `Pagination` wrapping layout; type-safe `platformRole` cast in superAdmin router | ✅ Done |
 
 ---
 

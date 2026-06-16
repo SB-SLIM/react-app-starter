@@ -174,6 +174,31 @@ document.documentElement.style.setProperty(
 
 ---
 
+## Responsive UI conventions
+
+All apps follow a **mobile-first** approach with Tailwind v4 breakpoints (`sm:` 640 px, `md:` 768 px, `lg:` 1024 px, `xl:` 1280 px).
+
+### Key patterns
+
+| Pattern             | Rule                                                                                                                                                                                               |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Table overflow**  | The border container around `DataTable` must have `overflow-hidden`. Without it the border expands with content and the inner `overflow-auto` on `<Table>` has no bounded parent to scroll within. |
+| **Viewport height** | Use `min-h-dvh` (dynamic viewport height) instead of `min-h-screen` so iOS Safari's collapsible address bar is accounted for on full-height layouts.                                               |
+| **Touch targets**   | Interactive elements must meet 44 × 44 px (WCAG 2.5.5). Achieved via `min-h-[44px] min-w-[44px]` on buttons and nav links.                                                                         |
+| **Flex shrink**     | Flex children that contain text must have `min-w-0` to allow shrinking below content width (e.g. truncated email in the header).                                                                   |
+| **Heading scale**   | Section headings use `text-xl sm:text-2xl` (or `text-2xl sm:text-4xl` for hero copy) — never a fixed large size on mobile.                                                                         |
+| **Hamburger nav**   | The `web` marketing site `NavBar` is a `'use client'` component with `useState` for the mobile drawer. Desktop links are `hidden sm:flex`; the hamburger is `sm:hidden`.                           |
+
+### `ui-components` responsive defaults
+
+- `DataTable` — border container: `overflow-hidden rounded-lg border …`; sort button: `min-h-[44px]`
+- `Button` — `md`/`lg`/`icon` sizes all include `min-h-[44px]` so they are always tap-friendly
+- `Tabs` — `TabsList` has `overflow-x-auto` for horizontal scroll on small screens
+- `Pagination` — uses `flex-wrap` so page controls stack gracefully on narrow viewports
+- `MainLayout` — inner padding is `p-4 sm:p-6`
+
+---
+
 ## Scaling path
 
 | Users        | Action                                              |
