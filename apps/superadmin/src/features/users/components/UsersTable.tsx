@@ -1,10 +1,5 @@
 import { Shield } from 'lucide-react'
-import {
-  Button,
-  type ColumnDef,
-  DataTable,
-  toast,
-} from '@sb-codex/ui-components'
+import { type ColumnDef, DataTable, toast } from '@sb-codex/ui-components'
 import { PLATFORM_ROLES, type PlatformRole } from '@sb-codex/acl'
 import { trpc } from '@/app/trpc'
 import { useUsers } from '../hooks/useUsers'
