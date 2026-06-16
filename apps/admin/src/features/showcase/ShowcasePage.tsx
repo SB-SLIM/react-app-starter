@@ -8,10 +8,7 @@ import {
   Badge,
   Breadcrumb,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
+  CardSection,
   CardUser,
   Checkbox,
   type ColumnDef,
@@ -414,66 +411,51 @@ export function ShowcasePage() {
       {/* ── Charts ── */}
       <Section title="Charts">
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Monthly Revenue</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <SbBarChart
-                  data={monthlyRevenue}
-                  barProps={{ dataKey: 'revenue' }}
-                  xAxis={{ dataKey: 'month' }}
-                  format={formatMoney}
-                  withKpi
-                  highlightCurrentMonth
-                  withMaxValueColor
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <CardSection title="Monthly Revenue">
+            <div className="h-64">
+              <SbBarChart
+                data={monthlyRevenue}
+                barProps={{ dataKey: 'revenue' }}
+                xAxis={{ dataKey: 'month' }}
+                format={formatMoney}
+                withKpi
+                highlightCurrentMonth
+                withMaxValueColor
+              />
+            </div>
+          </CardSection>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>User Growth</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <SbLineChart
-                  data={userGrowth}
-                  lines={[
-                    { dataKey: 'users', label: 'Total users' },
-                    { dataKey: 'active', label: 'Active users', dashed: true },
-                  ]}
-                  xAxis={{ dataKey: 'month' }}
-                  format={formatNum}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <CardSection title="User Growth">
+            <div className="h-64">
+              <SbLineChart
+                data={userGrowth}
+                lines={[
+                  { dataKey: 'users', label: 'Total users' },
+                  { dataKey: 'active', label: 'Active users', dashed: true },
+                ]}
+                xAxis={{ dataKey: 'month' }}
+                format={formatNum}
+              />
+            </div>
+          </CardSection>
 
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Page Views</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <SbAreaChart
-                  data={pageViews}
-                  areas={[
-                    { dataKey: 'views', label: 'Total views' },
-                    {
-                      dataKey: 'unique',
-                      label: 'Unique visitors',
-                      fillOpacity: 0.15,
-                    },
-                  ]}
-                  xAxis={{ dataKey: 'month' }}
-                  format={formatNum}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <CardSection title="Page Views" className="lg:col-span-2">
+            <div className="h-64">
+              <SbAreaChart
+                data={pageViews}
+                areas={[
+                  { dataKey: 'views', label: 'Total views' },
+                  {
+                    dataKey: 'unique',
+                    label: 'Unique visitors',
+                    fillOpacity: 0.15,
+                  },
+                ]}
+                xAxis={{ dataKey: 'month' }}
+                format={formatNum}
+              />
+            </div>
+          </CardSection>
         </div>
       </Section>
 
@@ -481,50 +463,48 @@ export function ShowcasePage() {
 
       {/* ── Table ── */}
       <Section title="Table">
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Invoice</TableHead>
-                  <TableHead>Client</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {invoices.map((inv) => (
-                  <TableRow key={inv.id}>
-                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">
-                      {inv.id}
-                    </TableCell>
-                    <TableCell>{inv.client}</TableCell>
-                    <TableCell>{inv.date}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[inv.status]}`}
-                      >
-                        {inv.status}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      {inv.amount}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TableCell colSpan={4} className="text-gray-500">
-                    5 invoices
+        <CardSection flush>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Invoice</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {invoices.map((inv) => (
+                <TableRow key={inv.id}>
+                  <TableCell className="font-medium text-gray-900 dark:text-gray-100">
+                    {inv.id}
                   </TableCell>
-                  <TableCell className="text-right">$19,530</TableCell>
+                  <TableCell>{inv.client}</TableCell>
+                  <TableCell>{inv.date}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[inv.status]}`}
+                    >
+                      {inv.status}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right font-medium">
+                    {inv.amount}
+                  </TableCell>
                 </TableRow>
-              </TableFooter>
-            </Table>
-          </CardContent>
-        </Card>
+              ))}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TableCell colSpan={4} className="text-gray-500">
+                  5 invoices
+                </TableCell>
+                <TableCell className="text-right">$19,530</TableCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </CardSection>
       </Section>
 
       <Separator />
@@ -928,31 +908,25 @@ export function ShowcasePage() {
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="overview">
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Overview tab content — workspace summary, recent activity.
-                </p>
-              </CardContent>
-            </Card>
+            <CardSection>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Overview tab content — workspace summary, recent activity.
+              </p>
+            </CardSection>
           </TabsContent>
           <TabsContent value="analytics">
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Analytics tab — key metrics and cohort data.
-                </p>
-              </CardContent>
-            </Card>
+            <CardSection>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Analytics tab — key metrics and cohort data.
+              </p>
+            </CardSection>
           </TabsContent>
           <TabsContent value="settings">
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Settings tab — workspace configuration.
-                </p>
-              </CardContent>
-            </Card>
+            <CardSection>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Settings tab — workspace configuration.
+              </p>
+            </CardSection>
           </TabsContent>
         </Tabs>
       </Section>
@@ -962,13 +936,11 @@ export function ShowcasePage() {
       {/* ── Skeleton ── */}
       <Section title="Skeleton Loaders">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Card>
-            <CardContent className="space-y-3 pt-6">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-              <Skeleton className="h-8 w-full" />
-            </CardContent>
-          </Card>
+          <CardSection contentClassName="space-y-3">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-8 w-full" />
+          </CardSection>
           <div className="flex items-center gap-4">
             <Skeleton className="h-12 w-12 rounded-full" />
             <div className="space-y-2">
@@ -981,16 +953,14 @@ export function ShowcasePage() {
 
       {/* ── Empty State ── */}
       <Section title="Empty State">
-        <Card>
-          <CardContent>
-            <EmptyState
-              icon={<span className="text-2xl">📭</span>}
-              title="No results found"
-              description="Try adjusting your filters or search query."
-              action={<Button variant="outline">Clear filters</Button>}
-            />
-          </CardContent>
-        </Card>
+        <CardSection>
+          <EmptyState
+            icon={<span className="text-2xl">📭</span>}
+            title="No results found"
+            description="Try adjusting your filters or search query."
+            action={<Button variant="outline">Clear filters</Button>}
+          />
+        </CardSection>
       </Section>
     </div>
   )

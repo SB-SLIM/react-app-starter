@@ -11,11 +11,7 @@ import {
 } from 'lucide-react'
 import {
   Badge,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  CardSection,
   type ColumnDef,
   DataTable,
   SbAreaChart,
@@ -262,94 +258,82 @@ function DashboardPage() {
 
       {/* Charts row */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Bookings per Month</CardTitle>
-            <CardDescription>Jan – Dec 2026</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <SbBarChart
-                data={bookingsByMonth}
-                barProps={{ dataKey: 'bookings' }}
-                xAxis={{ dataKey: 'month' }}
-                format={formatNum}
-                withKpi
-                highlightCurrentMonth
-                withMaxValueColor
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <CardSection title="Bookings per Month" description="Jan – Dec 2026">
+          <div className="h-64">
+            <SbBarChart
+              data={bookingsByMonth}
+              barProps={{ dataKey: 'bookings' }}
+              xAxis={{ dataKey: 'month' }}
+              format={formatNum}
+              withKpi
+              highlightCurrentMonth
+              withMaxValueColor
+            />
+          </div>
+        </CardSection>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Revenue Trend</CardTitle>
-            <CardDescription>Gross revenue vs refunds (TND)</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <SbAreaChart
-                data={revenueByMonth}
-                areas={[
-                  { dataKey: 'revenue', label: 'Revenue' },
-                  { dataKey: 'refunds', label: 'Refunds', fillOpacity: 0.15 },
-                ]}
-                xAxis={{ dataKey: 'month' }}
-                format={formatMoneyAxis}
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <CardSection
+          title="Revenue Trend"
+          description="Gross revenue vs refunds (TND)"
+        >
+          <div className="h-64">
+            <SbAreaChart
+              data={revenueByMonth}
+              areas={[
+                { dataKey: 'revenue', label: 'Revenue' },
+                { dataKey: 'refunds', label: 'Refunds', fillOpacity: 0.15 },
+              ]}
+              xAxis={{ dataKey: 'month' }}
+              format={formatMoneyAxis}
+            />
+          </div>
+        </CardSection>
       </div>
 
       {/* Recent bookings + Top destinations */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Recent Bookings</CardTitle>
-            <CardDescription>Latest 5 reservations</CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <DataTable
-              columns={bookingColumns}
-              data={recentBookings}
-              enableGlobalFilter={false}
-              emptyMessage="No bookings yet."
-            />
-          </CardContent>
-        </Card>
+        <CardSection
+          title="Recent Bookings"
+          description="Latest 5 reservations"
+          flush
+          className="lg:col-span-2"
+        >
+          <DataTable
+            columns={bookingColumns}
+            data={recentBookings}
+            enableGlobalFilter={false}
+            emptyMessage="No bookings yet."
+          />
+        </CardSection>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Destinations</CardTitle>
-            <CardDescription>By bookings this year</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {topDestinations.map((d) => (
-              <div key={d.city} className="space-y-1.5">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-1.5 font-medium text-gray-900 dark:text-gray-100">
-                    <MapPin className="h-3.5 w-3.5 text-gray-400" />
-                    {d.city}
-                    <span className="font-normal text-gray-400">
-                      · {d.country}
-                    </span>
+        <CardSection
+          title="Top Destinations"
+          description="By bookings this year"
+          contentClassName="space-y-4"
+        >
+          {topDestinations.map((d) => (
+            <div key={d.city} className="space-y-1.5">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-1.5 font-medium text-gray-900 dark:text-gray-100">
+                  <MapPin className="h-3.5 w-3.5 text-gray-400" />
+                  {d.city}
+                  <span className="font-normal text-gray-400">
+                    · {d.country}
                   </span>
-                  <span className="tabular-nums text-gray-500 dark:text-gray-400">
-                    {d.bookings}
-                  </span>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-                  <div
-                    className="h-full rounded-full bg-primary-600 dark:bg-primary-500"
-                    style={{ width: `${d.share * 5}%` }}
-                  />
-                </div>
+                </span>
+                <span className="tabular-nums text-gray-500 dark:text-gray-400">
+                  {d.bookings}
+                </span>
               </div>
-            ))}
-          </CardContent>
-        </Card>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                <div
+                  className="h-full rounded-full bg-primary-600 dark:bg-primary-500"
+                  style={{ width: `${d.share * 5}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </CardSection>
       </div>
     </div>
   )

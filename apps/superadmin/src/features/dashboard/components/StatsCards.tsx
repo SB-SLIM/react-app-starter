@@ -1,4 +1,5 @@
 import { Building2, Users, UserCheck } from 'lucide-react'
+import { CardSection } from '@sb-codex/ui-components'
 import { useDashboardStats } from '../hooks/useDashboardStats'
 
 export function StatsCards() {
@@ -13,10 +14,7 @@ export function StatsCards() {
   return (
     <div className="grid gap-4 sm:grid-cols-3">
       {cards.map(({ label, value, icon: Icon }) => (
-        <div
-          key={label}
-          className="rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
-        >
+        <CardSection key={label}>
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-primary-50 p-2 dark:bg-primary-900/20">
               <Icon className="h-5 w-5 text-primary-600 dark:text-primary-400" />
@@ -30,7 +28,7 @@ export function StatsCards() {
               </p>
             </div>
           </div>
-        </div>
+        </CardSection>
       ))}
     </div>
   )
