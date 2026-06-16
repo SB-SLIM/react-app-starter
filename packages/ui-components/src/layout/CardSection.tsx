@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, CardContent, CardAction } from '../components/Card'
+import { Card, CardHeader, CardContent, CardAction } from '../components/Card'
 
 export interface CardSectionProps {
   title?: string
@@ -21,14 +21,16 @@ export const CardSection: React.FC<CardSectionProps> = ({
   return (
     <Card shadow={shadow} className={className}>
       {hasHeader && (
-        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-          {title && (
-            <h5 className="text-sm font-semibold leading-tight text-gray-900 dark:text-gray-100">
-              {title}
-            </h5>
-          )}
-          {actions && <CardAction>{actions}</CardAction>}
-        </div>
+        <CardHeader className="border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            {title && (
+              <h5 className="text-sm font-semibold leading-tight text-gray-900 dark:text-gray-100">
+                {title}
+              </h5>
+            )}
+            {actions && <CardAction>{actions}</CardAction>}
+          </div>
+        </CardHeader>
       )}
       <CardContent>{children}</CardContent>
     </Card>
