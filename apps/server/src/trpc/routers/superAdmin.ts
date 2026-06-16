@@ -122,7 +122,7 @@ export const superAdminRouter = router({
     list: superAdminProcedure
       .output(z.array(userSchema))
       .query(async ({ ctx }) => {
-        return ctx.db
+        const rows = await ctx.db
           .select({
             id: user.id,
             name: user.name,
@@ -132,6 +132,10 @@ export const superAdminRouter = router({
           })
           .from(user)
           .orderBy(desc(user.createdAt))
+        return rows.map((r) => ({
+          ...r,
+          platformRole: r.platformRole as PlatformRole | null,
+        }))
       }),
 
     get: superAdminProcedure
@@ -167,7 +171,11 @@ export const superAdminRouter = router({
           .innerJoin(organization, eq(organization.id, member.organizationId))
           .where(eq(member.userId, input.id))
 
-        return { ...u, orgs }
+        return {
+          ...u,
+          platformRole: u.platformRole as PlatformRole | null,
+          orgs,
+        }
       }),
 
     // Only platform owners can grant/revoke platform roles
