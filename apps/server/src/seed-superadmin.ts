@@ -7,9 +7,9 @@ import { db } from './db'
  * Bootstrap the first super admin.
  *
  * The platform has no other way to create the initial super admin: promoting a
- * user requires already being one (`superAdmin.users.setSuperAdmin`). This
+ * user requires already being one (`superAdmin.users.setPlatformRole`). This
  * script creates the account through better-auth (so the password is hashed the
- * same way login expects) then flips `is_super_admin = true` directly.
+ * same way login expects) then sets `platform_role = 'owner'` directly.
  *
  * Run against the superuser DATABASE_URL (like migrations) so RLS/grants don't
  * block the write — never the restricted `app` role.
@@ -44,10 +44,10 @@ async function main() {
     }
   }
 
-  // 2. Promote to super admin.
+  // 2. Promote to platform owner (highest platform role).
   const result = await db
     .update(user)
-    .set({ isSuperAdmin: true })
+    .set({ platformRole: 'owner' })
     .where(eq(user.email, email))
     .returning({ id: user.id })
 
@@ -56,7 +56,7 @@ async function main() {
     process.exit(1)
   }
 
-  console.log(`${email} is now a super admin.`)
+  console.log(`${email} is now a platform owner.`)
   process.exit(0)
 }
 

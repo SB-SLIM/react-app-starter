@@ -3,6 +3,11 @@
 // The role→permission MAPPING lives only in index.ts (server) — never shipped
 // to the browser. Permissions are `resource:action`.
 
+// ── Platform roles (superadmin axis) ─────────────────────────────────────────
+export const PLATFORM_ROLES = ['owner', 'admin', 'viewer'] as const
+export type PlatformRole = (typeof PLATFORM_ROLES)[number]
+
+// ── Tenant permissions ────────────────────────────────────────────────────────
 export const PERMISSIONS = [
   // Clients / CRM
   'clients:read',

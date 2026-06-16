@@ -2,7 +2,13 @@ import { z } from 'zod'
 import { eq, count, desc } from 'drizzle-orm'
 import { organization, member, user } from '@sb-codex/db'
 import { router } from '@sb-codex/api-contracts'
-import { superAdminProcedure } from '../superAdminProcedure'
+import { PLATFORM_ROLES, type PlatformRole } from '@sb-codex/acl'
+import {
+  superAdminProcedure,
+  platformOwnerProcedure,
+} from '../superAdminProcedure'
+
+const platformRoleEnum = z.enum(PLATFORM_ROLES)
 
 const orgSchema = z.object({
   id: z.string(),
@@ -17,7 +23,7 @@ const userSchema = z.object({
   id: z.string(),
   name: z.string(),
   email: z.string(),
-  isSuperAdmin: z.boolean(),
+  platformRole: platformRoleEnum.nullable(),
   createdAt: z.date(),
 })
 
@@ -121,7 +127,7 @@ export const superAdminRouter = router({
             id: user.id,
             name: user.name,
             email: user.email,
-            isSuperAdmin: user.isSuperAdmin,
+            platformRole: user.platformRole,
             createdAt: user.createdAt,
           })
           .from(user)
@@ -143,7 +149,7 @@ export const superAdminRouter = router({
             id: user.id,
             name: user.name,
             email: user.email,
-            isSuperAdmin: user.isSuperAdmin,
+            platformRole: user.platformRole,
             createdAt: user.createdAt,
           })
           .from(user)
@@ -164,12 +170,18 @@ export const superAdminRouter = router({
         return { ...u, orgs }
       }),
 
-    setSuperAdmin: superAdminProcedure
-      .input(z.object({ id: z.string(), isSuperAdmin: z.boolean() }))
+    // Only platform owners can grant/revoke platform roles
+    setPlatformRole: platformOwnerProcedure
+      .input(
+        z.object({
+          id: z.string(),
+          platformRole: platformRoleEnum.nullable(),
+        }),
+      )
       .mutation(async ({ ctx, input }) => {
         await ctx.db
           .update(user)
-          .set({ isSuperAdmin: input.isSuperAdmin })
+          .set({ platformRole: input.platformRole as PlatformRole | null })
           .where(eq(user.id, input.id))
         return { success: true }
       }),
