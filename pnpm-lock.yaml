@@ -294,6 +294,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.4.0
         version: 5.4.0(react-hook-form@7.78.0(react@19.2.7))
+      '@sb-codex/acl':
+        specifier: workspace:^
+        version: link:../../packages/acl
       '@sb-codex/api-contracts':
         specifier: workspace:^
         version: link:../../packages/api-contracts
