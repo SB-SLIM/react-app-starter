@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500&display=swap');
 @import '@sb-codex/ui-components/theme.css';
 
 /* Scan this app's own components for Tailwind classes. */
@@ -11,12 +12,208 @@
   margin: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+body {
+  background: var(--bg);
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+}
+
+/* ── Design tokens ────────────────────────────────────────── */
+:root {
+  /* Zinc scale */
+  --zinc-950: #09090b;
+  --zinc-925: #0c0c0f;
+  --zinc-900: #18181b;
+  --zinc-850: #1f1f23;
+  --zinc-800: #27272a;
+  --zinc-700: #3f3f46;
+  --zinc-600: #52525b;
+  --zinc-500: #71717a;
+  --zinc-400: #a1a1aa;
+  --zinc-300: #d4d4d8;
+  --zinc-200: #e4e4e7;
+  --white: #fafafa;
+
+  /* Brand accent ramp */
+  --indigo-300: #a5b4fc;
+  --indigo-400: #818cf8;
+  --indigo-500: #6366f1;
+  --indigo-600: #4f46e5;
+  --indigo-700: #4338ca;
+  --violet-300: #c4b5fd;
+  --violet-400: #a78bfa;
+  --violet-500: #8b5cf6;
+  --violet-600: #7c3aed;
+
+  /* Secondary accents */
+  --emerald-300: #6ee7b7;
+  --emerald-400: #34d399;
+  --emerald-500: #10b981;
+  --cyan-300: #67e8f9;
+  --cyan-400: #22d3ee;
+  --cyan-500: #06b6d4;
+  --rose-400: #fb7185;
+  --amber-400: #fbbf24;
+
+  /* Surfaces */
+  --bg: var(--zinc-950);
+  --bg-elevated: var(--zinc-925);
+  --surface-card: rgba(255, 255, 255, 0.02);
+  --surface-card-hover: rgba(255, 255, 255, 0.04);
+  --surface-inset: rgba(255, 255, 255, 0.03);
+  --surface-code: #0b0b0e;
+
+  /* Borders */
+  --border-card: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --border-accent: rgba(129, 140, 248, 0.4);
+
+  /* Text */
+  --text-primary: #fafafa;
+  --text-secondary: var(--zinc-400);
+  --text-muted: var(--zinc-500);
+  --text-faint: var(--zinc-600);
+  --text-on-accent: #ffffff;
+
+  /* Brand gradients */
+  --accent: var(--indigo-400);
+  --accent-from: var(--indigo-400);
+  --accent-to: var(--violet-400);
+  --gradient-brand: linear-gradient(
+    120deg,
+    var(--indigo-400),
+    var(--violet-400)
+  );
+  --gradient-brand-strong: linear-gradient(
+    120deg,
+    var(--indigo-500),
+    var(--violet-500)
+  );
+
+  /* Functional accents */
+  --accent-success: var(--emerald-400);
+  --accent-terminal: var(--cyan-400);
+  --accent-danger: var(--rose-400);
+  --accent-warn: var(--amber-400);
+
+  /* Glow blobs */
+  --glow-indigo: rgba(79, 70, 229, 0.1);
+  --glow-violet: rgba(124, 58, 237, 0.08);
+  --glow-cyan: rgba(34, 211, 238, 0.06);
+
+  /* Glow shadows */
+  --glow-accent:
+    0 0 0 1px rgba(129, 140, 248, 0.3), 0 12px 40px rgba(99, 102, 241, 0.25);
+  --glow-accent-sm: 0 8px 30px rgba(99, 102, 241, 0.22);
+  --glow-emerald: 0 8px 30px rgba(16, 185, 129, 0.18);
+  --glow-cyan: 0 8px 30px rgba(34, 211, 238, 0.16);
+
+  /* Fonts */
+  --font-sans:
+    'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    system-ui, sans-serif;
+  --font-mono:
+    'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace;
+  --font-display: var(--font-sans);
+
+  /* Font weights */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-extrabold: 800;
+  --fw-black: 900;
+
+  /* Fluid sizes */
+  --text-display: clamp(2.75rem, 1.4rem + 6vw, 5.25rem);
+  --text-h1: clamp(2.25rem, 1.4rem + 3.8vw, 3.5rem);
+  --text-h2: clamp(1.875rem, 1.2rem + 2.6vw, 2.75rem);
+  --text-h3: clamp(1.375rem, 1.1rem + 1.2vw, 1.75rem);
+  --text-h4: 1.25rem;
+
+  /* Tracking */
+  --tracking-tighter: -0.04em;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.02em;
+  --tracking-label: 0.12em;
+
+  /* Leading */
+  --leading-tight: 1.08;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  /* Layout */
+  --container-max: 1200px;
+  --container-narrow: 760px;
+  --gutter: clamp(1.25rem, 5vw, 3rem);
+  --section-y: clamp(4rem, 9vw, 8rem);
+
+  /* Radii */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-pill: 999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
+  --shadow-inset-top: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  /* Blur */
+  --blur-glass: 14px;
+  --blur-blob: 100px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+}
+
+/* ── Animations ───────────────────────────────────────────── */
+@keyframes sbxPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes sbxBlink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ── Scroll-reveal ────────────────────────────────────────── */
+/* Content is visible by default (SSR/no-JS fallback).
+   The Reveal component applies hidden state via JS on mount. */
