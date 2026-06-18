@@ -102,14 +102,12 @@ export function NavBar() {
                 textDecoration: 'none',
                 transition: 'color 0.2s',
               }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLAnchorElement).style.color =
-                  'var(--text-primary)')
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLAnchorElement).style.color =
-                  'var(--text-secondary)')
-              }
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--text-primary)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-secondary)'
+              }}
             >
               {l.label}
             </a>
@@ -136,14 +134,12 @@ export function NavBar() {
                 'transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-base) var(--ease-out)',
             }}
             onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement
-              el.style.boxShadow = 'var(--glow-accent)'
-              el.style.transform = 'translateY(-1px)'
+              e.currentTarget.style.boxShadow = 'var(--glow-accent)'
+              e.currentTarget.style.transform = 'translateY(-1px)'
             }}
             onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLAnchorElement
-              el.style.boxShadow = 'var(--glow-accent-sm)'
-              el.style.transform = 'none'
+              e.currentTarget.style.boxShadow = 'var(--glow-accent-sm)'
+              e.currentTarget.style.transform = 'none'
             }}
           >
             Launch app →
@@ -232,14 +228,12 @@ export function NavBar() {
                   textDecoration: 'none',
                   transition: 'color 0.2s',
                 }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.color =
-                    'var(--text-primary)')
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLAnchorElement).style.color =
-                    'var(--text-secondary)')
-                }
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--text-primary)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--text-secondary)'
+                }}
               >
                 {l.label}
               </a>

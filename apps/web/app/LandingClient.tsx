@@ -268,22 +268,20 @@ function Card({
       onMouseEnter={
         interactive
           ? (e) => {
-              const el = e.currentTarget as HTMLDivElement
-              el.style.background = 'var(--surface-card-hover)'
-              el.style.borderColor = ring
-              el.style.boxShadow = glow
-              el.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.background = 'var(--surface-card-hover)'
+              e.currentTarget.style.borderColor = ring
+              e.currentTarget.style.boxShadow = glow
+              e.currentTarget.style.transform = 'translateY(-2px)'
             }
           : undefined
       }
       onMouseLeave={
         interactive
           ? (e) => {
-              const el = e.currentTarget as HTMLDivElement
-              el.style.background = 'var(--surface-card)'
-              el.style.borderColor = 'var(--border-card)'
-              el.style.boxShadow = 'none'
-              el.style.transform = 'none'
+              e.currentTarget.style.background = 'var(--surface-card)'
+              e.currentTarget.style.borderColor = 'var(--border-card)'
+              e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.transform = 'none'
             }
           : undefined
       }
@@ -478,14 +476,13 @@ function LandingButton({
     <a
       href={href ?? '#'}
       style={baseStyle}
-      onMouseEnter={(e) => h.enter(e.currentTarget as HTMLElement)}
-      onMouseLeave={(e) => h.leave(e.currentTarget as HTMLElement)}
+      onMouseEnter={(e) => h.enter(e.currentTarget)}
+      onMouseLeave={(e) => h.leave(e.currentTarget)}
       onMouseDown={(e) => {
-        ;(e.currentTarget as HTMLElement).style.transform =
-          'translateY(0) scale(0.985)'
+        e.currentTarget.style.transform = 'translateY(0) scale(0.985)'
       }}
       onMouseUp={(e) => {
-        ;(e.currentTarget as HTMLElement).style.transform =
+        e.currentTarget.style.transform =
           variant === 'primary' ? 'translateY(-1px)' : 'none'
       }}
     >
@@ -1141,14 +1138,12 @@ function Footer() {
                 textDecoration: 'none',
                 transition: 'color 0.2s',
               }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLAnchorElement).style.color =
-                  'var(--text-primary)')
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLAnchorElement).style.color =
-                  'var(--text-secondary)')
-              }
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--text-primary)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-secondary)'
+              }}
             >
               {l.label}
             </a>
@@ -1166,13 +1161,12 @@ function Footer() {
               textDecoration: 'none',
               transition: 'color 0.2s',
             }}
-            onMouseEnter={(e) =>
-              ((e.currentTarget as HTMLAnchorElement).style.color =
-                'var(--zinc-400)')
-            }
-            onMouseLeave={(e) =>
-              ((e.currentTarget as HTMLAnchorElement).style.color = 'inherit')
-            }
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--zinc-400)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'inherit'
+            }}
           >
             Slim Bouchoucha
           </a>{' '}
