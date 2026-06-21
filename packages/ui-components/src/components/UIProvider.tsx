@@ -1,6 +1,9 @@
 'use client'
 
 import React from 'react'
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import { muiLightTheme, muiDarkTheme } from '../mui-theme'
 
 export type Theme = 'light' | 'dark'
 
@@ -58,7 +61,16 @@ export const UIProvider: React.FC<UIProviderProps> = ({
     [theme],
   )
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  const muiTheme = theme === 'dark' ? muiDarkTheme : muiLightTheme
+
+  return (
+    <ThemeContext.Provider value={value}>
+      <MuiThemeProvider theme={muiTheme}>
+        <CssBaseline />
+        {children}
+      </MuiThemeProvider>
+    </ThemeContext.Provider>
+  )
 }
 
 export function useTheme(): ThemeContextValue {
