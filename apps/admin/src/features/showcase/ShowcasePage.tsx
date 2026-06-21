@@ -694,9 +694,7 @@ export function ShowcasePage() {
         <div className="flex flex-wrap gap-3">
           <Button
             variant="outline"
-            onClick={() =>
-              toast('Booking saved', { description: 'Changes are live.' })
-            }
+            onClick={() => toast('Booking saved — changes are live.')}
           >
             Default
           </Button>
@@ -714,11 +712,7 @@ export function ShowcasePage() {
           </Button>
           <Button
             variant="outline"
-            onClick={() =>
-              toast('Trip confirmed', {
-                action: { label: 'Undo', onClick: () => {} },
-              })
-            }
+            onClick={() => toast.info('Trip confirmed')}
           >
             With action
           </Button>
