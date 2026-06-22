@@ -36,7 +36,7 @@
     "dev": "tsup --watch"
   },
   "dependencies": {
-    "@clack/prompts": "^0.7.0",
+    "@clack/prompts": "^1.6.0",
     "giget": "^3.3.0",
     "picocolors": "^1.1.1"
   },
